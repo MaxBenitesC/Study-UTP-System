@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_1/Ejercicio_1.iml" filepath="$PROJECT_DIR$/../Ejercicio_1/Ejercicio_1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_2/Ejercicio_2.iml" filepath="$PROJECT_DIR$/../Ejercicio_2/Ejercicio_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_3/Ejercicio_3.iml" filepath="$PROJECT_DIR$/../Ejercicio_3/Ejercicio_3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_4/Ejercicio_4.iml" filepath="$PROJECT_DIR$/../Ejercicio_4/Ejercicio_4.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_5/Ejercicio_5.iml" filepath="$PROJECT_DIR$/../Ejercicio_5/Ejercicio_5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Ejercicio_6/Ejercicio_6.iml" filepath="$PROJECT_DIR$/../Ejercicio_6/Ejercicio_6.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PatronFactoryMethod.iml" filepath="$PROJECT_DIR$/PatronFactoryMethod.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../PatronSingleton/PatronSingleton.iml" filepath="$PROJECT_DIR$/../PatronSingleton/PatronSingleton.iml" />
+    </modules>
+  </component>
+</project>

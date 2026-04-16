@@ -1,0 +1,153 @@
+conceptos previos:
+Programación Orientada a Objetos: parecida a la forma de percibir el mundo real por parte de los seres humanos: objetos que se relacionan (se comunican mediante mensajes=invocación a métodos) 
+Clase: plantilla para la creación de objetos.
+Instancia: objeto creado
+MIEMBRO Atributo / campo: variables de instancia (forman parte de los datos de un objeto)
+MIEMBRO Operación / método: actividades que realiza un objeto
+MIEMBROS del objeto (no static) y MIEMBROS de la clase(static)
+CONSTRUCTOR: método que se invoca (con new) para instanciar un objeto. Tiene el mismo nombre que la clase a la que pertenece y no tiene tipo de retorno. 
+SOBRECARGA de métodos: tipo de polimorfismo DENTRO de la clase, donde se diferencian por el número o tipo de parámetros. 
+SOBRESCRITURA con toString(): tipo de polimorfismo ENTRE clases (super clase=base y sub clase=derivada). Sirve para desplegar (imprimir los valores los campos) un objeto.
+VISIBILIDAD private(accesible solo DENTRO de SU clase) y public(accesible en TODA la aplicación)
+THIS: referencia al OBJETO actual
+RELACIÓN (1 de 4) DE HERENCIA: "jerarquía" donde la instancia de la subclase incialmente es un gemelo de su superclase. Luego se "extiende" (añaden ESTADO y COMPORTAMIENTO propios del la instancia hija.
+MODELO: descripción, resumen, diagrama, bosquejo, construcción que es una ABSTRACCIÓN que facilita la solución de un problema COMPLEJO. Ejm: maqueta de los arquitectos.
+UML: estándar de modelamiento para la orientación a objetos
+
+mano alzada / Paint
+diagramador( draw.io, lucidchar, …)
+software (starUML, Rational, complemento EASYUML del NetBeans, …)
+
+
+CASO EJEMPLO1: UML en formato de texto para la clase Estudiante con campos nombre string, codigo int, sexo boolean. Un campo de la clase cantidaddeestudiantes que tenga la cantidad de estudiantes creado. redefine toString() para mostrar en consola  los valores de los campos. sobrecarga los constructores. la visibilidad de todos los campos debe ser private y por tanto los accesores (getters y setters) son public. 
+En la prueba con la clase principal, instancia 2 estudiantes. Solicita los valores de los campos desde Joptionpane. La salida tambien muestrala con joptionpane. Genera el codigo java para ese diagrama UML.
+
++----------------------------------+
+|         <<Clase>> Estudiante     |
++----------------------------------+
+| - nombre: String                 |
+| - codigo: int                    |
+| - sexo: boolean                  |
+| - cantidadEstudiantes: int       |                                                                                             static
+|   ________________________       |
++----------------------------------+
+| + Estudiante()                   |
+| + Estudiante(nombre: String)     |
+| + Estudiante(nombre: String,     |
+|             codigo: int)         |
+| + Estudiante(nombre: String,     |
+|             codigo: int,         |
+|             sexo: boolean)       |
+| + getNombre(): String            |
+| + setNombre(nombre: String): void|
+| + getCodigo(): int               |
+| + setCodigo(codigo: int): void   |
+| + isSexo(): boolean              |
+| + setSexo(sexo: boolean): void   |
+| + getCantidadEstudiantes(): int  |                                                                                             static
+|   ________________________       |
+| + toString(): String             |
++----------------------------------+
+package demomain;
+// Archivo: DemoMain.java
+import javax.swing.*;
+public class DemoMain {
+   public static void main(String[] args) {
+              // Instancia 1: Constructor sin parámetros
+       JOptionPane.showMessageDialog(null,
+               "Ingresa datos para el primer estudiante (constructor vacío)",
+               "Constructor por defecto", JOptionPane.INFORMATION_MESSAGE);
+
+       Estudiante est1 = new Estudiante();
+       est1.setNombre(JOptionPane.showInputDialog("Nombre del estudiante:"));
+       String codigoStr = JOptionPane.showInputDialog("Código del estudiante:");
+       est1.setCodigo(Integer.parseInt(codigoStr));
+       String sexoStr = JOptionPane.showInputDialog("Sexo (M/F):");
+       est1.setSexo(sexoStr.toUpperCase().charAt(0) == 'M');
+
+       // Instancia 2: Constructor con nombre, código y sexo
+       JOptionPane.showMessageDialog(null,
+               "Ingresa datos para el segundo estudiante (todos los parámetros)",
+               "Constructor completo", JOptionPane.INFORMATION_MESSAGE);
+       String nombre2 = JOptionPane.showInputDialog("Nombre del estudiante:");
+       String codigo2Str = JOptionPane.showInputDialog("Código del estudiante:");
+       int codigo2 = Integer.parseInt(codigo2Str);
+       String sexo2Str = JOptionPane.showInputDialog("Sexo (M/F):");
+       boolean sexo2 = sexo2Str.toUpperCase().charAt(0) == 'M';
+
+       Estudiante est2 = new Estudiante(nombre2, codigo2, sexo2);
+
+       // Mostrar resultados con JOptionPane
+       String mensaje = "Estudiante 1:\n" + est1.toString() +
+               "\n\nEstudiante 2:\n" + est2.toString() +
+               "\n\nTotal de estudiantes creados: " +
+               Estudiante.getCantidadEstudiantes();
+
+       JOptionPane.showMessageDialog(null, mensaje, "Resultados",
+               JOptionPane.INFORMATION_MESSAGE);
+
+       // Salida también en consola (opcional)
+       System.out.println(est1);
+       System.out.println(est2);
+       System.out.println("Cantidad total de estudiantes: " 
+               + Estudiante.getCantidadEstudiantes());
+   }
+}
+
+package demomain;
+public class Estudiante {
+   // Atributos privados
+   private String nombre;
+   private int codigo;
+   private boolean sexo; // true = masculino, false = femenino
+   private static int cantidadEstudiantes = 0;
+   // Constructores sobrecargados
+   public Estudiante() {
+       this.nombre = "Sin nombre";
+       this.codigo = 0;
+       this.sexo = true; // por defecto masculino
+       cantidadEstudiantes++;
+   }
+   public Estudiante(String nombre) {
+       this.nombre = nombre;
+       this.codigo = 0;
+       this.sexo = true;
+       cantidadEstudiantes++;
+   }
+   public Estudiante(String nombre, int codigo) {
+       this.nombre = nombre;
+       this.codigo = codigo;
+       this.sexo = true;
+       cantidadEstudiantes++;
+   }
+
+   public Estudiante(String nombre, int codigo, boolean sexo) {
+       this.nombre = nombre;
+       this.codigo = codigo;
+       this.sexo = sexo;
+       cantidadEstudiantes++;
+   }
+   // Getters y Setters
+   public String getNombre() {  return nombre;  }
+   public void setNombre(String nombre) {   this.nombre = nombre;   }
+   public int getCodigo() {  return codigo;   }
+   public void setCodigo(int codigo) {   this.codigo = codigo;  }
+   public boolean isSexo() {  return sexo; }
+   public void setSexo(boolean sexo) {  this.sexo = sexo;    }
+   public static int getCantidadEstudiantes() {
+       return cantidadEstudiantes;
+   }
+
+   // Método toString sobrescrito
+   @Override
+   public String toString() {
+       return "Estudiante{" +
+               "nombre='" + nombre + '\'' +
+               ", codigo=" + codigo +
+               ", sexo=" + (sexo ? "Masculino" : "Femenino") +
+               '}';
+   }
+}
+
+
+ 

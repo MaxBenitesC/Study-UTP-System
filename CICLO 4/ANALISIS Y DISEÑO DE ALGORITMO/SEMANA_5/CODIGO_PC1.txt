@@ -1,0 +1,418 @@
+//MAIN
+
+public class Main {
+    public static void main(String[] args) {
+        int[] vector1 = new int[] {40,23,56,112,57,64,234,8};
+        int[] vector2 = new int[] {6,278,76,172,27,604,24,8,-5,-8,0};
+        int[] vector3 = new int[] {5,2,1,8,3,9,7,6,-5,-3,0,-6};
+        int[] vector4 = new int[] {58,14,78,20,3,0,-15,14,72,65,-5,-1,10};
+        int[] vector5 = new int[] {32,6,22,11,9,7,1,32,-8,0,2,35};
+        AlgoritmoDeOrdenamiento a = new AlgoritmoDeOrdenamiento(vector1);
+        long start = System.nanoTime();
+        System.out.println("==================================");
+        System.out.println("ARREGLO ORINIGAL 1:");
+        a.mostrarArreglo_2(vector1);
+        System.out.println("ARREGLO ORDENADO POR SELECCION:");
+        a.ordenamientoSeleccion(vector1);
+        System.out.println("==================================");
+        System.out.println("ARREGLO ORIGINAL 2:");
+        a.mostrarArreglo_2(vector2);
+        System.out.println("ARREGLO ORDENADO POR MEZCLA DIRECTA:");
+        vector2=a.mezclaDirecta(vector2);
+        a.mostrarArreglo_2(vector2);
+        System.out.println("==================================");
+        System.out.println("ARREGLO ORIGINAL 3:");
+        a.mostrarArreglo_2(vector3);
+        System.out.println("ARREGLO ORDENADO POR MEZCLA NATURAL:");
+        a.mezclaNatural(vector3);
+        a.mostrarArreglo_2(vector3);
+        System.out.println("==================================");
+        System.out.println("ARREGLO ORIGINAL 4:");
+        a.mostrarArreglo_2(vector4);
+        System.out.println("ARREGLO ORDENADO POR BURBUJA:");
+        a.ordenamientoBurbuja(vector4);
+        System.out.println("==================================");
+        System.out.println("ARREGLO ORIGINAL 5:");
+        a.mostrarArreglo_2(vector5);
+        System.out.println("ARREGLO ORDENADO POR INSERCION:");
+        a.ordenamientoInsercion(vector5);
+        System.out.println("==================================");
+
+        long end = System.nanoTime();
+        long tiempoTotal= end-start;
+        System.out.println("\nEl tiempo total de ejecución es de: " + tiempoTotal + "ns.");
+    }
+
+}
+
+//CLASE AlgoritmoDeOrdenamiento:
+
+public class AlgoritmoDeOrdenamiento {
+    private int arreglo[];
+
+    public AlgoritmoDeOrdenamiento(int arreglo[]){
+        this.arreglo=arreglo;
+    }
+
+    public void ordenamientoBurbuja(int[] arr){
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j= 0; j < n - i -1; j++) {
+                if (arr[j] > arr[j + 1]){
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+        mostrarArreglo_2(arr);
+    }
+
+    public void ordenamientoSeleccion(int[] arr){
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int min = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[min]){
+                    min = j;
+                }
+            }
+            int temp=arr[min];
+            arr[min]=arr[i];
+            arr[i] = temp;
+        }
+        mostrarArreglo_2(arr);
+    }
+
+    public void ordenamientoInsercion(int[] arr){
+        int n = arr.length;
+        for (int i = 1; i < n; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+        mostrarArreglo_2(arr);
+    }
+
+    public int [] mezclaDirecta(int[] arreglo){
+        int i,j,k;
+        if(arreglo.length >1){
+            int nElementosIzq = arreglo.length / 2;
+            int nElementosDer = arreglo.length - nElementosIzq;
+            int[] arregloIzq = new int[nElementosIzq];
+            int[] arregloDer = new int[nElementosDer];
+
+            for (i = 0; i < nElementosIzq; i++) {
+                arregloIzq[i]=arreglo[i];
+            }
+            for (i = nElementosIzq; i < nElementosIzq + nElementosDer; i++) {
+                arregloDer[i - nElementosIzq] = arreglo[i];
+            }
+            //RECURSIVIDAD
+            arregloIzq = mezclaDirecta(arregloIzq);
+            arregloDer = mezclaDirecta(arregloDer);
+            i = 0;
+            j = 0;
+            k = 0;
+            while (arregloIzq.length != j && arregloDer.length != k) {
+                if (arregloIzq[j]<arregloDer[k]) {
+                    arreglo[i] = arregloIzq[j];
+                    i++;
+                    j++;
+                } else{
+                    arreglo[i] = arregloDer[k];
+                    i++;
+                    k++;
+                }
+            }
+            //ARREGLO FINAL
+            while (arregloIzq.length != j ) {
+                arreglo[i] = arregloIzq[j];
+                i++;
+                j++;
+            }
+            while (arregloDer.length != k) {
+                arreglo[i] = arregloDer[k];
+                i++;
+                k++;
+            }
+        }//Fin del if
+        return arreglo;
+    }
+
+    public void mezclaNatural(int[] arreglo){
+        int izquierda=0,izq=0,derecha=arreglo.length-1,der=derecha;
+        boolean ordenado=false;
+        do {
+            ordenado=true;
+            izquierda=0;
+            while (izquierda < derecha) {
+                izq=izquierda;
+                while (izq < derecha && arreglo[izq] <= arreglo[izq + 1]) {
+                    izq++;
+                }
+                der=izq+1;
+                while (der==derecha-1 || der < derecha && arreglo[der] <= arreglo[der+1]) {
+                    der++;
+                }
+                if (der <= derecha) {
+                    mezclaDirecta2(arreglo);
+                    ordenado=false;
+                }
+                izquierda=izq;
+            }
+        } while (!ordenado);
+    }
+
+    public void mezclaDirecta2(int[] arreglo){
+        int i,j,k;
+        if(arreglo.length >1){
+            int nElementosIzq = arreglo.length / 2;
+            int nElementosDer = arreglo.length - nElementosIzq;
+            int[] arregloIzq = new int[nElementosIzq];
+            int[] arregloDer = new int[nElementosDer];
+
+            for (i = 0; i < nElementosIzq; i++) {
+                arregloIzq[i]=arreglo[i];
+            }
+            for (i = nElementosIzq; i < nElementosIzq + nElementosDer; i++) {
+                arregloDer[i - nElementosIzq] = arreglo[i];
+            }
+            //RECURSIVIDAD
+            arregloIzq = mezclaDirecta(arregloIzq);
+            arregloDer = mezclaDirecta(arregloDer);
+            i = 0;
+            j = 0;
+            k = 0;
+            while (arregloIzq.length != j && arregloDer.length != k) {
+                if (arregloIzq[j]<arregloDer[k]) {
+                    arreglo[i] = arregloIzq[j];
+                    i++;
+                    j++;
+                } else{
+                    arreglo[i] = arregloDer[k];
+                    i++;
+                    k++;
+                }
+            }
+            //ARREGLO FINAL
+            while (arregloIzq.length != j ) {
+                arreglo[i] = arregloIzq[j];
+                i++;
+                j++;
+            }
+            while (arregloDer.length != k) {
+                arreglo[i] = arregloDer[k];
+                i++;
+                k++;
+            }
+        }
+    }
+
+    public void mostrarArreglo_2(int[] arreglo){
+        int k;
+        for (k = 0; k < arreglo.length; k++) {
+            System.out.print("[" + arreglo[k] + "]");
+        }
+        System.out.println();
+    }
+}
+
+
+###########################################################################################
+MAIN:
+
+import java.util.Random;
+public class Main {
+    public static void main(String[] args) {
+        int n = 100000;
+        int[] arreglo = generarArreglo(n);
+
+        // Clonar arreglo para probar cada algoritmo con la misma entrada
+        int[] arrBurbuja = arreglo.clone();
+        int[] arrSeleccion = arreglo.clone();
+        int[] arrInsercion = arreglo.clone();
+
+        // Burbuja
+        long inicio = System.nanoTime();
+        AlgoritmoOrdenamientoInterno.burbuja(arrBurbuja);
+        long fin = System.nanoTime();
+        long tiempoBurbuja = fin - inicio;
+        System.out.println("Burbuja: \t" + tiempoBurbuja + " ns");
+
+        // Selección
+        inicio = System.nanoTime();
+        AlgoritmoOrdenamientoInterno.seleccion(arrSeleccion);
+        fin = System.nanoTime();
+        long tiempoSeleccion = fin - inicio;
+        System.out.println("Selección: \t" + tiempoSeleccion + " ns");
+
+        // Inserción
+        inicio = System.nanoTime();
+        AlgoritmoOrdenamientoInterno.insercion(arrInsercion);
+        fin = System.nanoTime();
+        long tiempoInsercion = fin - inicio;
+        System.out.println("Inserción: \t" + tiempoInsercion + " ns");
+
+        //Intercalación 1 ya ordenados
+        int[] x ={4,8,12,16,20,22,30};
+        int[] y ={2,5,6,13};
+        inicio = System.nanoTime();
+        int[] c = AlgoritmoOrdenamientoExterno.intercalacion(x, y);
+        System.out.println(AlgoritmoOrdenamientoExterno.muestraArreglo(x, y, c));
+        fin = System.nanoTime();
+        long tiempoIntercala1 = fin - inicio;
+        System.out.println("Intercalación 1: \t" + tiempoIntercala1 + " ns");
+
+        //Intercalación 2 ordenando por insercion
+        int[] p ={12,38,142,16,-20,22,-30};
+        int[] q ={12,57,-6,13,0};
+        inicio = System.nanoTime();
+        int[] p_ordenado = AlgoritmoOrdenamientoInterno.insercion2(p);
+        int[] q_ordenado = AlgoritmoOrdenamientoInterno.insercion2(q);
+        int[] r = AlgoritmoOrdenamientoExterno.intercalacion(p_ordenado, q_ordenado);
+        System.out.println(AlgoritmoOrdenamientoExterno.muestraArreglo(p_ordenado, q_ordenado, r));
+        fin = System.nanoTime();
+        long tiempoIntercala2 = fin - inicio;
+        System.out.println("Intercalación 2: \t" + tiempoIntercala2 + " ns");
+
+        // Intercalación 2
+//        inicio = System.nanoTime();
+//        int[] a= AlgoritmoOrdenamientoInterno.insercion2(arrBurbuja);
+//        int[] b= AlgoritmoOrdenamientoInterno.insercion2(arrSeleccion);
+//        int[] c = AlgoritmoOrdenamientoExterno.intercalacion(a, b);
+//        System.out.println(AlgoritmoOrdenamientoExterno.muestraArreglo(a, b, c));
+//        fin = System.nanoTime();
+//        long tiempoIntercalacion = fin - inicio;
+//        System.out.println("Intercalación: \t" + tiempoIntercalacion + " ns");
+    }
+
+    // Genera arreglo aleatorio
+    public static int[] generarArreglo(int n) {
+        Random rnd = new Random();
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = rnd.nextInt(100000); // valores entre 0 y 100000
+            System.out.println("Elemento "+i+" = "+arr[i]);
+        }
+        return arr;
+    }
+}
+
+CLASE ORDENAMIENTO INTERNO:
+public class AlgoritmoOrdenamientoInterno {
+    public static void burbuja(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    public static void seleccion(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int min = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[min]) {
+                    min = j;
+                }
+            }
+            int temp = arr[min];
+            arr[min] = arr[i];
+            arr[i] = temp;
+        }
+    }
+
+    public static void insercion(int[] arr) {
+        int n = arr.length;
+        for (int i = 1; i < n; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+
+    public static int [] insercion2(int[] arr) {
+        int n = arr.length;
+        for (int i = 1; i < n; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+        return arr;
+    }
+}
+
+
+CLASE ORDENAMIENTO EXTERNO:
+import java.util.Arrays;
+
+public class AlgoritmoOrdenamientoExterno {
+    public static int[] intercalacion(int[] arr1, int[] arr2) {
+        int tamano1 = arr1.length, tamano2 = arr2.length;
+        int[] arr3 = new int[tamano1 + tamano2];
+        int i = 0, j = 0, k = -1;
+
+        // Intercalación
+        while (i <= tamano1 - 1 && j <= tamano2 - 1) {
+            k++;
+            if (arr1[i] < arr2[j]) {
+                arr3[k] = arr1[i];
+                i++;
+            } else {
+                arr3[k] = arr2[j];
+                j++;
+            }
+        }
+
+        // Copiar sobrantes de arr1
+        if (i <= tamano1 - 1) {
+            for (int m = i; m <= tamano1 - 1; m++) {
+                k++;
+                arr3[k] = arr1[m];
+            }
+        }
+        // Copiar sobrantes de arr2
+        else {
+            for (int m = j; m <= tamano2 - 1; m++) {
+                k++;
+                arr3[k] = arr2[m];
+            }
+        }
+
+        return arr3;
+    }
+
+    public static String muestraArreglo(int[] arr1, int[] arr2, int[] arr3) {
+        return Arrays.toString(arr1) + "\n" +
+                Arrays.toString(arr2) + "\n" +
+                Arrays.toString(arr3);
+    }
+}
+
+
+//
+Runtime runtime = Runtime.getRuntime();
+runtime.gc(); // Limpia memoria basura
+long memoriaAntes = runtime.totalMemory() - runtime.freeMemory();
+// ... tu código ...
+long memoriaDespues = runtime.totalMemory() - runtime.freeMemory();
+System.out.println("Memoria usada (bytes): " + (memoriaDespues - memoriaAntes));

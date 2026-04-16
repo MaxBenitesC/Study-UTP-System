@@ -1,0 +1,558 @@
+MAIN:
+
+public class Main {
+    public static void main(String[] args) {
+        ModoDeJuego mododejuego=new ModoDeJuego();
+        do{
+            mododejuego.eleccionModoJuego();
+            if (mododejuego.getModoJuego() == 1) {
+                Jugador[] jugadores = new Jugador[mododejuego.getNumJugadores()];
+                RegistrodeJugadores registrar = new RegistrodeJugadores();
+                registrar.registrarJugador(jugadores);
+                registrar.mostrarInfoJugador(jugadores);
+                MensajeDurantePartida.mostrarInicioPartida();
+                ModoSolitario modosolitario = new ModoSolitario();
+                modosolitario.jugarModoSolitario(jugadores);
+            } else if (mododejuego.getModoJuego() == 2){
+                Jugador[] jugadoresVersus = new Jugador[mododejuego.getNumJugadores()];
+                RegistrodeJugadores registrar = new RegistrodeJugadores();
+                registrar.registrarJugador(jugadoresVersus);
+                registrar.mostrarInfoJugador(jugadoresVersus);
+                MensajeDurantePartida.mostrarInicioPartida();
+                ModoVersus modoversus = new ModoVersus();
+                modoversus.jugarModoVersus(jugadoresVersus, mododejuego.getNumJugadores());
+            }
+        }while(mododejuego.getModoJuego()!=9);
+    }
+}
+
+ModoDeJuego:
+
+import java.util.Scanner;
+
+public class ModoDeJuego {
+    private int modoJuego;
+    private int numJugadores;
+
+    public void eleccionModoJuego() {
+        Scanner teclado = new Scanner(System.in);
+        do{
+            mostrarMenuPrincipal.mostrar();
+            System.out.print("Elige una opción: ");
+            modoJuego = teclado.nextInt();
+            switch (modoJuego) {
+                case 1:
+                    System.out.println("Modo Solitario seleccionado.");
+                    numJugadores = 1;
+                    break;
+                case 2:
+                    System.out.println("Modo Versus seleccionado.");
+                    while (numJugadores != 2 && numJugadores != 3) {
+                        System.out.print("Ingrese cantidad de jugadores (2 o 3): ");
+                        numJugadores = teclado.nextInt();
+                    }
+                    break;
+                case 9:
+                    System.out.println("¡Adios!");
+                    return;
+                default:
+                    System.out.println("Opción inválida. Intenta nuevamente.");
+            }
+        } while (modoJuego != 1 && modoJuego != 2);
+    }
+
+    public int getModoJuego() {
+        return modoJuego;
+    }
+
+    public int getNumJugadores() {
+        return numJugadores;
+    }
+}
+
+REGISTRO DE JUGADORES:
+
+import java.util.Scanner;
+
+public class RegistrodeJugadores {
+
+    public void registrarJugador(Jugador[] jugadores) {
+        Scanner teclado = new Scanner(System.in);
+        String nombre;
+        String rol = "";
+        int opcionRol;
+        for (int i = 0; i < jugadores.length; i++) {
+            System.out.println("\n╔═════════════════════════════╗");
+            System.out.println("║    REGISTRO DE JUGADOR " + (i + 1) + "    ║");
+            System.out.println("╚═════════════════════════════╝");
+            System.out.print("Ingrese su nombre: ");
+            nombre = teclado.next();
+            do {
+                System.out.println("Muy bien " + nombre + " - Elige tu personaje:");
+                System.out.println("┌─────┬──────────┐");
+                System.out.println("│ [1] │ FUEGO    │");
+                System.out.println("│ [2] │ AGUA     │");
+                System.out.println("│ [3] │ TIERRA   │");
+                System.out.println("└─────┴──────────┘");
+                System.out.print("Opción → ");
+                opcionRol = teclado.nextInt();
+                switch (opcionRol) {
+                    case 1:
+                        rol = "fuego";
+                        break;
+                    case 2:
+                        rol = "agua";
+                        break;
+                    case 3:
+                        rol = "tierra";
+                        break;
+                    default:
+                        System.out.println("Opción inválida. Intenta de nuevo.");
+                }
+            } while (opcionRol < 1 || opcionRol > 3);
+            jugadores[i] = new Jugador(nombre, rol);
+        }
+    }
+
+    public void mostrarInfoJugador(Jugador[] jugadores) {
+        System.out.println("\n╔════════════════════════════════════════════╗");
+        System.out.println("║            DETALLE DE JUGADORES            ║");
+        System.out.println("╠════════════════════════════════════════════╣");
+        System.out.printf("║ %-10s │ %-6s │ %-4s │ %-7s │ %-3s ║\n","NOMBRE", "ROL", "PS", "ENERGÍA", "XP");
+        System.out.println("╠════════════════════════════════════════════╣");
+        for (int i = 0; i < jugadores.length; i++) {
+            System.out.printf("║ %-10s │ %-6s │ %-4d │ %-7d │ %-3d ║\n", jugadores[i].getNombre().toUpperCase(), jugadores[i].getRol().toUpperCase(), jugadores[i].getPs(), jugadores[i].getEnergia(), jugadores[i].getXp());
+        }
+        System.out.println("╚════════════════════════════════════════════╝");
+    }
+}
+
+MensajeDurantePartida:
+
+public class MensajeDurantePartida {
+    public static void mostrarInicioPartida() {
+        System.out.println("\n══════════════════════════════════════════════");
+        System.out.println("⚔️  LA AVENTURA COMIENZA... ¡PREPÁRATE! ⚔️");
+        System.out.println("══════════════════════════════════════════════");
+        System.out.println();
+    }
+
+    public static void mostrarFinalPartida() {
+        System.out.println("🎉 ¡Partida finalizada! Gracias por jugar.");
+    }
+}
+
+ModoSolitario:
+
+import java.util.Scanner;
+
+public class ModoSolitario {
+    Preguntas generadordePreguntas = new Preguntas();
+    char opcSeleccionada;
+    int respuestasCorrectas = 0;
+    int respuestasIncorrectas = 0;
+
+    public void jugarModoSolitario(Jugador[] jugador){
+        Scanner teclado=new Scanner(System.in);
+        for(int turno=0;turno<10;turno++){
+            do{
+                System.out.println("┌─────────────────────────────┬────────┬───────┐");
+                System.out.printf("│ Jugador: %-19s│ PS:%-4d│ XP:%-3d│\n", jugador[0].getNombre(),jugador[0].getPs(),jugador[0].getXp());
+                System.out.println("├─────────────────────────────┴────────┴───────┤");
+                System.out.printf("│ Pregunta N°%-34s│\n",(turno+1));
+                System.out.println("├──────────────────────────────────────────────┤");
+                System.out.println(" " + generadordePreguntas.getPregunta(turno));
+                generadordePreguntas.mostrarOpciones(turno);
+                System.out.println("└──────────────────────────────────────────────┘");
+                System.out.print(" Elige tu respuesta: ");
+                opcSeleccionada=teclado.next().toLowerCase().charAt(0);
+                if (opcSeleccionada != 'a' && opcSeleccionada != 'b' && opcSeleccionada != 'c' && opcSeleccionada != 'd') {
+                    System.out.println("\nOPCIÓN INVÁLIDA. Debes ingresar a, b, c o d.");
+                }
+            }while (opcSeleccionada != 'a' && opcSeleccionada != 'b' && opcSeleccionada != 'c' && opcSeleccionada != 'd');
+            validarRespuesta(jugador[0],opcSeleccionada,turno);
+        }
+        ResumenPartida.mostrarResumenSolitario(jugador[0], respuestasCorrectas, respuestasIncorrectas);
+        int decision;
+        do {
+            System.out.println("\n¿Deseas volver a jugar?");
+            System.out.println("[1] Sí");
+            System.out.println("[2] Volver al menú principal");
+            System.out.print("Elige una opción: ");
+            decision = teclado.nextInt();
+            if (decision == 1) {
+                jugarModoSolitario(jugador);
+            }
+        } while (decision != 1 && decision != 2);
+    }
+    public boolean validarRespuesta(Jugador jugador,char respuestaUsuario, int turno) {
+        if (respuestaUsuario == generadordePreguntas.getRespuesta(turno).charAt(0)) {
+            System.out.println("¡Correcto! Ganas 10 XP.");
+            jugador.sumarXp(10);
+            respuestasCorrectas++;
+            return true;
+        } else {
+            System.out.println("Incorrecto. Pierdes 5 PS.");
+            System.out.println("La respuesta correcta era: " + generadordePreguntas.getRespuesta(turno));
+            jugador.recibirDano(5);
+            respuestasIncorrectas++;
+            return false;
+        }
+    }
+}
+
+ModoVersus:
+
+import java.util.Scanner;
+
+public class ModoVersus {
+    Preguntas generadordePreguntas = new Preguntas();
+    char opcSeleccionada;
+
+
+    public void jugarModoVersus(Jugador[] jugador, int cantidadJugadores){
+        int[] respuestasCorrectas = new int[cantidadJugadores];
+        int[] respuestasIncorrectas = new int[cantidadJugadores];
+        Scanner teclado=new Scanner(System.in);
+        for(int turno=0;turno<10;turno++){
+            for(int i =0;i<cantidadJugadores;i++){
+                int numPregunta=turno*cantidadJugadores+i;
+                do{
+                    System.out.println("┌─────────────────────────────┬────────┬───────┐");
+                    System.out.printf("│ Jugador: %-19s│ PS:%-4d│ XP:%-3d│\n", jugador[i].getNombre(),jugador[i].getPs(),jugador[i].getXp());
+                    System.out.println("├─────────────────────────────┴────────┴───────┤");
+                    System.out.printf("│ Pregunta N°%-34s│\n",(turno+1));
+                    System.out.println("├──────────────────────────────────────────────┤");
+                    System.out.println(" " + generadordePreguntas.getPregunta(numPregunta));
+                    generadordePreguntas.mostrarOpciones(numPregunta);
+                    System.out.println("└──────────────────────────────────────────────┘");
+                    System.out.print(" Elige tu respuesta: ");
+                    opcSeleccionada=teclado.next().toLowerCase().charAt(0);
+                    if (opcSeleccionada != 'a' && opcSeleccionada != 'b' && opcSeleccionada != 'c' && opcSeleccionada != 'd') {
+                        System.out.println("\nOPCIÓN INVÁLIDA. Debes ingresar a, b, c o d.");
+                    }
+                }while (opcSeleccionada != 'a' && opcSeleccionada != 'b' && opcSeleccionada != 'c' && opcSeleccionada != 'd');
+                validarRespuesta(jugador[i], opcSeleccionada, numPregunta, i, respuestasCorrectas, respuestasIncorrectas);
+
+            }
+        }
+        ResumenPartida.mostrarResumenVersus(jugador, respuestasCorrectas, respuestasIncorrectas);
+
+        int decision;
+        do {
+            System.out.println("\n¿Deseas volver a jugar?");
+            System.out.println("[1] Sí");
+            System.out.println("[2] Volver al menú principal");
+            System.out.print("Elige una opción: ");
+            decision = teclado.nextInt();
+            if (decision == 1) {
+                jugarModoVersus(jugador,cantidadJugadores);
+            }
+        } while (decision != 1 && decision != 2);
+    }
+
+    public boolean validarRespuesta(Jugador jugador, char respuestaUsuario, int turno, int indiceJugador, int[] respuestasCorrectas, int[] respuestasIncorrectas){
+        if (respuestaUsuario == generadordePreguntas.getRespuesta(turno).charAt(0)) {
+            System.out.println("¡Correcto! Ganas 10 XP.");
+            jugador.sumarXp(10);
+            respuestasCorrectas[indiceJugador]++;
+            return true;
+        } else {
+            System.out.println("Incorrecto. Pierdes 5 PS.");
+            System.out.println("La respuesta correcta era: " + generadordePreguntas.getRespuesta(turno));
+            jugador.recibirDano(5);
+            respuestasIncorrectas[indiceJugador]++;
+            return false;
+        }
+    }
+}
+
+
+ResumenPartida:
+
+public class ResumenPartida {
+    public static void mostrarResumenSolitario(Jugador jugador, int respuestasCorrectas, int respuestasIncorrectas) {
+        System.out.println("\n═══════════════════════════════════════════════");
+        System.out.println("\t\t\tRESUMEN DE TU PARTIDA");
+        System.out.println("═══════════════════════════════════════════════");
+        System.out.printf("Jugador: %s\n", jugador.getNombre());
+        System.out.printf("Rol: %s\n", jugador.getRol().toUpperCase());
+        System.out.println("-----------------------------------------------");
+        System.out.printf("%-25s %5d\n", "Respuestas Correctas:", respuestasCorrectas);
+        System.out.printf("%-25s %5d\n", "Respuestas Incorrectas:", respuestasIncorrectas);
+        System.out.printf("%-25s %5d\n", "XP Acumulado:", jugador.getXp());
+        System.out.printf("%-25s %5d\n", "PS Final:", jugador.getPs());
+        System.out.println("-----------------------------------------------");
+        if (jugador.getXp() >= 40) {
+            System.out.println("\n═══════════════════════════════════════════════════════");
+            System.out.println("¡Felicidades!Has demostrado ser un gran Sabio del " + jugador.getRol());
+        } else {
+            System.out.println("Aún te falta mucho por mejorar.");
+        }
+        System.out.println("═══════════════════════════════════════════════════════");
+    }
+
+    public static void mostrarResumenVersus(Jugador[] jugadores, int[] correctas, int[] incorrectas) {
+        System.out.println("\n╔════════════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                                RESUMEN FINAL DE PARTIDA                           ║");
+        System.out.println("╠════════════╦════════════╦════════════════╦════════════════════╦════════╦══════════╣");
+        System.out.println("║ JUGADOR    ║ ROL        ║ RESP. CORRECTAS║ RESP. INCORRECTAS  ║ XP     ║ PS FINAL ║");
+        System.out.println("╠════════════╬════════════╬════════════════╬════════════════════╬════════╬══════════╣");
+        int maxCorrectas = -1;
+        String ganador = "";
+        for (int i = 0; i < jugadores.length; i++) {
+            System.out.printf("║ %-10s ║ %-10s ║ %-14d ║ %-18d ║ %-6d ║ %-8d ║\n",
+                    jugadores[i].getNombre(),
+                    jugadores[i].getRol().toUpperCase(),
+                    correctas[i],
+                    incorrectas[i],
+                    jugadores[i].getXp(),
+                    jugadores[i].getPs());
+            if (correctas[i] > maxCorrectas) {
+                maxCorrectas = correctas[i];
+                ganador = jugadores[i].getNombre();
+            }
+        }
+        System.out.println("╚════════════╩════════════╩════════════════╩════════════════════╩════════╩══════════╝");
+        System.out.printf("\n🏆 ¡El ganador es %s con %d respuestas correctas!\n", ganador, maxCorrectas);
+    }
+
+}
+
+mostrarMenuPrincipal:
+
+public class mostrarMenuPrincipal {
+    public static void mostrar() {
+        System.out.println("╔══════════════════════════════════════════╗");
+        System.out.println("║         LA AVENTURA DEL SABIO            ║");
+        System.out.println("╠══════════════════════════════════════════╣");
+        System.out.println("║ 1. Solitario (contra la máquina)         ║");
+        System.out.println("║ 2. Versus (2 o 3 jugadores)              ║");
+        System.out.println("║ 9. Salir del Juego                       ║");
+        System.out.println("╚══════════════════════════════════════════╝");
+    }
+}
+
+
+Preguntas:
+
+public class Preguntas {
+    private String[] preguntas;
+    private String[] respuestas;
+    private String[][] opciones;
+
+    public Preguntas() {
+        preguntas = new String[]{
+                "¿Cuanto es 7 + 6?",
+                "¿Cuanto es la raiz cuadrada de 81?",
+                "¿Cual es la capital de Peru?",
+                "¿Cuanto es 5 x 12?",
+                "¿Con que palabra se define una clase en Java?",
+                "¿Que instrumento mide la temperatura?",
+                "¿Quien fue el libertador del Peru?",
+                "¿Que funcion se usa para imprimir en consola?",
+                "¿Quien escribio 'Romeo y Julieta'?",
+                "¿Cuanto es 2 al cubo?",
+                "¿Que estudia la cinematica?",
+                "¿Cuanto es 100 dividido entre 4?",
+                "¿Quien fue el ultimo inca del Tahuantinsuyo?",
+                "¿Que estructura se usa para repetir código mientras una condicion sea verdadera?",
+                "¿Que evento inicio la Edad Moderna?",
+                "¿Cual fue la capital del imperio incaico?",
+                "¿Que civilización construyo Machu Picchu?",
+                "¿Quien formulo las leyes del movimiento?",
+                "¿Que palabra se usa para comparar cadenas de texto?",
+                "¿Que velocidad tiene la luz en el vacio (en km/s)?",
+                "¿Que imperio construyo el Coliseo Romano?",
+                "¿Cual es la formula de la velocidad?",
+                "¿Con que palabra se define un arreglo en Java?",
+                "¿Que unidad se usa para medir fuerza en el SI?",
+                "¿En que año se proclamo la independencia del Peru?",
+                "¿En que batalla se consolido la independencia del Peru?",
+                "¿Quien lidero el movimiento de independencia de la India?",
+                "¿Que año comenzo la Segunda Guerra Mundial?",
+                "¿Que año cayó el Imperio Romano de Occidente?",
+                "¿Quien fue el emperador frances derrotado en Waterloo?"
+        };
+        opciones = new String[][]{
+                {"a) 11", "b) 12", "c) 13", "d) 14"},
+                {"a) 7", "b) 8", "c) 9", "d) 10"},
+                {"a) Arequipa", "b) Trujillo", "c) Lima", "d) Cusco"},
+                {"a) 50", "b) 60", "c) 55", "d) 65"},
+                {"a) define", "b) class", "c) public", "d) static"},
+                {"a) Barometro", "b) Termometro", "c) Higrometro", "d) Cronometro"},
+                {"a) Bolivar", "b) San Martin", "c) Grau", "d) Bolognesi"},
+                {"a) print()", "b) echo", "c) System.out.println", "d) write()"},
+                {"a) Cervantes", "b) Lope de Vega", "c) Shakespeare", "d) Moliere"},
+                {"a) 6", "b) 7", "c) 8", "d) 9"},
+                {"a) Movimiento", "b) Genética", "c) Electricidad", "d) Optica"},
+                {"a) 20", "b) 25", "c) 30", "d) 35"},
+                {"a) Manco Capac", "b) Pachacutec", "c) Atahualpa", "d) Tupac Amaru"},
+                {"a) if", "b) switch", "c) for", "d) while"},
+                {"a) Guerra Civil", "b) Caida de Roma", "c) Descubrimiento de America", "d) Revolución Francesa"},
+                {"a) Lima", "b) Ayacucho", "c) Cusco", "d) Arequipa"},
+                {"a) Azteca", "b) Inca", "c) Maya", "d) Nazca"},
+                {"a) Newton", "b) Einstein", "c) Galileo", "d) Kepler"},
+                {"a) compareTo", "b) ==", "c) equals", "d) isEqual"},
+                {"a) 150000", "b) 200000", "c) 250000", "d) 300000"},
+                {"a) Griego", "b) Romano", "c) Egipcio", "d) Persa"},
+                {"a) v=s/t", "b) v=d*t", "c) v=d/t", "d) v=s*d"},
+                {"a) int", "b) list", "c) array", "d) new"},
+                {"a) Pascal", "b) Newton", "c) Joule", "d) Watt"},
+                {"a) 1821", "b) 1824", "c) 1810", "d) 1820"},
+                {"a) Junin", "b) Ayacucho", "c) Tarapaca", "d) Pichincha"},
+                {"a) Mandela", "b) Gandhi", "c) Luther King", "d) Lenin"},
+                {"a) 1938", "b) 1940", "c) 1939", "d) 1941"},
+                {"a) 476", "b) 500", "c) 450", "d) 400"},
+                {"a) Alejandro Magno", "b) Julio Cesar", "c) Napoleon", "d) Hitler"},
+        };
+        respuestas = new String[]{
+                "c",
+                "c",
+                "c",
+                "b",
+                "b",
+                "b",
+                "b",
+                "c",
+                "c",
+                "c",
+                "a",
+                "b",
+                "c",
+                "d",
+                "c",
+                "c",
+                "b",
+                "a",
+                "c",
+                "d",
+                "b",
+                "c",
+                "d",
+                "b",
+                "a",
+                "b",
+                "b",
+                "c",
+                "a",
+                "c"
+        };
+    }
+
+    public void mostrarOpciones(int index) {
+        for (String opcion : opciones[index]) {
+            System.out.println(opcion);
+        }
+    }
+
+    public String getPregunta(int index) {
+        return preguntas[index];
+    }
+
+    public String getRespuesta(int index) {
+        return respuestas[index];
+    }
+
+    public int totalPreguntas() {
+        return preguntas.length;
+    }
+
+}
+
+Jugador:
+
+public class Jugador {
+    private String nombre;
+    private String rol;
+    private int ps;
+    private int energia;
+    private int xp;
+    private int racha;
+    private boolean eliminado;
+    private String nombreAtaque;
+
+    public Jugador(String nombreJugador, String rolJugador) {
+        nombre = nombreJugador;
+        rol = rolJugador.toLowerCase();
+        switch (rol) {
+            case "fuego":
+                ps = 100;
+                energia = 30;
+                break;
+            case "agua":
+                ps = 70;
+                energia = 60;
+                break;
+            default:
+                ps = 80;
+                energia = 45;
+                break;
+        }
+        xp = 0;
+        racha = 0;
+        eliminado = false;
+    }
+
+    public String NombreAtaque(){
+        return nombreAtaque;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public int getPs() {
+        return ps;
+    }
+
+    public int getEnergia() {
+        return energia;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public boolean estaEliminado() {
+        return eliminado;
+    }
+
+    public void sumarXp(int valor) {
+        xp += valor;
+    }
+
+    public void sumarRacha() {
+        racha++;
+    }
+
+    public void reiniciarRacha() {
+        racha = 0;
+    }
+
+    public int getRacha() {
+        return racha;
+    }
+
+    public void curar(int valor) {
+        ps += valor;
+    }
+
+    public void setRacha(int valor) {
+        racha = valor;
+    }
+
+    public void recibirDano(int valor) {
+        ps -= valor;
+        if (ps < 0) {
+            ps = 0;
+        }
+    }
+    public void eliminar() {
+        eliminado = true;
+    }
+}

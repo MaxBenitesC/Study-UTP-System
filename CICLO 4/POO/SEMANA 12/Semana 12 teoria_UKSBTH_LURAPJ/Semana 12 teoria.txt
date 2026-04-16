@@ -1,0 +1,224 @@
+buenos día, hoy 28 de octubre
+POO: Set, Iterator, SequencedCollection
+duda? Collection: lista de objetos
+previo: Jerarquía "SuperClases" hay varias intefaces
+Logro: al finalizar la sesión el estudiante comprende el uso de Set y el uso  Iteradores en el lenguaje Java.
+ÚTIL: Necesidad de organizar los datos para su recuperación
+Transformación:
+ ¿Qué es un `Set` en Java?
+Un `Set` es una colección que no permite elementos duplicados. Pertenece al paquete `java.util` y es parte del marco de colecciones de Java. Su principal característica es garantizar unicidad.
+
+---
+
+ 🔹 Implementaciones principales de `Set`
+
+ 1. HashSet
+- Orden: No garantiza ningún orden de los elementos.
+- Ventajas:
+  - Muy rápido para operaciones de búsqueda, inserción y eliminación (basado en hashing).
+  - Ideal para almacenar elementos únicos sin importar el orden.
+- Desventajas:
+  - No conserva el orden de inserción.
+  - El rendimiento depende de una buena implementación de `hashCode()` y `equals()`.
+
+ 2. LinkedHashSet
+- Orden: Conserva el orden de inserción.
+- Ventajas:
+  - Combina la velocidad de `HashSet` con la capacidad de mantener el orden.
+  - Útil cuando se necesita evitar duplicados y mantener el orden.
+- Desventajas:
+  - Ligera sobrecarga de memoria comparado con `HashSet`.
+
+ 3. TreeSet
+- Orden: Ordena los elementos de forma natural (por `Comparable`) o mediante un `Comparator`.
+- Ventajas:
+  - Ideal para conjuntos ordenados.
+  - Permite operaciones como rangos (`subSet`, `headSet`, `tailSet`).
+- Desventajas:
+  - Más lento que `HashSet` y `LinkedHashSet`.
+  - Requiere que los elementos sean comparables o que se proporcione un comparador.
+
+---
+
+ 🔹 Comparación rápida
+
+| Implementación   | Orden de elementos | Velocidad | Uso típico                          |
+|------------------|--------------------|-----------|-------------------------------------|
+| `HashSet`        | No                 | Alta      | Eliminación de duplicados rápida    |
+| `LinkedHashSet`  | Sí (inserción)     | Media     | Cache, historial, orden preservado  |
+| `TreeSet`        | Sí (ordenado)      | Baja      | Listas ordenadas sin duplicados     |
+
+---
+
+ 🔹 Usos típicos de `Set`
+- Eliminar duplicados de una lista.
+- Verificar pertenencia rápida (`contains()`).
+- Representar conjuntos matemáticos.
+- Implementar filtros únicos en streams.
+- Mantener historial sin repeticiones (`LinkedHashSet`).
+
+---
+
+ 🔹 Desventajas generales de `Set`
+- No permite acceso por índice.
+- No admite elementos duplicados (puede ser limitante en ciertos casos).
+- Algunas implementaciones requieren que los elementos sean comparables (`TreeSet`).
+
+
+ 🔹 ¿Qué es un Iterador en Java?
+
+Un iterador es un objeto que permite recorrer una colección de elementos uno a uno, sin exponer su estructura interna. Es parte del paquete `java.util` y se obtiene generalmente mediante el método `.iterator()` de una colección.
+
+---
+
+ 🔹 Tipos principales de iteradores
+
+ 1. Iterator
+- Métodos clave:
+  - `hasNext()`: ¿Hay más elementos?
+  - `next()`: Devuelve el siguiente elemento.
+  - `remove()`: Elimina el último elemento retornado (opcional).
+- Orden: Depende de la colección. Por ejemplo:
+  - `ArrayList`, `LinkedHashSet`: orden de inserción.
+  - `HashSet`: sin orden garantizado.
+  - `TreeSet`: orden natural o por comparador.
+- Ventajas:
+  - Permite recorrer cualquier colección que implemente `Collection`.
+  - Compatible con estructuras no indexadas como `Set`.
+- Desventajas:
+  - No permite recorrer hacia atrás.
+  - No permite modificar elementos directamente.
+
+---
+
+ 2. ListIterator
+- Solo disponible para listas (`List`) como `ArrayList`, `LinkedList`.
+- Métodos clave:
+  - `hasPrevious()`, `previous()`: recorrido bidireccional.
+  - `add()`, `set()`: modificación directa.
+- Orden: Conserva el orden de la lista.
+- Ventajas:
+  - Recorrido hacia adelante y hacia atrás.
+  - Permite modificar la lista durante la iteración.
+- Desventajas:
+  - No disponible para `Set` ni `Queue`.
+  - Más pesado que `Iterator`.
+
+---
+
+ 3. Enhanced for-loop (`for-each`)
+- Sintaxis: `for (Tipo elemento : colección)`
+- Orden: Depende de la colección.
+- Ventajas:
+  - Más conciso y legible.
+  - Ideal para lectura simple.
+- Desventajas:
+  - No permite eliminar ni modificar elementos.
+  - No se puede recorrer hacia atrás.
+
+---
+
+ 🔹 Comparación rápida
+
+| Tipo           | Modifica colección | Recorrido bidireccional | Uso típico                      |
+|----------------|--------------------|--------------------------|---------------------------------|
+| `Iterator`     | Sí (`remove`)      | No                       | Recorrido general de colecciones |
+| `ListIterator` | Sí (`add`, `set`)  | Sí                       | Edición de listas durante iteración |
+| `for-each`     | No                 | No                       | Lectura simple y clara          |
+
+---
+
+ 🔹 Usos típicos
+- `Iterator`: recorrer `Set`, eliminar elementos mientras se recorre.
+- `ListIterator`: insertar o modificar elementos en listas.
+- `for-each`: recorrer listas, arreglos o colecciones para lectura.
+
+---
+
+ 🔹 Desventajas generales
+- Iteradores pueden lanzar `ConcurrentModificationException` si se modifica la colección fuera del iterador.
+- No todos los iteradores permiten modificación.
+- Algunos iteradores no son eficientes en colecciones grandes si no se usan correctamente.
+
+
+
+
+
+ 🔹 ¿Qué son las Sequenced Collections?
+
+Desde Java 21, se introdujo la interfaz `SequencedCollection`, que extiende `Collection` y define colecciones con orden definido. Esto permite acceder de forma consistente al primer y último elemento, además de recorrer los elementos en orden.
+
+ 🔸 Interfaces relacionadas:
+- `SequencedCollection<E>`
+- `SequencedSet<E>` (extiende `Set`)
+- `SequencedMap<K,V>` (extiende `Map`)
+
+---
+
+ 🔹 Características clave
+
+- Orden garantizado: los elementos tienen una posición definida.
+- Acceso directo a:
+  - `getFirst()`
+  - `getLast()`
+  - `reversed()`: devuelve una vista invertida de la colección.
+- Mutabilidad: permite agregar al inicio (`addFirst`) o al final (`addLast`).
+
+---
+
+ 🔹 Implementaciones comunes
+
+ 1. ArrayList (como `SequencedCollection`)
+- Orden: Conserva el orden de inserción.
+- Ventajas:
+  - Acceso rápido por índice.
+  - Compatible con `SequencedCollection`.
+- Desventajas:
+  - Costoso insertar al inicio (`addFirst`).
+
+ 2. LinkedList
+- Orden: Conserva el orden de inserción.
+- Ventajas:
+  - Eficiente para inserciones al inicio y al final.
+  - Soporta todas las operaciones de `SequencedCollection`.
+- Desventajas:
+  - Acceso por índice más lento que `ArrayList`.
+
+ 3. LinkedHashSet (como `SequencedSet`)
+- Orden: Conserva el orden de inserción.
+- Ventajas:
+  - Evita duplicados y mantiene orden.
+- Desventajas:
+  - No permite acceso por índice.
+
+ 4. LinkedHashMap (como `SequencedMap`)
+- Orden: Conserva el orden de inserción de claves.
+- Ventajas:
+  - Acceso ordenado a pares clave-valor.
+- Desventajas:
+  - No permite claves duplicadas.
+
+---
+
+ 🔹 Comparación rápida
+
+| Implementación     | Tipo         | Orden | Acceso por índice | Duplicados | Uso típico                        |
+|--------------------|--------------|-------|-------------------|------------|----------------------------------|
+| `ArrayList`        | Lista        | Sí    | Sí                | Sí         | Listas ordenadas, acceso rápido  |
+| `LinkedList`       | Lista        | Sí    | No (lento)        | Sí         | Pilas, colas, doble acceso       |
+| `LinkedHashSet`    | Conjunto     | Sí    | No                | No         | Conjuntos únicos ordenados       |
+| `LinkedHashMap`    | Mapa         | Sí    | No                | No (claves) | Diccionarios ordenados           |
+
+---
+
+ 🔹 Ventajas de las Sequenced Collections
+- Orden predecible y manipulable.
+- Acceso directo al primer y último elemento.
+- Ideal para estructuras como pilas, colas, listas ordenadas.
+
+ 🔹 Desventajas
+- Algunas operaciones pueden ser costosas (ej. insertar al inicio en `ArrayList`).
+- No todas las colecciones tradicionales implementan `SequencedCollection` aún.
+- Requiere Java 21 o superior.
+
+

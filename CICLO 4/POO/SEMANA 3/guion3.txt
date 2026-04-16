@@ -1,0 +1,20 @@
+
+dudas de la clase anterior?:
+previo:  herencia
+LOGRO: al finalizar la sesión el estudiante modela en UML e implementa en java el caso de personalUTP aplicando la herencia.
+UTIL: uso de POO para reutilización
+
+pregunta retadora: 
+
+Transformación: 
+
+
+
+Práctica:  la clase Persona con nombre y sexo. Un Estudiante, con creditos y promedio ES UNA Persona. Un docente con sueldo y antigüedad EN UNA Persona. Se pide modelar y luego implementar (código y prueba). Sobrecargar constructores. Desplegar con toString(). Encapsular al máximo y, por tanto, accesores. Contar cantidad de estudiantes. Instanciar estudiantes y docentes. Usar multifuente y multipaquete.
+
+Cierre.
+
+Implementación usando JOpcionPane
+
+
+

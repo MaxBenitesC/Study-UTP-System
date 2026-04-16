@@ -1,0 +1,70 @@
+buenas tardes, hoy 21 de octubre.
+POO, tema: Genéricos y Colecciones
+duda? herencia múltiple multinivel y casting
+previo: objetos (ya no: byte, short, int, long, float, double, char, boolean
+11 a 15: ArrayList, LinkedList y HashMap (son clases concretas dentro de una jerarquía)
+
+logro: al finalizar la sesión el estudiante comprende la jerarquía Framework Collections y desarrolla aplicaciones en java usando Colecciones.
+útil: "primitivas" de uso común y frecuente.
+
+List(interfaz):
+*  jerarquía Collection<-List<-ArrayList, LinkedList
+* características: 
+  . permite duplicados
+  . mantiene el orden de inserción
+  . acceso por índice
+
+Map(interfaz)
+*  jerarquía Map <- HashMap
+* características: 
+  . almacena pares clave-valor
+  . las claves son únicas
+  . no implementa Collection
+
+Métodos comunes y usos prácticos
+
+List-métodos más usados
+add(E e) - añade un elemento al final
+get(int índice) - obtiene el elemento en una posición
+remove(int índice) - elimina un elemento por índice
+Ventajas:
+Acceso rápido por índice (en ArrayList)
+Fácil de iterar y manipular
+Desventajas:
+ArrayList: costoso insertar / eliminar en medio
+LinkedList: Acceso lento por índice.
+Útil:
+Gestión de pedidos en un tienda online
+Registro de mediciones científicas secuenciales
+Historial de transacciones Bancarias.
+
+Map-métodos mas usados:
+put(K clave, V valor) - inserta un par clave - valor
+get(Object clave) - obtiene el valor asociado a la clave
+containsKey(Object clave) - verifica si existe la clave
+Ventajas:
+Búsqueda eficiente por clave (HashMap: O(1) promedio)
+Ideal para asociar datos
+Desventajas:
+No permite claves duplicadas
+HashMap no garantiza el orden (a menos que uses LinkedHashMap o TreeMap)
+Útil:
+Catálogo de productos (Id - producto)
+Configuración de aplicaciones (clave - valor)
+Análisis de frecuencia de las palabras en textos científicos
+
+
+
+caso1 basico: Crear una Lista de nombres de estudiantes. Agrega 3 nombres, muestra el segundo y elimina el primero
+NOTA: por seguridad de tipos TODOS los ejemplos deben usar genéricos
+
+caso2 intermedio: (GESTIÓN DE INVENTARIO) Se tiene una lista productos (como cadenas). Permitir al usuario:
+Añadir producto
+Eliminar producto por nombre
+Mostrar todos los productos
+
+ 
+
+
+
+
