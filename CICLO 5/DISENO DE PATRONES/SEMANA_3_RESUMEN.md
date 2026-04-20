@@ -244,7 +244,106 @@ SIN DIP (MAL)                    CON DIP (BIEN)
 
 ---
 
-## 4. COMPARACIÓN ISP vs DIP
+## 4. ANÁLISIS SOLID EN EL CÓDIGO UNIVERSITARIO
+
+### ISP — ¿Dónde está la violación y dónde se corrige?
+
+```java
+// ❌ VIOLA ISP — DP_S03_E1_INCORRECTO/Impresora.java
+package DP_S03_E1_INCORRECTO;
+public interface Impresora {
+    void imprimir();     // ← ImpresoraBasica SÍ necesita esto
+    void escanear();     // ← ImpresoraBasica NO necesita esto ← PROBLEMA
+    void enviarFax();    // ← ImpresoraBasica NO necesita esto ← PROBLEMA
+}
+// Cualquier clase que implemente esta interfaz se ve FORZADA a
+// implementar métodos que no usa → viola ISP
+```
+
+```java
+// ✅ CUMPLE ISP — DP_S03_E1_CORRECTO/
+// Cada interfaz tiene UNA responsabilidad
+public interface Impresora { void imprimir(); }   // ← solo imprimir
+public interface Scanner { void escanear(); }     // ← solo escanear
+public interface Fax { void enviarFax(); }        // ← solo fax
+
+// ImpresoraBasica: solo implementa lo que NECESITA
+public class ImpresoraBasica implements Impresora {
+    @Override
+    public void imprimir() { ... } // ← solo lo suyo
+    // No implementa Scanner ni Fax → no es forzada
+}
+
+// ImpresoraMultifuncional: implementa TODO porque PUEDE hacer todo
+public class ImpresoraMultifuncional implements Impresora, Scanner, Fax {
+    @Override public void imprimir() { System.out.println("Imprimiendo Documento Multifuncional..."); }
+    @Override public void enviarFax() { System.out.println("Enviando Fax...."); }
+    @Override public void escanear() { System.out.println("Escaneando Documento..."); }
+}
+```
+
+**Dónde se refleja ISP:** la clave está en que `ImpresoraBasica` ya **NO está obligada** a implementar `escanear()` ni `enviarFax()`. Cada clase implementa **solo las interfaces que realmente usa**.
+
+---
+
+### DIP — ¿Dónde está la violación y dónde se corrige?
+
+```java
+// ❌ VIOLA DIP — DP_S03_E1_INCORRECTO/TiendaIncorrecta.java
+public class TiendaIncorrecta {
+    private Paypal p1;              // ← depende de implementación CONCRETA
+
+    public TiendaIncorrecta() {
+        this.p1 = new Paypal();     // ← módulo de ALTO NIVEL (Tienda)
+    }                               //   crea directamente módulo de BAJO NIVEL (Paypal)
+                                    //   → acoplamiento fuerte
+    public void realizarPago(double monto){
+        p1.pagar(monto);            // ← solo puede pagar con Paypal, nunca con otro método
+    }
+}
+```
+
+```java
+// ✅ CUMPLE DIP — DP_S03_E1_CORRECTO/
+
+// La abstracción (interfaz) es el puente
+public interface MetodoPago {
+    void pagar(double monto);       // ← abstracción que separa alto y bajo nivel
+}
+
+// Módulos de BAJO NIVEL dependen de la abstracción
+public class Paypal implements MetodoPago {
+    @Override
+    public void pagar(double monto) {
+        System.out.printf("Pago de $ %.2f realizado con Paypal\n", monto);
+    }
+}
+// TarjetaCredito, TransferenciaBancaria → igual
+
+// Módulo de ALTO NIVEL también depende de la abstracción (NO de Paypal)
+public class TiendaCorrecta {
+    private MetodoPago m1;          // ← depende de ABSTRACCIÓN, no de Paypal
+
+    public TiendaCorrecta(MetodoPago m1) {  // ← inyección de dependencia
+        this.m1 = m1;               // recibe cualquier MetodoPago desde afuera
+    }
+
+    public void realizarPago(double monto){
+        m1.pagar(monto);            // ← no sabe ni le importa qué implementación es
+    }
+}
+
+// MainCorrecto demuestra DIP: TiendaCorrecta nunca cambia
+TiendaCorrecta t1 = new TiendaCorrecta(new Paypal());           // paga con Paypal
+TiendaCorrecta t2 = new TiendaCorrecta(new TarjetaCredito());   // paga con tarjeta
+TiendaCorrecta t3 = new TiendaCorrecta(new TransferenciaBancaria()); // paga por transferencia
+```
+
+**Dónde se refleja DIP:** `TiendaCorrecta` depende de `MetodoPago` (abstracción) y **nunca** de `Paypal`, `TarjetaCredito` ni nada concreto. El módulo de alto nivel y los de bajo nivel **dependen ambos de la interfaz**.
+
+---
+
+## 5. COMPARACIÓN ISP vs DIP
 
 | Aspecto | ISP | DIP |
 |---------|-----|-----|

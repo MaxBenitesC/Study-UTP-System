@@ -232,7 +232,93 @@ public class Notificador {
 
 ---
 
-## 5. RESUMEN COMPARATIVO
+## 5. ANÁLISIS SOLID EN EL CÓDIGO UNIVERSITARIO
+
+### OCP — ¿Dónde está la violación y dónde se corrige?
+
+```java
+// ❌ VIOLA OCP — ClaseQueNocumple.java
+public class ClaseQueNocumple {
+    public void enviar(String tipo, String mensaje){
+        if(tipo.equals("email")){               // ← para agregar WhatsApp
+            System.out.println("Enviando email: "+mensaje);  // hay que venir
+        } else if(tipo.equals("sms")){          // ← AQUÍ y modificar
+            System.out.println("Enviando SMS: "+mensaje);    // esta clase
+        } else if(tipo.equals("push")){
+            System.out.println("Enviando notificación Push: "+mensaje);
+        }
+        // ← Agregar WhatsApp = modificar esta clase → viola OCP
+    }
+}
+```
+
+**Por qué viola OCP:** cada nuevo canal de notificación obliga a **modificar** `ClaseQueNocumple`.
+
+```java
+// ✅ CUMPLE OCP — Notificacion.java (interfaz = punto de extensión)
+public interface Notificacion {
+    void enviar(String mensaje);  // ← contrato que NUNCA cambia
+}
+
+// Agregar nuevo canal = nueva clase, sin tocar nada existente
+public class NotificacionSMS implements Notificacion {
+    @Override
+    public void enviar(String mensaje) { /* SMS */ }
+}
+// NotificacionWhatsapp, NotificacionEmail, NotificacionPush → igual
+
+// Notificador.java — NUNCA cambia sin importar cuántos canales se agreguen
+public class Notificador {
+    public void notificar(Notificacion notificacion, String mensaje){
+        notificacion.enviar(mensaje);  // ← solo conoce la abstracción
+    }
+}
+```
+
+**Dónde se refleja OCP:** la interfaz `Notificacion` es el **mecanismo de extensión**. El `Notificador` está **cerrado** (no se modifica) y el sistema está **abierto** (se extiende con nuevas clases).
+
+---
+
+### LSP — ¿Dónde está la violación y dónde se corrige?
+
+```java
+// ❌ SI HUBIERA PUESTO: Pinguino extends AveVoladora → violaría LSP
+// class PinguinoMalo extends AveVoladora {
+//     @Override
+//     public void volar() {
+//         throw new UnsupportedOperationException("No puedo volar"); // ← VIOLA LSP
+//     }                                                              // rompe el contrato
+// }
+
+// ✅ CUMPLE LSP — jerarquía correcta
+public class Ave {
+    public void comer(){ ... }  // ← comportamiento COMÚN a toda ave
+}
+
+public class AveVoladora extends Ave {
+    public void volar(){ ... }  // ← solo aves que SÍ vuelan
+}
+
+public class AveNoVoladora extends Ave {
+    public void caminar(){ ... } // ← solo aves que NO vuelan
+}
+
+// Pinguino extiende AveNoVoladora → NUNCA se le pedirá volar → LSP cumplido
+public class Pinguino extends AveNoVoladora {
+    @Override
+    public void caminar() { System.out.println("Estoy caminando"); }
+
+    @Override
+    public void comer() { System.out.println("Estoy comiendo pescado"); }
+    // ← puede sustituir a AveNoVoladora sin problema
+}
+```
+
+**Dónde se refleja LSP:** `Pinguino` puede reemplazar a `AveNoVoladora` en cualquier lugar del código sin sorpresas. Nunca se rompe el contrato de la clase base.
+
+---
+
+## 6. RESUMEN COMPARATIVO
 
 | Principio | Qué prohíbe | Solución |
 |-----------|-------------|----------|

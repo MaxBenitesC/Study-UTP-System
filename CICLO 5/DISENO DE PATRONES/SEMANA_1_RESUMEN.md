@@ -229,7 +229,83 @@ UsuarioManager (MAL)          Refactorizado (BIEN)
 
 ---
 
-## 6. CONCLUSIONES CLAVE
+## 6. ANÁLISIS SOLID EN EL CÓDIGO UNIVERSITARIO
+
+### ¿Dónde se refleja SRP en `UsuarioManager`?
+
+```java
+public class UsuarioManager {
+    // RESPONSABILIDAD 1: DATOS
+    private Integer id;       // ← solo almacenar datos del usuario
+    private String nombre;
+    private String email;
+
+    // RESPONSABILIDAD 2: VALIDACIÓN DE NEGOCIO
+    public boolean validarEmail(){          // ← lógica de negocio
+        return email.contains("@") && email.contains(".");
+    }
+
+    // RESPONSABILIDAD 3: PERSISTENCIA (simula BD)
+    public void guardarUsuario(){           // ← acceso a "base de datos"
+        if(validarEmail()){
+            usuarios.add(this);             // ← manipula lista interna
+        }
+    }
+    public void listarUsuarios(){ ... }     // ← también persistencia
+}
+```
+
+**Diagnóstico SRP:** Esta clase tiene **3 razones para cambiar**:
+- Si cambia la estructura del usuario (datos) → hay que modificarla
+- Si cambia la lógica de validación → hay que modificarla
+- Si cambia la forma de guardar (de lista a BD real) → hay que modificarla
+
+### ¿Dónde se aplica SRP en la refactorización?
+
+```java
+// CLASE 1: Usuario.java
+// Razón única para cambiar: si cambian los datos del usuario
+public class Usuario {
+    private Integer id;
+    private String nombre;       // ← SOLO datos
+    private String email;
+    // getters y setters
+}
+
+// CLASE 2: UsuarioRepositorio.java
+// Razón única para cambiar: si cambia cómo se persisten los usuarios
+public class UsuarioRepositorio {
+    private List<Usuario> usuarios = new ArrayList<>();
+
+    public void guardarUsuario(Usuario usuario){     // ← SOLO persistencia
+        usuarios.add(usuario);
+    }
+    public List<Usuario> obtenerUsuarios(){ return usuarios; }
+}
+
+// CLASE 3: UsuarioServicio.java
+// Razón única para cambiar: si cambia la lógica de negocio (validación, registro)
+public class UsuarioServicio {
+    private UsuarioRepositorio repositorio;
+
+    public boolean validarEmail(String email){       // ← SOLO validación
+        return email.contains("@") && email.contains(".");
+    }
+
+    public void registrarUsuario(String nombre, String email){  // ← SOLO orquestación
+        if(validarEmail(email)){
+            Usuario usuario = new Usuario(nombre, email);
+            repositorio.guardarUsuario(usuario);     // ← delega a repositorio
+        }
+    }
+}
+```
+
+**Conclusión:** Cada clase ahora tiene **UNA sola razón para cambiar** → SRP cumplido.
+
+---
+
+## 7. CONCLUSIONES CLAVE
 
 - Los principios SOLID mejoran **cohesión** (clases enfocadas) y reducen **acoplamiento** (menos dependencias)
 - SRP: si necesitas usar "y" para describir qué hace una clase → viola SRP

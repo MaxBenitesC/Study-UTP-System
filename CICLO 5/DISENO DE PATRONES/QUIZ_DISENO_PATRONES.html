@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz - Diseño de Patrones | UTP</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; color: #222; }
+
+  .header {
+    background: linear-gradient(135deg, #c0392b, #2c3e50);
+    color: white; padding: 20px 24px; text-align: center;
+  }
+  .header h1 { font-size: 1.6em; }
+  .header p { opacity: 0.85; font-size: 0.9em; margin-top: 4px; }
+
+  .tabs { display: flex; background: #2c3e50; overflow-x: auto; }
+  .tab-btn {
+    flex: 1; padding: 14px 8px; background: none; border: none;
+    color: #aaa; cursor: pointer; font-size: 0.85em; font-weight: 600;
+    border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap;
+    min-width: 80px;
+  }
+  .tab-btn:hover { color: white; background: rgba(255,255,255,0.05); }
+  .tab-btn.active { color: #e74c3c; border-bottom-color: #e74c3c; background: rgba(255,255,255,0.08); }
+
+  .tab-content { display: none; padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  .semana-header {
+    background: white; border-radius: 10px; padding: 16px 20px;
+    margin-bottom: 20px; border-left: 5px solid #e74c3c;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .semana-header h2 { color: #c0392b; font-size: 1.2em; }
+  .semana-header p { color: #666; font-size: 0.88em; margin-top: 4px; }
+
+  .question {
+    background: white; border-radius: 10px; padding: 18px 20px;
+    margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: all 0.2s;
+  }
+  .question:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+  .question.correct { border-left: 5px solid #27ae60; background: #f0fff4; }
+  .question.incorrect { border-left: 5px solid #e74c3c; background: #fff5f5; }
+  .question.unanswered { border-left: 5px solid #f39c12; background: #fffbf0; }
+
+  .q-num { font-size: 0.75em; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+  .q-text { font-size: 0.97em; font-weight: 600; margin: 8px 0 14px; line-height: 1.5; color: #1a1a2e; }
+  .q-text code {
+    background: #f1f3f5; padding: 1px 5px; border-radius: 4px;
+    font-family: 'Courier New', monospace; font-size: 0.9em; color: #c0392b;
+  }
+
+  .options label {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 12px; border-radius: 8px; cursor: pointer;
+    transition: background 0.15s; margin-bottom: 6px;
+    border: 2px solid transparent; font-size: 0.9em; line-height: 1.4;
+  }
+  .options label:hover { background: #f5f7ff; border-color: #dee2ff; }
+  .options input[type="radio"] { margin-top: 2px; flex-shrink: 0; accent-color: #c0392b; }
+  .options label.correct-answer { background: #e8f8f0 !important; border-color: #27ae60 !important; color: #1e8449; font-weight: 600; }
+  .options label.wrong-answer { background: #fdf0f0 !important; border-color: #e74c3c !important; color: #c0392b; text-decoration: line-through; }
+
+  .feedback {
+    margin-top: 10px; padding: 10px 14px; border-radius: 8px;
+    font-size: 0.85em; display: none;
+  }
+  .feedback.correct { background: #d4edda; color: #155724; display: block; }
+  .feedback.incorrect { background: #f8d7da; color: #721c24; display: block; }
+
+  .code-block {
+    background: #1e2435; color: #abb2bf; border-radius: 8px;
+    padding: 12px 14px; font-family: 'Courier New', monospace;
+    font-size: 0.82em; margin: 10px 0 14px; overflow-x: auto;
+    line-height: 1.5; white-space: pre;
+  }
+
+  .btn-submit {
+    display: block; width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #c0392b, #e74c3c);
+    color: white; border: none; border-radius: 10px;
+    font-size: 1em; font-weight: 700; cursor: pointer;
+    margin: 20px 0 10px; transition: all 0.2s; letter-spacing: 0.5px;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(192,57,43,0.4); }
+  .btn-submit:active { transform: translateY(0); }
+
+  .btn-reset {
+    display: block; width: 100%; padding: 12px;
+    background: #6c757d; color: white; border: none; border-radius: 10px;
+    font-size: 0.9em; font-weight: 600; cursor: pointer; margin-bottom: 20px;
+    transition: all 0.2s;
+  }
+  .btn-reset:hover { background: #545b62; }
+
+  .score-box {
+    background: linear-gradient(135deg, #1e2435, #2c3e50);
+    color: white; border-radius: 12px; padding: 20px 24px;
+    text-align: center; margin: 16px 0; display: none;
+  }
+  .score-box h3 { font-size: 1.1em; opacity: 0.8; margin-bottom: 8px; }
+  .score-num { font-size: 3em; font-weight: 900; color: #f39c12; }
+  .score-sub { font-size: 0.9em; opacity: 0.7; margin-top: 6px; }
+  .score-bar { background: rgba(255,255,255,0.15); border-radius: 50px; height: 10px; margin-top: 14px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60); transition: width 0.8s ease; }
+
+  .progress {
+    display: flex; justify-content: space-between; align-items: center;
+    background: white; border-radius: 8px; padding: 10px 16px;
+    margin-bottom: 16px; font-size: 0.85em; color: #666;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .progress span { font-weight: 700; color: #c0392b; }
+
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75em; font-weight: 700; margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-theory { background: #d4e6f1; color: #1a5276; }
+  .badge-code { background: #d5f5e3; color: #1e8449; }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.2em; }
+    .tab-btn { font-size: 0.75em; padding: 12px 4px; }
+    .q-text { font-size: 0.9em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Quiz — Diseño de Patrones</h1>
+  <p>Universidad Tecnológica del Perú | Ciclo 5 | Docente: Mg. Iván Robles Fernández</p>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('s1')">S1 · SRP</button>
+  <button class="tab-btn" onclick="showTab('s2')">S2 · OCP &amp; LSP</button>
+  <button class="tab-btn" onclick="showTab('s3')">S3 · ISP &amp; DIP</button>
+  <button class="tab-btn" onclick="showTab('s4')">S4 · Singleton &amp; Factory</button>
+</div>
+
+<!-- ============================================================ SEMANA 1 ============================================================ -->
+<div id="s1" class="tab-content active">
+  <div class="semana-header">
+    <h2>Semana 1 — Principios SOLID &amp; SRP</h2>
+    <p>20 preguntas · Teoría y análisis de código · Principio de Responsabilidad Única</p>
+  </div>
+  <div class="progress">Preguntas respondidas: <span id="s1-prog">0 / 20</span></div>
+
+  <!-- Q1 -->
+  <div class="question" id="s1-q1">
+    <div class="q-num">Pregunta 1 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Qué significa el acrónimo SRP?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q1" value="a"> a) Single Resource Principle</label>
+      <label><input type="radio" name="s1q1" value="b"> b) Single Responsibility Principle</label>
+      <label><input type="radio" name="s1q1" value="c"> c) Software Reuse Principle</label>
+      <label><input type="radio" name="s1q1" value="d"> d) System Relationship Protocol</label>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question" id="s1-q2">
+    <div class="q-num">Pregunta 2 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Según SRP, ¿cuántas razones para cambiar debe tener una clase?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q2" value="a"> a) Las que sean necesarias para su funcionamiento</label>
+      <label><input type="radio" name="s1q2" value="b"> b) Dos como máximo</label>
+      <label><input type="radio" name="s1q2" value="c"> c) Una sola razón</label>
+      <label><input type="radio" name="s1q2" value="d"> d) Ninguna, las clases no deben cambiar</label>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question" id="s1-q3">
+    <div class="q-num">Pregunta 3 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La clase <code>UsuarioManager</code> del ejercicio universitario viola SRP porque:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q3" value="a"> a) No tiene constructor definido</label>
+      <label><input type="radio" name="s1q3" value="b"> b) Mezcla datos, validación de negocio y persistencia en una sola clase</label>
+      <label><input type="radio" name="s1q3" value="c"> c) Usa ArrayList en lugar de una BD real</label>
+      <label><input type="radio" name="s1q3" value="d"> d) Los métodos son públicos cuando deberían ser privados</label>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question" id="s1-q4">
+    <div class="q-num">Pregunta 4 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En la refactorización SRP del ejercicio universitario, ¿en cuántas clases se dividió <code>UsuarioManager</code>?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q4" value="a"> a) 2 clases</label>
+      <label><input type="radio" name="s1q4" value="b"> b) 3 clases</label>
+      <label><input type="radio" name="s1q4" value="c"> c) 4 clases</label>
+      <label><input type="radio" name="s1q4" value="d"> d) 5 clases</label>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question" id="s1-q5">
+    <div class="q-num">Pregunta 5 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Qué clase del ejercicio universitario es responsable de validar el email?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q5" value="a"> a) Usuario</label>
+      <label><input type="radio" name="s1q5" value="b"> b) UsuarioRepositorio</label>
+      <label><input type="radio" name="s1q5" value="c"> c) UsuarioServicio</label>
+      <label><input type="radio" name="s1q5" value="d"> d) UsuarioPrincipal</label>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question" id="s1-q6">
+    <div class="q-num">Pregunta 6 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Qué clase del ejercicio universitario se encarga de guardar y obtener usuarios?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q6" value="a"> a) Usuario</label>
+      <label><input type="radio" name="s1q6" value="b"> b) UsuarioRepositorio</label>
+      <label><input type="radio" name="s1q6" value="c"> c) UsuarioServicio</label>
+      <label><input type="radio" name="s1q6" value="d"> d) UsuarioManager</label>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question" id="s1-q7">
+    <div class="q-num">Pregunta 7 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La clase <code>Usuario</code> refactorizada en el ejercicio universitario contiene:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q7" value="a"> a) Lógica de validación de email</label>
+      <label><input type="radio" name="s1q7" value="b"> b) Métodos de acceso a base de datos</label>
+      <label><input type="radio" name="s1q7" value="c"> c) Solo los atributos (id, nombre, email) con getters y setters</label>
+      <label><input type="radio" name="s1q7" value="d"> d) La lógica de registro completa</label>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question" id="s1-q8">
+    <div class="q-num">Pregunta 8 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál de las siguientes opciones NO forma parte de los principios SOLID?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q8" value="a"> a) SRP (Single Responsibility)</label>
+      <label><input type="radio" name="s1q8" value="b"> b) OCP (Open/Closed)</label>
+      <label><input type="radio" name="s1q8" value="c"> c) MVC (Model-View-Controller)</label>
+      <label><input type="radio" name="s1q8" value="d"> d) DIP (Dependency Inversion)</label>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question" id="s1-q9">
+    <div class="q-num">Pregunta 9 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál es la señal más clara de que una clase viola SRP?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q9" value="a"> a) La clase tiene más de 100 líneas de código</label>
+      <label><input type="radio" name="s1q9" value="b"> b) Necesitas usar la palabra "y" para describir qué hace la clase</label>
+      <label><input type="radio" name="s1q9" value="c"> c) La clase tiene métodos privados</label>
+      <label><input type="radio" name="s1q9" value="d"> d) La clase hereda de más de una clase padre</label>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question" id="s1-q10">
+    <div class="q-num">Pregunta 10 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Una clase con responsabilidad única tiene:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q10" value="a"> a) Alta cohesión y bajo acoplamiento</label>
+      <label><input type="radio" name="s1q10" value="b"> b) Baja cohesión y alto acoplamiento</label>
+      <label><input type="radio" name="s1q10" value="c"> c) Alta cohesión y alto acoplamiento</label>
+      <label><input type="radio" name="s1q10" value="d"> d) Ninguna de las anteriores</label>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="question" id="s1-q11">
+    <div class="q-num">Pregunta 11 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuántos principios componen SOLID?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q11" value="a"> a) 3</label>
+      <label><input type="radio" name="s1q11" value="b"> b) 4</label>
+      <label><input type="radio" name="s1q11" value="c"> c) 5</label>
+      <label><input type="radio" name="s1q11" value="d"> d) 6</label>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="question" id="s1-q12">
+    <div class="q-num">Pregunta 12 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">El principio SOLID que dice "depender de abstracciones, no de implementaciones" es:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q12" value="a"> a) SRP</label>
+      <label><input type="radio" name="s1q12" value="b"> b) LSP</label>
+      <label><input type="radio" name="s1q12" value="c"> c) ISP</label>
+      <label><input type="radio" name="s1q12" value="d"> d) DIP</label>
+    </div>
+  </div>
+
+  <!-- Q13 -->
+  <div class="question" id="s1-q13">
+    <div class="q-num">Pregunta 13 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>UsuarioServicio.registrarUsuario()</code> en el ejercicio universitario:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q13" value="a"> a) Guarda directamente en la lista interna</label>
+      <label><input type="radio" name="s1q13" value="b"> b) Valida el email y luego delega la persistencia al repositorio</label>
+      <label><input type="radio" name="s1q13" value="c"> c) Llama a UsuarioManager.guardarUsuario()</label>
+      <label><input type="radio" name="s1q13" value="d"> d) Conecta directamente a una base de datos real</label>
+    </div>
+  </div>
+
+  <!-- Q14 -->
+  <div class="question" id="s1-q14">
+    <div class="q-num">Pregunta 14 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál es la diferencia entre los principios de diseño generales y los principios SOLID?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q14" value="a"> a) Son exactamente lo mismo</label>
+      <label><input type="radio" name="s1q14" value="b"> b) SOLID es un subconjunto específico de los principios de diseño, más concreto</label>
+      <label><input type="radio" name="s1q14" value="c"> c) Los principios de diseño generales son parte de SOLID</label>
+      <label><input type="radio" name="s1q14" value="d"> d) No tienen ninguna relación entre sí</label>
+    </div>
+  </div>
+
+  <!-- Q15 -->
+  <div class="question" id="s1-q15">
+    <div class="q-num">Pregunta 15 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>UsuarioManager</code> tiene exactamente ¿cuántas razones para cambiar (responsabilidades)?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q15" value="a"> a) 1</label>
+      <label><input type="radio" name="s1q15" value="b"> b) 2</label>
+      <label><input type="radio" name="s1q15" value="c"> c) 3</label>
+      <label><input type="radio" name="s1q15" value="d"> d) 4</label>
+    </div>
+  </div>
+
+  <!-- Q16 -->
+  <div class="question" id="s1-q16">
+    <div class="q-num">Pregunta 16 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Una clase <code>Empleado</code> con métodos <code>calcularSalario()</code> e <code>imprimirRecibo()</code>:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q16" value="a"> a) No viola SRP porque ambos métodos pertenecen a empleados</label>
+      <label><input type="radio" name="s1q16" value="b"> b) Viola SRP porque tiene dos responsabilidades diferentes</label>
+      <label><input type="radio" name="s1q16" value="c"> c) Solo viola SRP si la clase tiene más de 5 métodos</label>
+      <label><input type="radio" name="s1q16" value="d"> d) Depende del tamaño de la clase</label>
+    </div>
+  </div>
+
+  <!-- Q17 -->
+  <div class="question" id="s1-q17">
+    <div class="q-num">Pregunta 17 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Qué estructura de datos usa <code>UsuarioRepositorio</code> para simular la base de datos?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q17" value="a"> a) HashMap</label>
+      <label><input type="radio" name="s1q17" value="b"> b) Set</label>
+      <label><input type="radio" name="s1q17" value="c"> c) ArrayList (List)</label>
+      <label><input type="radio" name="s1q17" value="d"> d) LinkedList</label>
+    </div>
+  </div>
+
+  <!-- Q18 -->
+  <div class="question" id="s1-q18">
+    <div class="q-num">Pregunta 18 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál es la ventaja de SRP en cuanto a pruebas (testing)?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q18" value="a"> a) Las clases pequeñas no necesitan ser probadas</label>
+      <label><input type="radio" name="s1q18" value="b"> b) Las clases con una sola responsabilidad son más fáciles de aislar y probar</label>
+      <label><input type="radio" name="s1q18" value="c"> c) Las pruebas se vuelven más complejas con SRP</label>
+      <label><input type="radio" name="s1q18" value="d"> d) SRP no tiene relación con el testing</label>
+    </div>
+  </div>
+
+  <!-- Q19 -->
+  <div class="question" id="s1-q19">
+    <div class="q-num">Pregunta 19 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">En el contexto de SOLID, "cohesión" significa:</div>
+    <div class="options">
+      <label><input type="radio" name="s1q19" value="a"> a) Que varias clases dependen entre sí</label>
+      <label><input type="radio" name="s1q19" value="b"> b) Que los métodos y atributos de una clase están estrechamente relacionados con su única responsabilidad</label>
+      <label><input type="radio" name="s1q19" value="c"> c) Que la clase tiene muchos métodos</label>
+      <label><input type="radio" name="s1q19" value="d"> d) Que la clase hereda de otra</label>
+    </div>
+  </div>
+
+  <!-- Q20 -->
+  <div class="question" id="s1-q20">
+    <div class="q-num">Pregunta 20 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">Si en la aplicación cambia la forma de guardar usuarios (de lista a base de datos real), en la versión refactorizada con SRP, ¿qué clase se modifica?</div>
+    <div class="options">
+      <label><input type="radio" name="s1q20" value="a"> a) Usuario</label>
+      <label><input type="radio" name="s1q20" value="b"> b) UsuarioServicio</label>
+      <label><input type="radio" name="s1q20" value="c"> c) UsuarioRepositorio</label>
+      <label><input type="radio" name="s1q20" value="d"> d) Las tres clases a la vez</label>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="checkAnswers('s1')">Verificar Semana 1</button>
+  <button class="btn-reset" onclick="resetQuiz('s1')">Reiniciar Semana 1</button>
+  <div class="score-box" id="s1-score">
+    <h3>Resultado Semana 1</h3>
+    <div class="score-num" id="s1-score-num">0/20</div>
+    <div class="score-sub" id="s1-score-sub"></div>
+    <div class="score-bar"><div class="score-fill" id="s1-score-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- ============================================================ SEMANA 2 ============================================================ -->
+<div id="s2" class="tab-content">
+  <div class="semana-header">
+    <h2>Semana 2 — OCP &amp; LSP</h2>
+    <p>20 preguntas · Principio Abierto/Cerrado y Sustitución de Liskov</p>
+  </div>
+  <div class="progress">Preguntas respondidas: <span id="s2-prog">0 / 20</span></div>
+
+  <div class="question" id="s2-q1">
+    <div class="q-num">Pregunta 1 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">OCP establece que las clases/entidades deben estar:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q1" value="a"> a) Abiertas para modificación y cerradas para extensión</label>
+      <label><input type="radio" name="s2q1" value="b"> b) Abiertas para extensión y cerradas para modificación</label>
+      <label><input type="radio" name="s2q1" value="c"> c) Abiertas para todo cambio que sea necesario</label>
+      <label><input type="radio" name="s2q1" value="d"> d) Cerradas tanto para extensión como para modificación</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q2">
+    <div class="q-num">Pregunta 2 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>ClaseQueNocumple</code> del ejercicio universitario viola OCP porque:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q2" value="a"> a) No tiene atributos definidos</label>
+      <label><input type="radio" name="s2q2" value="b"> b) Usa if/else para cada tipo de notificación, forzando modificar la clase al agregar un nuevo canal</label>
+      <label><input type="radio" name="s2q2" value="c"> c) No implementa ninguna interfaz</label>
+      <label><input type="radio" name="s2q2" value="d"> d) El método enviar() recibe demasiados parámetros</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q3">
+    <div class="q-num">Pregunta 3 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La interfaz <code>Notificacion</code> del ejercicio universitario declara el método:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q3" value="a"> a) <code>notificar()</code></label>
+      <label><input type="radio" name="s2q3" value="b"> b) <code>mandar(String tipo, String msg)</code></label>
+      <label><input type="radio" name="s2q3" value="c"> c) <code>enviar(String mensaje)</code></label>
+      <label><input type="radio" name="s2q3" value="d"> d) <code>send(String to)</code></label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q4">
+    <div class="q-num">Pregunta 4 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">Para agregar un canal <code>NotificacionTelegram</code> respetando OCP, se debe:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q4" value="a"> a) Modificar el método de ClaseQueNocumple agregando otro if/else</label>
+      <label><input type="radio" name="s2q4" value="b"> b) Modificar la clase Notificador</label>
+      <label><input type="radio" name="s2q4" value="c"> c) Crear nueva clase <code>NotificacionTelegram implements Notificacion</code> sin tocar nada existente</label>
+      <label><input type="radio" name="s2q4" value="d"> d) Agregar un nuevo parámetro al método enviar()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q5">
+    <div class="q-num">Pregunta 5 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">LSP (Principio de Sustitución de Liskov) establece que:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q5" value="a"> a) Las subclases deben ser más complejas que las clases base</label>
+      <label><input type="radio" name="s2q5" value="b"> b) Los objetos de clases derivadas deben ser reemplazables por objetos de la clase base sin alterar el funcionamiento</label>
+      <label><input type="radio" name="s2q5" value="c"> c) Las clases base no pueden ser abstractas</label>
+      <label><input type="radio" name="s2q5" value="d"> d) Las subclases deben tener exactamente los mismos métodos que la clase base</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q6">
+    <div class="q-num">Pregunta 6 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario de Aves, ¿por qué <code>Pinguino</code> extiende <code>AveNoVoladora</code> y no <code>AveVoladora</code>?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q6" value="a"> a) Es un error del programador, debería extender AveVoladora</label>
+      <label><input type="radio" name="s2q6" value="b"> b) Para cumplir LSP: el pingüino no puede volar, y extender AveVoladora violaría el contrato de volar()</label>
+      <label><input type="radio" name="s2q6" value="c"> c) Por un problema de rendimiento en AveVoladora</label>
+      <label><input type="radio" name="s2q6" value="d"> d) Porque AveVoladora es una clase final</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q7">
+    <div class="q-num">Pregunta 7 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario, la clase base <code>Ave</code> solo tiene el método:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q7" value="a"> a) <code>volar()</code></label>
+      <label><input type="radio" name="s2q7" value="b"> b) <code>comer()</code></label>
+      <label><input type="radio" name="s2q7" value="c"> c) <code>caminar()</code></label>
+      <label><input type="radio" name="s2q7" value="d"> d) <code>volar()</code> y <code>comer()</code></label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q8">
+    <div class="q-num">Pregunta 8 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>Pinguino</code> en el ejercicio universitario sobreescribe (<code>@Override</code>):</div>
+    <div class="options">
+      <label><input type="radio" name="s2q8" value="a"> a) Solo <code>caminar()</code></label>
+      <label><input type="radio" name="s2q8" value="b"> b) Solo <code>comer()</code></label>
+      <label><input type="radio" name="s2q8" value="c"> c) Tanto <code>caminar()</code> como <code>comer()</code></label>
+      <label><input type="radio" name="s2q8" value="d"> d) <code>volar()</code> lanzando una excepción</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q9">
+    <div class="q-num">Pregunta 9 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Qué patrón de código es la señal más clara de violación de LSP?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q9" value="a"> a) Usar @Override en los métodos</label>
+      <label><input type="radio" name="s2q9" value="b"> b"> Lanzar <code>UnsupportedOperationException</code> en un método heredado</label>
+      <label><input type="radio" name="s2q9" value="c"> c) Agregar nuevos métodos en la subclase</label>
+      <label><input type="radio" name="s2q9" value="d"> d) Tener constructores con parámetros</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q10">
+    <div class="q-num">Pregunta 10 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio de Aves, <code>AveVoladora</code> agrega el método:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q10" value="a"> a) <code>comer()</code></label>
+      <label><input type="radio" name="s2q10" value="b"> b) <code>volar()</code></label>
+      <label><input type="radio" name="s2q10" value="c"> c) <code>caminar()</code></label>
+      <label><input type="radio" name="s2q10" value="d"> d) <code>nadar()</code></label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q11">
+    <div class="q-num">Pregunta 11 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">La diferencia principal entre OCP y LSP es:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q11" value="a"> a) OCP trata de herencia, LSP trata de interfaces</label>
+      <label><input type="radio" name="s2q11" value="b"> b) OCP es sobre extender sin modificar; LSP es sobre sustitución correcta en jerarquías de herencia</label>
+      <label><input type="radio" name="s2q11" value="c"> c) Son exactamente iguales</label>
+      <label><input type="radio" name="s2q11" value="d"> d) OCP aplica a clases, LSP aplica solo a interfaces</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q12">
+    <div class="q-num">Pregunta 12 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Cuántas clases implementan la interfaz <code>Notificacion</code> en el ejercicio universitario?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q12" value="a"> a) 2</label>
+      <label><input type="radio" name="s2q12" value="b"> b) 3</label>
+      <label><input type="radio" name="s2q12" value="c"> c) 4 (Email, SMS, Push, Whatsapp)</label>
+      <label><input type="radio" name="s2q12" value="d"> d) 5</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q13">
+    <div class="q-num">Pregunta 13 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La clase <code>Notificador</code> en el ejercicio universitario recibe como parámetro:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q13" value="a"> a) Un String con el tipo: "email", "sms", etc.</label>
+      <label><input type="radio" name="s2q13" value="b"> b) Un objeto de tipo <code>Notificacion</code> y el mensaje</label>
+      <label><input type="radio" name="s2q13" value="c"> c) Solo el mensaje de texto</label>
+      <label><input type="radio" name="s2q13" value="d"> d) El destinatario y el asunto</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q14">
+    <div class="q-num">Pregunta 14 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál es la jerarquía correcta según el ejercicio universitario para la clase <code>Aguila</code>?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q14" value="a"> a) Ave → Aguila</label>
+      <label><input type="radio" name="s2q14" value="b"> b) AveNoVoladora → Aguila</label>
+      <label><input type="radio" name="s2q14" value="c"> c) AveVoladora → Aguila</label>
+      <label><input type="radio" name="s2q14" value="d"> d) Ave → AveNoVoladora → Aguila</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q15">
+    <div class="q-num">Pregunta 15 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Según OCP, ¿en qué caso es aceptable modificar código existente?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q15" value="a"> a) Nunca, bajo ninguna circunstancia</label>
+      <label><input type="radio" name="s2q15" value="b"> b) Para corregir bugs, no para agregar nueva funcionalidad</label>
+      <label><input type="radio" name="s2q15" value="c"> c) Siempre que sea necesario para el proyecto</label>
+      <label><input type="radio" name="s2q15" value="d"> d) Solo cuando hay tests automatizados</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q16">
+    <div class="q-num">Pregunta 16 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Cómo imprime <code>Pinguino.comer()</code> en el ejercicio universitario?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q16" value="a"> a) "Estoy comiendo"</label>
+      <label><input type="radio" name="s2q16" value="b"> b) "Estoy comiendo pescado"</label>
+      <label><input type="radio" name="s2q16" value="c"> c) "Pingüino comiendo"</label>
+      <label><input type="radio" name="s2q16" value="d"> d) No tiene el método comer()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q17">
+    <div class="q-num">Pregunta 17 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Para cumplir OCP se utilizan principalmente:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q17" value="a"> a) Variables globales y constantes</label>
+      <label><input type="radio" name="s2q17" value="b"> b) Herencia y/o interfaces (polimorfismo)</label>
+      <label><input type="radio" name="s2q17" value="c"> c) Métodos estáticos</label>
+      <label><input type="radio" name="s2q17" value="d"> d) Constructores privados</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q18">
+    <div class="q-num">Pregunta 18 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario, <code>NotificacionSMS</code> actualmente:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q18" value="a"> a) Envía un SMS real</label>
+      <label><input type="radio" name="s2q18" value="b"> b) Imprime el mensaje por consola</label>
+      <label><input type="radio" name="s2q18" value="c"> c) Lanza UnsupportedOperationException (pendiente de implementar)</label>
+      <label><input type="radio" name="s2q18" value="d"> d) No tiene el método enviar()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q19">
+    <div class="q-num">Pregunta 19 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Si una subclase <code>Rectangulo</code> extiende <code>Cuadrado</code> pero al cambiar el alto también cambia el ancho (comportamiento inesperado), ¿qué principio viola?</div>
+    <div class="options">
+      <label><input type="radio" name="s2q19" value="a"> a) SRP</label>
+      <label><input type="radio" name="s2q19" value="b"> b) OCP</label>
+      <label><input type="radio" name="s2q19" value="c"> c) LSP</label>
+      <label><input type="radio" name="s2q19" value="d"> d) DIP</label>
+    </div>
+  </div>
+
+  <div class="question" id="s2-q20">
+    <div class="q-num">Pregunta 20 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario de OCP, el mecanismo que permite extender sin modificar es:</div>
+    <div class="options">
+      <label><input type="radio" name="s2q20" value="a"> a) El método if/else de ClaseQueNocumple</label>
+      <label><input type="radio" name="s2q20" value="b"> b"> La interfaz <code>Notificacion</code> como punto de extensión</label>
+      <label><input type="radio" name="s2q20" value="c"> c) El uso de static en el método enviar()</label>
+      <label><input type="radio" name="s2q20" value="d"> d) La herencia directa entre notificaciones</label>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="checkAnswers('s2')">Verificar Semana 2</button>
+  <button class="btn-reset" onclick="resetQuiz('s2')">Reiniciar Semana 2</button>
+  <div class="score-box" id="s2-score">
+    <h3>Resultado Semana 2</h3>
+    <div class="score-num" id="s2-score-num">0/20</div>
+    <div class="score-sub" id="s2-score-sub"></div>
+    <div class="score-bar"><div class="score-fill" id="s2-score-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- ============================================================ SEMANA 3 ============================================================ -->
+<div id="s3" class="tab-content">
+  <div class="semana-header">
+    <h2>Semana 3 — ISP &amp; DIP</h2>
+    <p>20 preguntas · Segregación de Interfaces e Inversión de Dependencia</p>
+  </div>
+  <div class="progress">Preguntas respondidas: <span id="s3-prog">0 / 20</span></div>
+
+  <div class="question" id="s3-q1">
+    <div class="q-num">Pregunta 1 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">ISP establece que los clientes no deben:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q1" value="a"> a) Usar interfaces en su código</label>
+      <label><input type="radio" name="s3q1" value="b"> b) Estar obligados a depender de interfaces que no utilizan</label>
+      <label><input type="radio" name="s3q1" value="c"> c) Crear más de una interfaz por módulo</label>
+      <label><input type="radio" name="s3q1" value="d"> d) Implementar más de dos interfaces a la vez</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q2">
+    <div class="q-num">Pregunta 2 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En la versión <strong>incorrecta</strong> del ejercicio universitario (ISP), la interfaz <code>Impresora</code> tiene:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q2" value="a"> a) Solo imprimir()</label>
+      <label><input type="radio" name="s3q2" value="b"> b) imprimir() y escanear()</label>
+      <label><input type="radio" name="s3q2" value="c"> c) imprimir(), escanear() y enviarFax()</label>
+      <label><input type="radio" name="s3q2" value="d"> d) Solo enviarFax()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q3">
+    <div class="q-num">Pregunta 3 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En la versión <strong>correcta</strong> (ISP) del ejercicio universitario, las interfaces están separadas en:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q3" value="a"> a) ImpresoraBasica e ImpresoraMultifuncional</label>
+      <label><input type="radio" name="s3q3" value="b"> b) Impresora, Scanner y Fax</label>
+      <label><input type="radio" name="s3q3" value="c"> c) Dispositivo e Impresora</label>
+      <label><input type="radio" name="s3q3" value="d"> d) Solo se usa una interfaz grande mejorada</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q4">
+    <div class="q-num">Pregunta 4 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>ImpresoraMultifuncional</code> en el ejercicio universitario implementa:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q4" value="a"> a) Solo Impresora</label>
+      <label><input type="radio" name="s3q4" value="b"> b) Impresora y Scanner</label>
+      <label><input type="radio" name="s3q4" value="c"> c) Impresora, Scanner y Fax</label>
+      <label><input type="radio" name="s3q4" value="d"> d) Solo Scanner y Fax</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q5">
+    <div class="q-num">Pregunta 5 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">DIP establece que los módulos de alto nivel:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q5" value="a"> a) Deben depender directamente de los módulos de bajo nivel</label>
+      <label><input type="radio" name="s3q5" value="b"> b) No deben depender de módulos de bajo nivel; ambos deben depender de abstracciones</label>
+      <label><input type="radio" name="s3q5" value="c"> c) Son totalmente independientes de cualquier otro módulo</label>
+      <label><input type="radio" name="s3q5" value="d"> d) Solo deben depender de otros módulos de alto nivel</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q6">
+    <div class="q-num">Pregunta 6 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>TiendaIncorrecta</code> viola DIP porque:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q6" value="a"> a) No tiene métodos de pago suficientes</label>
+      <label><input type="radio" name="s3q6" value="b"> b) Crea directamente <code>new Paypal()</code> dentro de su constructor, acoplándose a una implementación concreta</label>
+      <label><input type="radio" name="s3q6" value="c"> c) Su constructor tiene demasiados parámetros</label>
+      <label><input type="radio" name="s3q6" value="d"> d) No implementa ninguna interfaz</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q7">
+    <div class="q-num">Pregunta 7 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La interfaz que usa <code>TiendaCorrecta</code> en el ejercicio universitario se llama:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q7" value="a"> a) Pago</label>
+      <label><input type="radio" name="s3q7" value="b"> b"> ServicioPago</label>
+      <label><input type="radio" name="s3q7" value="c"> c) MetodoPago</label>
+      <label><input type="radio" name="s3q7" value="d"> d) IPago</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q8">
+    <div class="q-num">Pregunta 8 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Cómo recibe <code>TiendaCorrecta</code> el método de pago en el ejercicio universitario?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q8" value="a"> a) A través de un setter</label>
+      <label><input type="radio" name="s3q8" value="b"> b"> A través del constructor (inyección de dependencia)</label>
+      <label><input type="radio" name="s3q8" value="c"> c) Lo crea internamente con new</label>
+      <label><input type="radio" name="s3q8" value="d"> d) A través de una variable global estática</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q9">
+    <div class="q-num">Pregunta 9 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En <code>MainCorrecto</code> del ejercicio universitario (DIP), ¿cuántas instancias de <code>TiendaCorrecta</code> se crean?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q9" value="a"> a) 1</label>
+      <label><input type="radio" name="s3q9" value="b"> b) 2</label>
+      <label><input type="radio" name="s3q9" value="c"> c) 3 (con Paypal, TarjetaCredito y TransferenciaBancaria)</label>
+      <label><input type="radio" name="s3q9" value="d"> d) 4</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q10">
+    <div class="q-num">Pregunta 10 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">La técnica que se usa para aplicar DIP en el código se llama:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q10" value="a"> a) Herencia múltiple</label>
+      <label><input type="radio" name="s3q10" value="b"> b) Inyección de dependencias</label>
+      <label><input type="radio" name="s3q10" value="c"> c) Sobrecarga de métodos</label>
+      <label><input type="radio" name="s3q10" value="d"> d) Polimorfismo estático</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q11">
+    <div class="q-num">Pregunta 11 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Qué imprime <code>ImpresoraMultifuncional.imprimir()</code> en el ejercicio universitario?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q11" value="a"> a) "Imprimiendo..."</label>
+      <label><input type="radio" name="s3q11" value="b"> b) "Imprimiendo Documento Multifuncional..."</label>
+      <label><input type="radio" name="s3q11" value="c"> c) "Iniciando proceso de impresión..."</label>
+      <label><input type="radio" name="s3q11" value="d"> d) "Procesando documento..."</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q12">
+    <div class="q-num">Pregunta 12 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Implementar métodos con cuerpo vacío o lanzando excepciones en una clase que implementa una interfaz es señal de violación de:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q12" value="a"> a) SRP</label>
+      <label><input type="radio" name="s3q12" value="b"> b) OCP</label>
+      <label><input type="radio" name="s3q12" value="c"> c) ISP</label>
+      <label><input type="radio" name="s3q12" value="d"> d) DIP</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q13">
+    <div class="q-num">Pregunta 13 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Qué ventaja concreta tiene DIP en el ejercicio de <code>TiendaCorrecta</code>?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q13" value="a"> a) TiendaCorrecta es más rápida que TiendaIncorrecta</label>
+      <label><input type="radio" name="s3q13" value="b"> b) Se puede cambiar el método de pago (Paypal, Tarjeta, Transferencia) sin modificar TiendaCorrecta</label>
+      <label><input type="radio" name="s3q13" value="c"> c) TiendaCorrecta tiene más métodos disponibles</label>
+      <label><input type="radio" name="s3q13" value="d"> d) No necesita interfaces para funcionar</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q14">
+    <div class="q-num">Pregunta 14 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">La diferencia entre ISP y DIP es:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q14" value="a"> a) ISP es sobre dependencias entre módulos, DIP es sobre interfaces</label>
+      <label><input type="radio" name="s3q14" value="b"> b) ISP trata interfaces innecesarias; DIP trata dependencias a implementaciones concretas</label>
+      <label><input type="radio" name="s3q14" value="c"> c) Son exactamente iguales</label>
+      <label><input type="radio" name="s3q14" value="d"> d) ISP es más moderno que DIP</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q15">
+    <div class="q-num">Pregunta 15 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">Si en el ejercicio universitario quisiéramos agregar pago con Bitcoin usando DIP, ¿qué habría que hacer?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q15" value="a"> a) Modificar TiendaCorrecta para agregar el caso Bitcoin</label>
+      <label><input type="radio" name="s3q15" value="b"> b"> Crear clase <code>Bitcoin implements MetodoPago</code> y pasarla al constructor de TiendaCorrecta</label>
+      <label><input type="radio" name="s3q15" value="c"> c) Crear una nueva clase TiendaBitcoin</label>
+      <label><input type="radio" name="s3q15" value="d"> d) Modificar la interfaz MetodoPago</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q16">
+    <div class="q-num">Pregunta 16 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">En DIP, "abstracciones" se refiere a:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q16" value="a"> a) Solo clases abstractas</label>
+      <label><input type="radio" name="s3q16" value="b"> b) Interfaces y clases abstractas</label>
+      <label><input type="radio" name="s3q16" value="c"> c) Solo interfaces</label>
+      <label><input type="radio" name="s3q16" value="d"> d) Solo métodos abstractos</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q17">
+    <div class="q-num">Pregunta 17 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>Paypal.pagar(2000)</code> en el ejercicio universitario imprime:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q17" value="a"> a) "Pago realizado"</label>
+      <label><input type="radio" name="s3q17" value="b"> b) "Pago de $ 2000.00 realizado con Paypal"</label>
+      <label><input type="radio" name="s3q17" value="c"> c) "Procesando Paypal: 2000"</label>
+      <label><input type="radio" name="s3q17" value="d"> d) "Paypal OK: $2000"</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q18">
+    <div class="q-num">Pregunta 18 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuántos paquetes/carpetas tiene el ejercicio de ISP en la universidad?</div>
+    <div class="options">
+      <label><input type="radio" name="s3q18" value="a"> a) 1 (solo el correcto)</label>
+      <label><input type="radio" name="s3q18" value="b"> b) 2 (CORRECTO e INCORRECTO)</label>
+      <label><input type="radio" name="s3q18" value="c"> c) 3</label>
+      <label><input type="radio" name="s3q18" value="d"> d) 4</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q19">
+    <div class="q-num">Pregunta 19 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Un "módulo de alto nivel" en DIP sería, por ejemplo:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q19" value="a"> a) La clase Paypal (implementa un detalle)</label>
+      <label><input type="radio" name="s3q19" value="b"> b"> La clase TiendaCorrecta (orquesta lógica de negocio)</label>
+      <label><input type="radio" name="s3q19" value="c"> c) La interfaz MetodoPago (abstracción)</label>
+      <label><input type="radio" name="s3q19" value="d"> d) La clase TarjetaCredito</label>
+    </div>
+  </div>
+
+  <div class="question" id="s3-q20">
+    <div class="q-num">Pregunta 20 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario de DIP, si se usa <code>TiendaIncorrecta</code> y se quiere cambiar de Paypal a TarjetaCredito, se necesita:</div>
+    <div class="options">
+      <label><input type="radio" name="s3q20" value="a"> a) Nada, funciona automáticamente</label>
+      <label><input type="radio" name="s3q20" value="b"> b"> Modificar el código interno de TiendaIncorrecta (cambiar private Paypal por TarjetaCredito)</label>
+      <label><input type="radio" name="s3q20" value="c"> c) Solo cambiar el Main</label>
+      <label><input type="radio" name="s3q20" value="d"> d) Agregar un nuevo método en TiendaIncorrecta</label>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="checkAnswers('s3')">Verificar Semana 3</button>
+  <button class="btn-reset" onclick="resetQuiz('s3')">Reiniciar Semana 3</button>
+  <div class="score-box" id="s3-score">
+    <h3>Resultado Semana 3</h3>
+    <div class="score-num" id="s3-score-num">0/20</div>
+    <div class="score-sub" id="s3-score-sub"></div>
+    <div class="score-bar"><div class="score-fill" id="s3-score-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- ============================================================ SEMANA 4 ============================================================ -->
+<div id="s4" class="tab-content">
+  <div class="semana-header">
+    <h2>Semana 4 — Singleton &amp; Factory Method</h2>
+    <p>20 preguntas · Patrones creacionales</p>
+  </div>
+  <div class="progress">Preguntas respondidas: <span id="s4-prog">0 / 20</span></div>
+
+  <div class="question" id="s4-q1">
+    <div class="q-num">Pregunta 1 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">El patrón Singleton garantiza:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q1" value="a"> a) Múltiples instancias reutilizables de una clase</label>
+      <label><input type="radio" name="s4q1" value="b"> b) Una única instancia de la clase con un punto de acceso global</label>
+      <label><input type="radio" name="s4q1" value="c"> c) La creación más rápida de objetos complejos</label>
+      <label><input type="radio" name="s4q1" value="d"> d) La herencia automática entre clases similares</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q2">
+    <div class="q-num">Pregunta 2 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En <code>ConfiguracionApp</code> del ejercicio universitario, el atributo <code>instancia</code> es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q2" value="a"> a) public static</label>
+      <label><input type="radio" name="s4q2" value="b"> b) private static</label>
+      <label><input type="radio" name="s4q2" value="c"> c) private final</label>
+      <label><input type="radio" name="s4q2" value="d"> d) protected static</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q3">
+    <div class="q-num">Pregunta 3 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">El método que devuelve la instancia única en <code>ConfiguracionApp</code> se llama:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q3" value="a"> a) getInstance()</label>
+      <label><input type="radio" name="s4q3" value="b"> b) getInstancia()</label>
+      <label><input type="radio" name="s4q3" value="c"> c) instancia()</label>
+      <label><input type="radio" name="s4q3" value="d"> d) crear()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q4">
+    <div class="q-num">Pregunta 4 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Qué hace <code>getInstancia()</code> cuando el atributo <code>instancia</code> ya NO es null?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q4" value="a"> a) Crea una nueva instancia para tener frescura</label>
+      <label><input type="radio" name="s4q4" value="b"> b) Lanza una excepción de instancia duplicada</label>
+      <label><input type="radio" name="s4q4" value="c"> c) Devuelve la instancia existente (la única)</label>
+      <label><input type="radio" name="s4q4" value="d"> d) Resetea y recrea la instancia</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q5">
+    <div class="q-num">Pregunta 5 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">La URL base configurada en <code>ConfiguracionApp</code> del ejercicio universitario es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q5" value="a"> a) http://localhost:3000</label>
+      <label><input type="radio" name="s4q5" value="b"> b) http://localhost:8080</label>
+      <label><input type="radio" name="s4q5" value="c"> c) http://localhost:8000</label>
+      <label><input type="radio" name="s4q5" value="d"> d) http://127.0.0.1</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q6">
+    <div class="q-num">Pregunta 6 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿A qué categoría de patrones pertenecen Singleton y Factory Method?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q6" value="a"> a) Estructurales</label>
+      <label><input type="radio" name="s4q6" value="b"> b) De comportamiento</label>
+      <label><input type="radio" name="s4q6" value="c"> c) Creacionales</label>
+      <label><input type="radio" name="s4q6" value="d"> d) Funcionales</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q7">
+    <div class="q-num">Pregunta 7 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">El patrón Factory Method delega la decisión de qué objeto crear a:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q7" value="a"> a) Una clase utilitaria estática</label>
+      <label><input type="radio" name="s4q7" value="b"> b) Las subclases (factories concretas)</label>
+      <label><input type="radio" name="s4q7" value="c"> c) El objeto que va a usar el producto</label>
+      <label><input type="radio" name="s4q7" value="d"> d) Una base de datos de configuración</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q8">
+    <div class="q-num">Pregunta 8 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio universitario de Factory Method (Reportes), la interfaz del producto es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q8" value="a"> a) ReporteFactory</label>
+      <label><input type="radio" name="s4q8" value="b"> b) ReportePDF</label>
+      <label><input type="radio" name="s4q8" value="c"> c) Reporte</label>
+      <label><input type="radio" name="s4q8" value="d"> d) GeneradorReporte</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q9">
+    <div class="q-num">Pregunta 9 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">El método declarado en <code>ReporteFactory</code> (abstracta) en el ejercicio universitario es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q9" value="a"> a) generar()</label>
+      <label><input type="radio" name="s4q9" value="b"> b) crear()</label>
+      <label><input type="radio" name="s4q9" value="c"> c) crearReporte()</label>
+      <label><input type="radio" name="s4q9" value="d"> d) fabricar()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q10">
+    <div class="q-num">Pregunta 10 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text"><code>ReportePDFFactory.crearReporte()</code> retorna:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q10" value="a"> a) Un nuevo ReporteFactory</label>
+      <label><input type="radio" name="s4q10" value="b"> b) Un nuevo ReportePDF</label>
+      <label><input type="radio" name="s4q10" value="c"> c) Un nuevo ReporteWord</label>
+      <label><input type="radio" name="s4q10" value="d"> d"> null</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q11">
+    <div class="q-num">Pregunta 11 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio de Vehículos (Semana 4), la interfaz del producto se llama:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q11" value="a"> a) VehiculoFactory</label>
+      <label><input type="radio" name="s4q11" value="b"> b) Auto</label>
+      <label><input type="radio" name="s4q11" value="c"> c) Vehiculo</label>
+      <label><input type="radio" name="s4q11" value="d"> d) Transporte</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q12">
+    <div class="q-num">Pregunta 12 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En el ejercicio de Vehículos, el método que se llama sobre el vehículo creado es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q12" value="a"> a) encender()</label>
+      <label><input type="radio" name="s4q12" value="b"> b) arrancar()</label>
+      <label><input type="radio" name="s4q12" value="c"> c) iniciar()</label>
+      <label><input type="radio" name="s4q12" value="d"> d) mover()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q13">
+    <div class="q-num">Pregunta 13 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">¿Cuántos tipos de vehículos se crean en el <code>main.java</code> del ejercicio universitario?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q13" value="a"> a) 2</label>
+      <label><input type="radio" name="s4q13" value="b"> b) 3 (Auto, Moto y Camión)</label>
+      <label><input type="radio" name="s4q13" value="c"> c) 4</label>
+      <label><input type="radio" name="s4q13" value="d"> d) 5</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q14">
+    <div class="q-num">Pregunta 14 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text"><code>ReporteFactory</code> en el ejercicio universitario es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q14" value="a"> a) Una interfaz</label>
+      <label><input type="radio" name="s4q14" value="b"> b) Una clase concreta normal</label>
+      <label><input type="radio" name="s4q14" value="c"> c) Una clase abstracta</label>
+      <label><input type="radio" name="s4q14" value="d"> d) Un enum</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q15">
+    <div class="q-num">Pregunta 15 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">La ventaja del Factory Method sobre hacer <code>new ClaseConcreto()</code> directamente en el cliente es:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q15" value="a"> a) Es más rápido en ejecución</label>
+      <label><input type="radio" name="s4q15" value="b"> b) Desacopla el cliente de las clases concretas que se crean</label>
+      <label><input type="radio" name="s4q15" value="c"> c) Usa menos memoria en el sistema</label>
+      <label><input type="radio" name="s4q15" value="d"> d) Elimina la necesidad de interfaces</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q16">
+    <div class="q-num">Pregunta 16 <span class="badge badge-code">Código UTP</span></div>
+    <div class="q-text">En <code>Main.java</code> del ejercicio de Reportes, el cliente (Main) nunca hace:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q16" value="a"> a"> factory.crearReporte()</label>
+      <label><input type="radio" name="s4q16" value="b"> b) reporte.generar()</label>
+      <label><input type="radio" name="s4q16" value="c"> c) new ReportePDF() directamente</label>
+      <label><input type="radio" name="s4q16" value="d"> d) new ReportePDFFactory()</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q17">
+    <div class="q-num">Pregunta 17 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuántos componentes principales tiene el patrón Factory Method?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q17" value="a"> a) 2</label>
+      <label><input type="radio" name="s4q17" value="b"> b) 3</label>
+      <label><input type="radio" name="s4q17" value="c"> c) 4 (Producto interfaz, Producto concreto, Factory abstracta, Factory concreta)</label>
+      <label><input type="radio" name="s4q17" value="d"> d) 5</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q18">
+    <div class="q-num">Pregunta 18 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Si se quiere agregar <code>ReporteExcel</code> al sistema del ejercicio universitario, ¿qué hay que crear?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q18" value="a"> a) Solo una clase ReporteExcel</label>
+      <label><input type="radio" name="s4q18" value="b"> b) <code>ReporteExcel implements Reporte</code> y <code>ReporteExcelFactory extends ReporteFactory</code></label>
+      <label><input type="radio" name="s4q18" value="c"> c) Modificar ReporteFactory para agregar Excel</label>
+      <label><input type="radio" name="s4q18" value="d"> d) Modificar el Main directamente</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q19">
+    <div class="q-num">Pregunta 19 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">Los 3 elementos que debe tener un Singleton correcto son:</div>
+    <div class="options">
+      <label><input type="radio" name="s4q19" value="a"> a) Constructor público, atributo estático, método privado</label>
+      <label><input type="radio" name="s4q19" value="b"> b) Constructor privado, atributo estático privado, método estático público getInstancia()</label>
+      <label><input type="radio" name="s4q19" value="c"> c) Constructor privado, lista de instancias, método de clonación</label>
+      <label><input type="radio" name="s4q19" value="d"> d) Interfaz pública, clase abstracta, implementación concreta</label>
+    </div>
+  </div>
+
+  <div class="question" id="s4-q20">
+    <div class="q-num">Pregunta 20 <span class="badge badge-theory">Teoría</span></div>
+    <div class="q-text">¿Cuál es la diferencia principal entre Singleton y Factory Method?</div>
+    <div class="options">
+      <label><input type="radio" name="s4q20" value="a"> a) Son patrones equivalentes con diferente nombre</label>
+      <label><input type="radio" name="s4q20" value="b"> b) Singleton controla el número de instancias; Factory Method controla cómo se crean diferentes tipos de objetos</label>
+      <label><input type="radio" name="s4q20" value="c"> c) Singleton es para objetos grandes; Factory Method para pequeños</label>
+      <label><input type="radio" name="s4q20" value="d"> d) Factory Method siempre usa Singleton internamente</label>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="checkAnswers('s4')">Verificar Semana 4</button>
+  <button class="btn-reset" onclick="resetQuiz('s4')">Reiniciar Semana 4</button>
+  <div class="score-box" id="s4-score">
+    <h3>Resultado Semana 4</h3>
+    <div class="score-num" id="s4-score-num">0/20</div>
+    <div class="score-sub" id="s4-score-sub"></div>
+    <div class="score-bar"><div class="score-fill" id="s4-score-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<script>
+// ===================== ANSWER KEY =====================
+const answers = {
+  s1: { q1:'b', q2:'c', q3:'b', q4:'b', q5:'c', q6:'b', q7:'c', q8:'c', q9:'b', q10:'a',
+        q11:'c', q12:'d', q13:'b', q14:'b', q15:'c', q16:'b', q17:'c', q18:'b', q19:'b', q20:'c' },
+  s2: { q1:'b', q2:'b', q3:'c', q4:'c', q5:'b', q6:'b', q7:'b', q8:'c', q9:'b', q10:'b',
+        q11:'b', q12:'c', q13:'b', q14:'c', q15:'b', q16:'b', q17:'b', q18:'c', q19:'c', q20:'b' },
+  s3: { q1:'b', q2:'c', q3:'b', q4:'c', q5:'b', q6:'b', q7:'c', q8:'b', q9:'c', q10:'b',
+        q11:'b', q12:'c', q13:'b', q14:'b', q15:'b', q16:'b', q17:'b', q18:'b', q19:'b', q20:'b' },
+  s4: { q1:'b', q2:'b', q3:'b', q4:'c', q5:'b', q6:'c', q7:'b', q8:'c', q9:'c', q10:'b',
+        q11:'c', q12:'b', q13:'b', q14:'c', q15:'b', q16:'c', q17:'c', q18:'b', q19:'b', q20:'b' }
+};
+
+const feedbacks = {
+  s1: {
+    q1:'SRP = Single Responsibility Principle (Principio de Responsabilidad Única).',
+    q2:'Una clase debe tener UNA SOLA razón para cambiar, según SRP.',
+    q3:'UsuarioManager mezcla datos, validarEmail() (negocio) y guardarUsuario()/listarUsuarios() (persistencia) en una sola clase.',
+    q4:'Se dividió en: Usuario (datos), UsuarioServicio (lógica/validación) y UsuarioRepositorio (persistencia).',
+    q5:'UsuarioServicio contiene el método validarEmail() que verifica si contiene "@" y ".".',
+    q6:'UsuarioRepositorio tiene guardarUsuario() y obtenerUsuarios() usando un ArrayList.',
+    q7:'La clase Usuario refactorizada solo tiene id, nombre, email con sus getters/setters. Sin lógica.',
+    q8:'MVC (Model-View-Controller) es un patrón arquitectónico, no un principio SOLID.',
+    q9:'La regla "si necesitas "y" para describir qué hace" es la señal clásica de violación de SRP.',
+    q10:'Alta cohesión (los elementos se relacionan entre sí) y bajo acoplamiento (pocas dependencias externas).',
+    q11:'SOLID tiene 5 principios: S, O, L, I, D.',
+    q12:'La D de SOLID es Dependency Inversion Principle.',
+    q13:'registrarUsuario() llama primero a validarEmail() y si pasa, crea un Usuario y llama a repositorio.guardarUsuario().',
+    q14:'SOLID es un subconjunto específico y concreto de los principios generales de diseño OOP.',
+    q15:'UsuarioManager tiene 3 responsabilidades: datos, validación (negocio) y persistencia (BD simulada).',
+    q16:'calcularSalario() y imprimirRecibo() son dos responsabilidades diferentes → viola SRP.',
+    q17:'UsuarioRepositorio usa private List<Usuario> usuarios = new ArrayList<>() para simular BD.',
+    q18:'Clases con una responsabilidad son fáciles de aislar: se puede probar UsuarioServicio sin repositorio real.',
+    q19:'Cohesión alta significa que métodos y atributos de la clase están todos relacionados con su única responsabilidad.',
+    q20:'Solo UsuarioRepositorio cambia, ya que es quien sabe cómo persiste. Usuario y UsuarioServicio no se tocan.'
+  },
+  s2: {
+    q1:'OCP = Open/Closed: abierto para EXTENSIÓN, cerrado para MODIFICACIÓN.',
+    q2:'ClaseQueNocumple usa if/else con strings ("email", "sms") → agregar WhatsApp exige modificar esa clase.',
+    q3:'La interfaz Notificacion declara: void enviar(String mensaje);',
+    q4:'Con OCP, agregar un canal = crear nueva clase que implementa Notificacion. Sin tocar Notificador.',
+    q5:'LSP: las subclases deben poder reemplazar a la clase base sin alterar el comportamiento del programa.',
+    q6:'Si Pinguino extendiera AveVoladora, debería implementar volar() correctamente, pero no puede → viola LSP.',
+    q7:'Ave solo tiene comer() porque es lo ÚNICO común a todas las aves sin excepción.',
+    q8:'Pinguino tiene @Override en caminar() (sobreescribe a AveNoVoladora) y en comer() (sobreescribe a Ave).',
+    q9:'Lanzar UnsupportedOperationException significa "no puedo hacer esto heredado" → rompe el contrato → viola LSP.',
+    q10:'AveVoladora extiende Ave y agrega el método volar() que imprime "Estoy volando".',
+    q11:'OCP = extensión sin modificación. LSP = sustitución correcta en jerarquías.',
+    q12:'Email, SMS, Push y Whatsapp = 4 clases implementan Notificacion.',
+    q13:'Notificador.notificar(Notificacion notificacion, String mensaje) recibe la abstracción y el mensaje.',
+    q14:'Aguila extiende AveVoladora (puede volar) → Ave → AveVoladora → Aguila.',
+    q15:'OCP permite modificar para corregir bugs; lo que no permite es modificar para agregar nueva funcionalidad.',
+    q16:'Pinguino.comer() imprime "Estoy comiendo pescado" (override del comer() de Ave).',
+    q17:'OCP se logra con herencia y/o interfaces que permiten polimorfismo.',
+    q18:'NotificacionSMS.enviar() lanza UnsupportedOperationException, está pendiente de implementar realmente.',
+    q19:'Rectangulo que no puede reemplazar a Cuadrado sin cambiar comportamiento → viola LSP.',
+    q20:'La interfaz Notificacion es el mecanismo: cierra el Notificador a cambios y abre el sistema a extensiones.'
+  },
+  s3: {
+    q1:'ISP: ningún cliente debe ser obligado a depender de métodos de una interfaz que no usa.',
+    q2:'DP_S03_E1_INCORRECTO/Impresora.java tiene: imprimir(), escanear() y enviarFax() juntos.',
+    q3:'En el correcto: Impresora {imprimir()}, Scanner {escanear()}, Fax {enviarFax()} → 3 interfaces separadas.',
+    q4:'ImpresoraMultifuncional implements Impresora, Scanner, Fax → implementa las 3 porque las necesita.',
+    q5:'DIP: módulos de alto nivel Y de bajo nivel deben depender de abstracciones, no entre sí.',
+    q6:'TiendaIncorrecta hace "this.p1 = new Paypal();" → acoplada directamente a Paypal.',
+    q7:'TiendaCorrecta usa "private MetodoPago m1;" → depende de la interfaz MetodoPago.',
+    q8:'TiendaCorrecta(MetodoPago m1) → recibe por constructor = inyección de dependencias.',
+    q9:'MainCorrecto crea t1=new TiendaCorrecta(new Paypal()), t2 con TarjetaCredito, t3 con TransferenciaBancaria.',
+    q10:'La técnica para aplicar DIP es la inyección de dependencias (pasar la implementación por constructor).',
+    q11:'ImpresoraMultifuncional.imprimir() imprime "Imprimiendo Documento Multifuncional..."',
+    q12:'Métodos vacíos o con excepciones = la clase es forzada a implementar lo que no necesita → viola ISP.',
+    q13:'Con DIP, TiendaCorrecta.realizarPago() llama a m1.pagar() sin importar si m1 es Paypal, Tarjeta o Transferencia.',
+    q14:'ISP = interfaces innecesarias/gordas. DIP = dependencias hacia implementaciones concretas.',
+    q15:'Bitcoin implements MetodoPago → luego new TiendaCorrecta(new Bitcoin()). TiendaCorrecta no cambia.',
+    q16:'Abstracciones en DIP = interfaces Y clases abstractas (cualquier tipo no concreto).',
+    q17:'Paypal.pagar(2000) usa printf: "Pago de $ 2000.00 realizado con Paypal".',
+    q18:'Hay 2 carpetas: DP_S03_E1_CORRECTO y DP_S03_E1_INCORRECTO, tanto en ISP como en DIP.',
+    q19:'TiendaCorrecta es el módulo de alto nivel: orquesta el negocio. Paypal es bajo nivel: implementa detalles.',
+    q20:'En TiendaIncorrecta, para cambiar de Paypal a Tarjeta hay que modificar el atributo y el constructor internamente.'
+  },
+  s4: {
+    q1:'Singleton = una sola instancia de la clase, accesible globalmente. Útil para configuración, logs, conexiones.',
+    q2:'private static ConfiguracionApp instancia; → privado (solo la clase lo accede) y estático (de la clase, no del objeto).',
+    q3:'El método se llama getInstancia() (en español, a diferencia del estándar getInstance()).',
+    q4:'Si instancia != null, getInstancia() simplemente retorna la instancia existente sin crear otra.',
+    q5:'this.urlBase = "http://localhost:8080" en el constructor de ConfiguracionApp.',
+    q6:'Singleton y Factory Method son patrones CREACIONALES (se enfocan en cómo se crean los objetos).',
+    q7:'Factory Method delega la creación a las subclases (factories concretas como ReportePDFFactory).',
+    q8:'La interfaz del producto es Reporte con el método generar().',
+    q9:'ReporteFactory (abstract) declara: public abstract Reporte crearReporte();',
+    q10:'ReportePDFFactory.crearReporte() retorna new ReportePDF() → un objeto ReportePDF.',
+    q11:'La interfaz del producto en el ejercicio de Vehículos se llama Vehiculo con el método arrancar().',
+    q12:'vehiculo.arrancar() → Auto imprime "Arranca el Auto", Moto imprime lo suyo, etc.',
+    q13:'En main.java de Vehículos se crean: Auto, Moto y Camión = 3 tipos.',
+    q14:'ReporteFactory es una clase ABSTRACTA: public abstract class ReporteFactory { public abstract Reporte crearReporte(); }',
+    q15:'El cliente (Main) no conoce ReportePDF ni ReporteWord directamente → desacoplado de implementaciones.',
+    q16:'El Main nunca hace "new ReportePDF()" directamente → eso es responsabilidad de la factory concreta.',
+    q17:'4 componentes: Producto(interfaz), ProductoConcreto, Factory(abstracta), FactoryConcreta.',
+    q18:'Crear: ReporteExcel implements Reporte (el producto) Y ReporteExcelFactory extends ReporteFactory (la fábrica).',
+    q19:'Constructor PRIVADO + atributo static privado + método estático público getInstancia() con lazy init.',
+    q20:'Singleton = cuántas instancias (1). Factory Method = qué tipo de objeto crear (varios tipos posibles).'
+  }
+};
+
+// ===================== TABS =====================
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ===================== PROGRESS =====================
+function updateProgress(sem) {
+  let count = 0;
+  for (let i = 1; i <= 20; i++) {
+    if (document.querySelector(`input[name="${sem}q${i}"]:checked`)) count++;
+  }
+  document.getElementById(`${sem}-prog`).textContent = `${count} / 20`;
+}
+
+document.querySelectorAll('input[type="radio"]').forEach(r => {
+  r.addEventListener('change', () => {
+    const sem = r.name.substring(0,2);
+    updateProgress(sem);
+  });
+});
+
+// ===================== CHECK ANSWERS =====================
+function checkAnswers(sem) {
+  const key = answers[sem];
+  const fb = feedbacks[sem];
+  let score = 0;
+
+  for (let i = 1; i <= 20; i++) {
+    const qid = `${sem}-q${i}`;
+    const qEl = document.getElementById(qid);
+    const selected = document.querySelector(`input[name="${sem}q${i}"]:checked`);
+    const correct = key[`q${i}`];
+
+    // Remove old feedback
+    const oldFb = qEl.querySelector('.feedback');
+    if (oldFb) oldFb.remove();
+
+    // Reset label styles
+    qEl.querySelectorAll('label').forEach(l => {
+      l.classList.remove('correct-answer', 'wrong-answer');
+    });
+    qEl.classList.remove('correct', 'incorrect', 'unanswered');
+
+    if (!selected) {
+      qEl.classList.add('unanswered');
+    } else {
+      // Mark correct answer always
+      qEl.querySelectorAll('label').forEach(l => {
+        const val = l.querySelector('input').value;
+        if (val === correct) l.classList.add('correct-answer');
+        if (selected.value !== correct && val === selected.value) l.classList.add('wrong-answer');
+      });
+
+      if (selected.value === correct) {
+        score++;
+        qEl.classList.add('correct');
+        const f = document.createElement('div');
+        f.className = 'feedback correct';
+        f.innerHTML = '✓ Correcto! ' + (fb[`q${i}`] || '');
+        qEl.appendChild(f);
+      } else {
+        qEl.classList.add('incorrect');
+        const f = document.createElement('div');
+        f.className = 'feedback incorrect';
+        f.innerHTML = '✗ Incorrecto. ' + (fb[`q${i}`] || '');
+        qEl.appendChild(f);
+      }
+    }
+  }
+
+  const pct = Math.round((score / 20) * 100);
+  const scoreBox = document.getElementById(`${sem}-score`);
+  scoreBox.style.display = 'block';
+  document.getElementById(`${sem}-score-num`).textContent = `${score}/20`;
+  document.getElementById(`${sem}-score-fill`).style.width = pct + '%';
+
+  let msg = '';
+  if (pct === 100) msg = '🏆 Perfecto! Dominas este tema completamente.';
+  else if (pct >= 80) msg = '💪 Muy bien! Estás listo para el examen.';
+  else if (pct >= 60) msg = '📚 Bien, pero repasa los puntos incorrectos.';
+  else msg = '🔄 Necesitas repasar el material. ¡Tú puedes!';
+  document.getElementById(`${sem}-score-sub`).textContent = pct + '% — ' + msg;
+
+  scoreBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ===================== RESET =====================
+function resetQuiz(sem) {
+  for (let i = 1; i <= 20; i++) {
+    const qEl = document.getElementById(`${sem}-q${i}`);
+    qEl.classList.remove('correct', 'incorrect', 'unanswered');
+    qEl.querySelectorAll('label').forEach(l => l.classList.remove('correct-answer', 'wrong-answer'));
+    const fb = qEl.querySelector('.feedback');
+    if (fb) fb.remove();
+    const radios = document.querySelectorAll(`input[name="${sem}q${i}"]`);
+    radios.forEach(r => r.checked = false);
+  }
+  document.getElementById(`${sem}-score`).style.display = 'none';
+  document.getElementById(`${sem}-prog`).textContent = '0 / 20';
+}
+</script>
+</body>
+</html>

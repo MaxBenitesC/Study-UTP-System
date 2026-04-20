@@ -271,7 +271,119 @@ public class main {
 
 ---
 
-## 6. COMPARACIÓN SINGLETON vs FACTORY METHOD
+## 6. ANÁLISIS DE PATRONES EN EL CÓDIGO UNIVERSITARIO
+
+### Singleton — ¿Dónde están los 3 elementos clave en `ConfiguracionApp`?
+
+```java
+public class ConfiguracionApp {
+
+    // ELEMENTO 1 ↓ — atributo estático privado (guarda la única instancia)
+    private static ConfiguracionApp instancia;
+    //              ^^^^^^ static = pertenece a la clase, no a un objeto
+
+    private String urlBase;
+    private String username;
+    private String password;
+
+    // NOTA: en el código universitario el constructor NO tiene private,
+    // pero en un Singleton correcto DEBE ser private para evitar new ConfiguracionApp()
+    public ConfiguracionApp() {     // ← idealmente debería ser PRIVATE
+        this.urlBase = "http://localhost:8080";
+        this.username = "admin";
+        this.password = "1234";
+    }
+
+    // ELEMENTO 2 ↓ — método estático público (única puerta de entrada)
+    public static ConfiguracionApp getInstancia(){
+    //             ^^^^^^ static = se llama sin crear objeto primero
+
+        // ELEMENTO 3 ↓ — lazy initialization (crea solo si no existe)
+        if (instancia == null){
+            instancia = new ConfiguracionApp();  // ← primera vez: crea
+        }
+        return instancia;  // ← siempre devuelve la misma
+    }
+}
+
+// USO:
+ConfiguracionApp c1 = ConfiguracionApp.getInstancia();
+ConfiguracionApp c2 = ConfiguracionApp.getInstancia();
+// c1 == c2 → TRUE (mismo objeto en memoria)
+```
+
+**Los 3 pilares del Singleton en el código:**
+1. `private static ConfiguracionApp instancia` → guarda la referencia única
+2. Constructor privado (idealmente) → nadie puede hacer `new ConfiguracionApp()`
+3. `public static getInstancia()` → único punto de acceso, con control `if null`
+
+---
+
+### Factory Method — ¿Dónde están los 4 componentes en el código universitario?
+
+```java
+// COMPONENTE 1: Producto (interfaz) — contrato que todos los productos deben cumplir
+public interface Reporte {
+    void generar();  // ← todos los reportes deben poder generarse
+}
+
+// COMPONENTE 2: Productos concretos — implementan el contrato
+public class ReportePDF implements Reporte {
+    @Override
+    public void generar() {
+        System.out.println("Generando reporte en formato PDF");
+        // ← implementación específica de PDF
+    }
+}
+public class ReporteWord implements Reporte {
+    @Override
+    public void generar() {
+        System.out.println("Generando reporte en formato Word");
+    }
+}
+
+// COMPONENTE 3: Factory abstracta — declara el método de creación
+public abstract class ReporteFactory {
+    public abstract Reporte crearReporte();  // ← subclases deciden QUÉ crear
+}
+
+// COMPONENTE 4: Factories concretas — implementan la creación específica
+public class ReportePDFFactory extends ReporteFactory {
+    @Override
+    public Reporte crearReporte() {
+        return new ReportePDF();  // ← sabe qué crear, el cliente NO
+    }
+}
+public class ReporteWordFactory extends ReporteFactory {
+    @Override
+    public Reporte crearReporte() {
+        return new ReporteWord();
+    }
+}
+
+// CLIENTE (Main) — solo conoce las abstracciones, nunca hace "new ReportePDF()"
+public class Main {
+    public static void main(String[] args) {
+        ReporteFactory factoryPDF = new ReportePDFFactory();
+        Reporte reportePDF = factoryPDF.crearReporte();  // ← no sabe que es PDF
+        reportePDF.generar();                            // ← solo llama al contrato
+
+        ReporteFactory factoryWord = new ReporteWordFactory();
+        Reporte reporteWord = factoryWord.crearReporte();
+        reporteWord.generar();
+    }
+}
+```
+
+**Los 4 componentes en el código:**
+- `Reporte` (interface) → **Producto abstracto** — define qué puede hacer un reporte
+- `ReportePDF`, `ReporteWord` → **Productos concretos** — cómo se hace cada uno
+- `ReporteFactory` (abstract) → **Creator abstracto** — dice que se puede crear, no cómo
+- `ReportePDFFactory`, `ReporteWordFactory` → **Creators concretos** — saben exactamente qué crear
+
+---
+
+## 7. COMPARACIÓN SINGLETON vs FACTORY METHOD
 
 | Aspecto | Singleton | Factory Method |
 |---------|-----------|----------------|
