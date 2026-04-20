@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ChapaTuPromo - Realiza tu pedido online y recogelo en Plaza Vea o recibelo en casa">
+  <meta name="author" content="ChapaTuPromo - Supermercados Peruanos">
+  <title>ChapaTuPromo | Hacer Pedido</title>
+</head>
+<body>
+
+  <header>
+    <h1>ChapaTuPromo</h1>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu.html">Ver Menu</a> |
+      <a href="pedidos.html">Mis Pedidos</a> |
+      <a href="ofertas.html">Ofertas del Dia</a>
+    </nav>
+  </header>
+
+  <hr>
+
+  <main>
+    <h2>Hacer mi Pedido</h2>
+    <p>Completa el formulario, paga en linea y recoge en tu Plaza Vea o recibelo en casa.</p>
+
+    <form action="#" method="post">
+
+      <fieldset>
+        <legend>1. Tus datos</legend>
+        <p>
+          <label for="nombre_cliente">Nombre completo:</label><br>
+          <input type="text" id="nombre_cliente" name="nombre_cliente"
+                 placeholder="Ej: Carlos Quispe Mamani" required>
+        </p>
+        <p>
+          <label for="telefono">Celular de contacto:</label><br>
+          <input type="tel" id="telefono" name="telefono"
+                 placeholder="9XXXXXXXX" pattern="9[0-9]{8}" required>
+        </p>
+        <p>
+          <label for="correo_cliente">Correo (te avisamos cuando este listo):</label><br>
+          <input type="email" id="correo_cliente" name="correo_cliente"
+                 placeholder="tucorreo@gmail.com" required>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Selecciona tus productos</legend>
+        <p><em>Marca los productos que quieres incluir en tu pedido:</em></p>
+
+        <p><label><input type="checkbox" name="productos" value="torta_chocolate"> Torta de Chocolate San Antonio 1kg &mdash; <strong>S/. 22.50</strong> (50% off, vence hoy)</label></p>
+        <p><label><input type="checkbox" name="productos" value="torta_tres_leches"> Torta Tres Leches 800g &mdash; <strong>S/. 22.80</strong> (40% off, vence manana)</label></p>
+        <p><label><input type="checkbox" name="productos" value="queque_donofrio"> Queque Marmoleado Donofrio 500g &mdash; <strong>S/. 9.80</strong> (30% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="pan_bimbo"> Pan de Molde Bimbo Integral 500g &mdash; <strong>S/. 4.80</strong> (20% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="yogurt_gloria"> Yogurt Gloria Fresa 1L &mdash; <strong>S/. 5.10</strong> (40% off, vence manana)</label></p>
+        <p><label><input type="checkbox" name="productos" value="queso_fresco"> Queso Fresco La Preferida 250g &mdash; <strong>S/. 6.30</strong> (30% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="crema_laive"> Crema de Leche Laive 200ml &mdash; <strong>S/. 3.50</strong> (30% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="pollo"> Pollo Entero Refrigerado aprox. 1.8kg &mdash; <strong>S/. 13.20</strong> (40% off, vence manana)</label></p>
+        <p><label><input type="checkbox" name="productos" value="jamon"> Jamon del Pais Suiza 200g &mdash; <strong>S/. 8.40</strong> (30% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="salchicha"> Salchicha estilo Huacho Suiza 500g &mdash; <strong>S/. 12.00</strong> (20% off)</label></p>
+        <p><label><input type="checkbox" name="productos" value="perico"> Filete de Perico Refrigerado 500g &mdash; <strong>S/. 9.00</strong> (50% off, vence hoy)</label></p>
+        <p><label><input type="checkbox" name="productos" value="ensalada_rusa"> Ensalada Rusa Bells 250g &mdash; <strong>S/. 3.75</strong> (50% off, vence hoy)</label></p>
+        <p><label><input type="checkbox" name="productos" value="causa"> Causa Rellena de Atun 300g &mdash; <strong>S/. 7.20</strong> (40% off, vence manana)</label></p>
+
+        <p>
+          <label for="cantidad">Cantidad (por cada producto seleccionado):</label>
+          <input type="number" id="cantidad" name="cantidad" min="1" max="5" value="1">
+          <small>Maximo 5 unidades por producto</small>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Como quieres recibir tu pedido?</legend>
+        <p><label><input type="radio" name="tipo_entrega" value="recojo" required> <strong>Recojo en tienda</strong> &mdash; Gratis. Te avisamos por correo cuando este listo.</label></p>
+        <p><label><input type="radio" name="tipo_entrega" value="delivery"> <strong>Delivery a domicilio</strong> &mdash; S/. 5.00. Llega en 60 a 90 minutos.</label></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>4. Tienda de recojo</legend>
+        <p>
+          <label for="tienda">Selecciona tu Plaza Vea mas cercana:</label><br>
+          <select id="tienda" name="tienda">
+            <option value="">-- Elige tu tienda --</option>
+            <option value="surco">Plaza Vea Surco - Av. Primavera 1180, Santiago de Surco</option>
+            <option value="san_miguel">Plaza Vea San Miguel - Av. La Marina 2000, San Miguel</option>
+            <option value="la_molina">Plaza Vea La Molina - Av. La Molina 1318, La Molina</option>
+            <option value="san_borja">Plaza Vea San Borja - Av. San Luis 1921, San Borja</option>
+            <option value="chorrillos">Plaza Vea Chorrillos - Av. Huaylas 370, Chorrillos</option>
+            <option value="independencia">Plaza Vea Independencia - Av. Tupac Amaru 3200, Independencia</option>
+          </select>
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>5. Direccion de delivery (si elegiste delivery a domicilio)</legend>
+        <p>
+          <label for="direccion">Direccion completa:</label><br>
+          <input type="text" id="direccion" name="direccion"
+                 placeholder="Ej: Jr. Las Flores 234, Miraflores">
+        </p>
+        <p>
+          <label for="referencia">Referencia:</label><br>
+          <input type="text" id="referencia" name="referencia"
+                 placeholder="Ej: Frente al parque, puerta azul">
+        </p>
+      </fieldset>
+
+      <fieldset>
+        <legend>6. Metodo de pago</legend>
+        <p><label><input type="radio" name="pago" value="agora" required> <strong>Agora Pay</strong> &mdash; Pago rapido con tu cuenta Intercorp</label></p>
+        <p><label><input type="radio" name="pago" value="yape"> <strong>Yape</strong></label></p>
+        <p><label><input type="radio" name="pago" value="plin"> <strong>Plin</strong></label></p>
+        <p><label><input type="radio" name="pago" value="tarjeta"> <strong>Tarjeta de credito o debito</strong> &mdash; Visa, Mastercard, Amex</label></p>
+      </fieldset>
+
+      <p>
+        <button type="submit">Enviar Pedido</button>
+        <button type="reset">Limpiar formulario</button>
+      </p>
+
+    </form>
+
+    <p><small>Al enviar tu pedido aceptas nuestros terminos y condiciones. Recibiras un correo de confirmacion con el detalle de tu pedido.</small></p>
+
+  </main>
+
+  <hr>
+
+  <footer>
+    <p><a href="menu.html">&larr; Volver al Menu</a> | <a href="index.html">Inicio</a></p>
+    <p>ChapaTuPromo &copy; 2026 | Supermercados Peruanos S.A.</p>
+  </footer>
+
+</body>
+</html>
