@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Base de Datos II - 20 preguntas por semana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header-content p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .reset-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .reset-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .week-selector {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .week-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .week-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .week-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .content {
+            padding: 30px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-left: 5px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 45px;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option input[type="radio"] {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .option label {
+            cursor: pointer;
+            display: block;
+            font-size: 1em;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .feedback-text {
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .score-text {
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .score-number {
+            font-size: 2.5em;
+            color: #764ba2;
+            font-weight: bold;
+        }
+
+        .completion-message {
+            text-align: center;
+            padding: 20px;
+            background: #d4edda;
+            border-radius: 8px;
+            color: #155724;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .completion-message.show {
+            display: block;
+        }
+
+        .disabled-option {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .correct-answer {
+            border-color: #28a745 !important;
+            background: #d4edda !important;
+        }
+
+        .incorrect-answer {
+            border-color: #dc3545 !important;
+            background: #f8d7da !important;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-content h1 {
+                font-size: 1.8em;
+            }
+
+            .week-selector {
+                flex-direction: column;
+            }
+
+            .week-btn {
+                width: 100%;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .question-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>📚 Quiz Base de Datos II</h1>
+                <p>20 preguntas por semana - Domina cada concepto</p>
+            </div>
+            <button class="reset-btn" onclick="resetAllQuiz()">🔄 RESET</button>
+        </div>
+
+        <div class="week-selector">
+            <button class="week-btn active" onclick="switchWeek(1)">Semana 1: PostgreSQL</button>
+            <button class="week-btn" onclick="switchWeek(2)">Semana 2: Estructura</button>
+            <button class="week-btn" onclick="switchWeek(3)">Semana 3: PostgreSQL vs SQL Server</button>
+            <button class="week-btn" onclick="switchWeek(4)">Semana 4: Oracle</button>
+        </div>
+
+        <!-- SEMANA 1 -->
+        <div id="week-1" class="content active">
+            <div class="score-display">
+                <div class="score-text">Puntuación Semana 1:</div>
+                <div class="score-number" id="score-1">0/20</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-1" style="width: 0%"></div>
+            </div>
+            <div id="questions-1"></div>
+            <div class="completion-message" id="completion-1"></div>
+        </div>
+
+        <!-- SEMANA 2 -->
+        <div id="week-2" class="content">
+            <div class="score-display">
+                <div class="score-text">Puntuación Semana 2:</div>
+                <div class="score-number" id="score-2">0/20</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-2" style="width: 0%"></div>
+            </div>
+            <div id="questions-2"></div>
+            <div class="completion-message" id="completion-2"></div>
+        </div>
+
+        <!-- SEMANA 3 -->
+        <div id="week-3" class="content">
+            <div class="score-display">
+                <div class="score-text">Puntuación Semana 3:</div>
+                <div class="score-number" id="score-3">0/20</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-3" style="width: 0%"></div>
+            </div>
+            <div id="questions-3"></div>
+            <div class="completion-message" id="completion-3"></div>
+        </div>
+
+        <!-- SEMANA 4 -->
+        <div id="week-4" class="content">
+            <div class="score-display">
+                <div class="score-text">Puntuación Semana 4:</div>
+                <div class="score-number" id="score-4">0/20</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-4" style="width: 0%"></div>
+            </div>
+            <div id="questions-4"></div>
+            <div class="completion-message" id="completion-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Función para mezclar opciones
+        function shuffleOptions(options) {
+            let optionsCopy = [...options];
+            for (let i = optionsCopy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optionsCopy[i], optionsCopy[j]] = [optionsCopy[j], optionsCopy[i]];
+            }
+            return optionsCopy;
+        }
+
+        // Base de datos de preguntas por semana
+        const quizzes = {
+            1: [
+                {
+                    text: "¿Qué significa que PostgreSQL sea ACID?",
+                    options: [
+                        { text: "Atomicidad, Consistencia, Aislamiento y Durabilidad - garantiza transacciones confiables", correct: true },
+                        { text: "Una característica química del software", correct: false },
+                        { text: "Advanced Client Interface Database", correct: false },
+                        { text: "Un tipo de encriptación de datos", correct: false }
+                    ],
+                    explanation: "ACID es un acrónimo fundamental en bases de datos que garantiza la integridad de las transacciones. Atomicidad (todo o nada), Consistencia (estado válido), Aislamiento (independencia entre transacciones) y Durabilidad (se persisten en disco)."
+                },
+                {
+                    text: "¿De dónde nace PostgreSQL y cuál era su nombre original?",
+                    options: [
+                        { text: "Nace en Berkeley como reemplazo de INGRES", correct: true },
+                        { text: "Fue creado en AT&T Labs como reemplazo de MySQL", correct: false },
+                        { text: "Se desarrolló en Microsoft como alternativa a SQL Server", correct: false },
+                        { text: "Fue desarrollado por Oracle en California", correct: false }
+                    ],
+                    explanation: "PostgreSQL nace en la Universidad de Berkeley en California como un reemplazo del sistema INGRES. Michael Stonebraker y su equipo lo crearon. El nombre PostgreSQL incluye el sufijo 'SQL' desde 1996 para evidenciar su soporte SQL completo."
+                },
+                {
+                    text: "¿Cuál es una ventaja clave de PostgreSQL?",
+                    options: [
+                        { text: "Es código abierto, gratuito y tiene una comunidad activa", correct: true },
+                        { text: "Es más rápido que todas las demás bases de datos", correct: false },
+                        { text: "Solo funciona en sistemas operativos Microsoft", correct: false },
+                        { text: "No necesita administración ni mantenimiento", correct: false }
+                    ],
+                    explanation: "PostgreSQL es completamente de código abierto, lo que significa que es gratuito, auditable y constantemente mejorado por la comunidad. Esto contrasta con bases de datos comerciales como Oracle o SQL Server que requieren licencias costosas."
+                },
+                {
+                    text: "¿Qué característica permite a PostgreSQL manejar múltiples transacciones sin conflictos?",
+                    options: [
+                        { text: "MVCC (Control de Concurrencia Multiversión)", correct: true },
+                        { text: "El protocolo HTTP", correct: false },
+                        { text: "Una única conexión por usuario", correct: false },
+                        { text: "Bloqueos exclusivos de tablas completas", correct: false }
+                    ],
+                    explanation: "MVCC (Multiversion Concurrency Control) permite que múltiples transacciones lean datos consistentes sin bloquearse entre sí. Cada transacción ve una versión 'snapshot' de los datos, evitando conflictos."
+                },
+                {
+                    text: "¿Cuál es la principal desventaja de PostgreSQL?",
+                    options: [
+                        { text: "Rendimiento más lento en comparación con otros RDBMS como SQL Server y MySQL", correct: true },
+                        { text: "No soporta SQL estándar", correct: false },
+                        { text: "Solo funciona en un único sistema operativo", correct: false },
+                        { text: "Los costos de licencia son muy altos", correct: false }
+                    ],
+                    explanation: "Una desventaja documentada de PostgreSQL es que tiende a ser más lento que algunos otros RDBMS en ciertos escenarios, particularmente en operaciones de lectura pura, debido a su enfoque en la compatibilidad con estándares SQL."
+                },
+                {
+                    text: "¿Qué tipos de datos avanzados soporta PostgreSQL?",
+                    options: [
+                        { text: "JSON, JSONB, arrays, tipos geoespaciales y tipos personalizados", correct: true },
+                        { text: "Solo números enteros y texto", correct: false },
+                        { text: "Únicamente datos de fecha y hora", correct: false },
+                        { text: "No soporta ningún tipo de datos avanzado", correct: false }
+                    ],
+                    explanation: "PostgreSQL soporta: JSON/JSONB para datos semi-estructurados, arrays para colecciones, tipos geoespaciales (PostGIS) para ubicaciones, y permite crear tipos de datos personalizados."
+                },
+                {
+                    text: "¿Por qué es importante que PostgreSQL sea multiplataforma?",
+                    options: [
+                        { text: "Permite usar la misma base de datos en Linux, Windows, macOS, etc. sin cambios", correct: true },
+                        { text: "Significa que es más rápido", correct: false },
+                        { text: "Permite usar múltiples procesadores", correct: false },
+                        { text: "No tiene ninguna importancia especial", correct: false }
+                    ],
+                    explanation: "Ser multiplataforma significa que puedes desarrollar en tu computadora (Windows/Mac) y desplegar sin cambios en un servidor Linux. Esto da flexibilidad y portabilidad a la aplicación."
+                },
+                {
+                    text: "¿Cuál es el propósito del WAL (Write-Ahead Logging)?",
+                    options: [
+                        { text: "Registra todos los cambios ANTES de aplicarlos, permitiendo recuperación ante fallos", correct: true },
+                        { text: "Es un tipo de índice para búsquedas rápidas", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false },
+                        { text: "Una herramienta para crear copias de seguridad", correct: false }
+                    ],
+                    explanation: "El WAL registra cada cambio en un archivo de log ANTES de aplicarlo a la base de datos. Si el sistema falla, puede recuperarse usando el log. Es fundamental para la durabilidad ACID."
+                },
+                {
+                    text: "¿Qué industrias utilizan ampliamente PostgreSQL?",
+                    options: [
+                        { text: "Finanzas, gobiernos, manufactura, tecnología web y ciencia de datos", correct: true },
+                        { text: "Solo pequeñas startups", correct: false },
+                        { text: "Únicamente instituciones académicas", correct: false },
+                        { text: "Solo agencias gubernamentales", correct: false }
+                    ],
+                    explanation: "PostgreSQL es usado ampliamente: finanzas por su confiabilidad ACID, gobiernos por su GIS integrado, manufactureras por escalabilidad, startups tech por su costo bajo, y científicos por su flexibilidad."
+                },
+                {
+                    text: "¿Cuál es la diferencia principal entre PostgreSQL y MySQL?",
+                    options: [
+                        { text: "PostgreSQL es más complejo pero más poderoso; MySQL es más simple pero más rápido en algunos casos", correct: true },
+                        { text: "No hay diferencia, son el mismo sistema", correct: false },
+                        { text: "PostgreSQL es comercial y MySQL es de código abierto", correct: false },
+                        { text: "MySQL soporta ACID y PostgreSQL no", correct: false }
+                    ],
+                    explanation: "PostgreSQL ofrece características más avanzadas (MVCC, JSON nativo, tipos complejos) a costa de complejidad. MySQL es generalmente más simple y puede ser más rápido en lecturas simples, pero menos flexible."
+                },
+                {
+                    text: "¿Cuándo se agregó el sufijo 'SQL' al nombre de PostgreSQL?",
+                    options: [
+                        { text: "En 1996, para evidenciar el soporte SQL completo", correct: true },
+                        { text: "En 1977, cuando fue fundado", correct: false },
+                        { text: "En 2000, como parte de una actualización mayor", correct: false },
+                        { text: "Nunca se agregó, siempre se llamó PostgreSQL", correct: false }
+                    ],
+                    explanation: "El nombre cambió a PostgreSQL en 1996 para evidenciar su soporte completo de SQL. Antes se llamaba simplemente 'Postgres'."
+                },
+                {
+                    text: "¿Quién fue el creador principal de PostgreSQL?",
+                    options: [
+                        { text: "Michael Stonebraker, profesor de la Universidad de Berkeley", correct: true },
+                        { text: "Larry Ellison", correct: false },
+                        { text: "Linus Torvalds", correct: false },
+                        { text: "Bill Gates", correct: false }
+                    ],
+                    explanation: "Michael Stonebraker fue el profesor de informática en Berkeley que lideró el proyecto de crear PostgreSQL como sucesor de INGRES."
+                },
+                {
+                    text: "¿Qué es la tolerancia a fallos en PostgreSQL?",
+                    options: [
+                        { text: "La capacidad de recuperarse ante fallos de energía o crashes, gracias al WAL", correct: true },
+                        { text: "La capacidad de ejecutar múltiples queries simultáneamente", correct: false },
+                        { text: "La capacidad de escalar horizontalmente", correct: false },
+                        { text: "La capacidad de encriptar datos", correct: false }
+                    ],
+                    explanation: "La tolerancia a fallos significa que PostgreSQL puede recuperarse de fallos inesperados sin perder datos. Esto lo logra gracias al Write-Ahead Logging (WAL) que registra cambios antes de aplicarlos."
+                },
+                {
+                    text: "¿PostgreSQL soporta interoperabilidad con qué tipos de frameworks?",
+                    options: [
+                        { text: "Django, Node.js, PHP, Hibernate y muchos más", correct: true },
+                        { text: "Solo frameworks de Microsoft", correct: false },
+                        { text: "Ningún framework, solo SQL puro", correct: false },
+                        { text: "Solo frameworks de código abierto escritos en C", correct: false }
+                    ],
+                    explanation: "PostgreSQL es muy versátil y se integra con múltiples frameworks: Django (Python), Express/Node.js (JavaScript), Laravel (PHP), Hibernate (Java), y muchos más."
+                },
+                {
+                    text: "¿Qué significa que PostgreSQL sea de clase empresarial?",
+                    options: [
+                        { text: "Que es confiable, seguro y escalable para uso en grandes empresas", correct: true },
+                        { text: "Que solo lo pueden usar grandes empresas", correct: false },
+                        { text: "Que es muy costoso de licenciar", correct: false },
+                        { text: "Que tiene interfaz gráfica avanzada", correct: false }
+                    ],
+                    explanation: "Ser de clase empresarial significa que PostgreSQL es suficientemente confiable, seguro, escalable y estable para ser usado en misiones críticas de grandes organizaciones."
+                },
+                {
+                    text: "¿Cuál es el rol del Postmaster en PostgreSQL?",
+                    options: [
+                        { text: "Proceso central que administra archivos de BD y acepta conexiones", correct: true },
+                        { text: "Enviar correos electrónicos entre servidores", correct: false },
+                        { text: "Un software para optimizar consultas SQL", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false }
+                    ],
+                    explanation: "El Postmaster es el proceso central de PostgreSQL que escucha continuamente por nuevas conexiones. Cuando un cliente se conecta, crea un proceso servidor dedicado para atender a ese cliente."
+                },
+                {
+                    text: "¿PostgreSQL es de propiedad de una sola organización?",
+                    options: [
+                        { text: "No, es de código abierto con comunidad global", correct: true },
+                        { text: "Sí, es propiedad de Oracle", correct: false },
+                        { text: "Sí, es propiedad de Microsoft", correct: false },
+                        { text: "Sí, es propiedad de Red Hat", correct: false }
+                    ],
+                    explanation: "PostgreSQL no es propiedad de una sola organización. Es un proyecto de código abierto mantenido por la comunidad global, lo que es una de sus principales ventajas."
+                },
+                {
+                    text: "¿Qué significa que PostgreSQL sea objeto-relacional?",
+                    options: [
+                        { text: "Que combina características de BD relacionales con objetos y tipos de datos personalizados", correct: true },
+                        { text: "Que solo almacena objetos JSON", correct: false },
+                        { text: "Que es una BD NoSQL", correct: false },
+                        { text: "Que requiere programación orientada a objetos", correct: false }
+                    ],
+                    explanation: "PostgreSQL es objeto-relacional porque combina la estructura de BD relacional (tablas, filas, columnas) con capacidades de objetos (tipos de datos personalizados, herencia de tipos, etc.)."
+                },
+                {
+                    text: "¿Cuál es el propósito del Control de Acceso Detallado en PostgreSQL?",
+                    options: [
+                        { text: "Permitir permisos granulares a nivel de usuario, rol, tabla y columna", correct: true },
+                        { text: "Prevenir conexiones desde la red", correct: false },
+                        { text: "Encriptar todas las transacciones automáticamente", correct: false },
+                        { text: "Crear backups automáticos diarios", correct: false }
+                    ],
+                    explanation: "El control de acceso detallado en PostgreSQL permite definir permisos específicos: qué usuarios pueden hacer qué operaciones (SELECT, INSERT, UPDATE, DELETE) en qué tablas o columnas específicas."
+                }
+            ],
+            2: [
+                {
+                    text: "¿Cuál es el rol del 'Postmaster' en PostgreSQL?",
+                    options: [
+                        { text: "Proceso central que administra archivos de BD y conexiones de clientes", correct: true },
+                        { text: "Una herramienta para enviar correos electrónicos", correct: false },
+                        { text: "Un software para optimizar consultas SQL", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false }
+                    ],
+                    explanation: "El Postmaster es el proceso central de PostgreSQL que corre continuamente escuchando por nuevas conexiones. Cuando un cliente se conecta, el Postmaster crea un proceso servidor dedicado para atender a ese cliente específico."
+                },
+                {
+                    text: "¿Qué es PGDATA?",
+                    options: [
+                        { text: "El directorio raíz donde PostgreSQL almacena todos los datos, catálogos y archivos de configuración", correct: true },
+                        { text: "Un archivo de contraseña de usuarios", correct: false },
+                        { text: "Una tabla que almacena logs de transacciones", correct: false },
+                        { text: "Un tipo de dato especial para fechas", correct: false }
+                    ],
+                    explanation: "PGDATA es el directorio de datos del cluster PostgreSQL. Contiene subdirectorios importantes como 'global' (usuarios y BD), 'base' (tablas de cada BD), 'pg_version' (info de versión), y 'pg_notify' (datos de LISTEN/NOTIFY)."
+                },
+                {
+                    text: "¿Cuál es la función del Buffer Cache?",
+                    options: [
+                        { text: "Almacenar datos frecuentemente accedidos en memoria para reducir lecturas de disco", correct: true },
+                        { text: "Almacenar consultas SQL no ejecutadas", correct: false },
+                        { text: "Comprimir datos para ahorrar espacio", correct: false },
+                        { text: "Encriptar datos antes de guardarlos", correct: false }
+                    ],
+                    explanation: "El Buffer Cache es una región de memoria compartida donde PostgreSQL mantiene copias de los datos más accedidos. Mientras más datos quepan en el cache, menos costosas son las operaciones I/O del disco."
+                },
+                {
+                    text: "¿Qué es WAL y cómo ayuda a la recuperación?",
+                    options: [
+                        { text: "Write-Ahead Logging: registra cambios en un archivo de log ANTES de aplicarlos, permitiendo recuperación ante fallos", correct: true },
+                        { text: "Es un tipo de índice para búsquedas rápidas", correct: false },
+                        { text: "Una herramienta de monitoreo de rendimiento", correct: false },
+                        { text: "Un protocolo de seguridad de red", correct: false }
+                    ],
+                    explanation: "El WAL es crucial para la durabilidad: antes de que PostgreSQL escriba cambios en las tablas, primero los escribe en archivos de log. Si hay un fallo, la BD puede replicar esos cambios usando el log y recuperarse al estado consistente anterior."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre escalabilidad vertical y horizontal?",
+                    options: [
+                        { text: "Vertical: más recursos en una máquina. Horizontal: distribuir en varias máquinas", correct: true },
+                        { text: "Vertical: distribuir en varias máquinas. Horizontal: más recursos en una máquina", correct: false },
+                        { text: "No hay diferencia, son sinónimos", correct: false },
+                        { text: "Vertical: para lectura. Horizontal: para escritura", correct: false }
+                    ],
+                    explanation: "Escalabilidad vertical (scaling up) significa aumentar CPU, RAM o almacenamiento de una sola máquina. Escalabilidad horizontal (scaling out) significa distribuir la carga entre múltiples máquinas."
+                },
+                {
+                    text: "¿Qué son las tablas, columnas y filas?",
+                    options: [
+                        { text: "Tablas: colecciones de datos. Columnas: propiedades/campos. Filas: registros individuales", correct: true },
+                        { text: "Tablas: archivos de índice. Columnas: procesos. Filas: transacciones", correct: false },
+                        { text: "Todos los términos son sinónimos para lo mismo", correct: false },
+                        { text: "No tienen relación con la estructura de datos", correct: false }
+                    ],
+                    explanation: "En una BD relacional: una TABLA es como una hoja de cálculo. Las COLUMNAS son las propiedades (nombre, email, teléfono). Las FILAS son las instancias individuales de datos (cada cliente específico)."
+                },
+                {
+                    text: "¿Qué es MVCC?",
+                    options: [
+                        { text: "Control de Concurrencia Multiversión: permite múltiples transacciones sin bloqueos", correct: true },
+                        { text: "Un tipo de índice para búsquedas rápidas", correct: false },
+                        { text: "Un protocolo de comunicación entre servidor y cliente", correct: false },
+                        { text: "Una técnica para comprimir datos en disco", correct: false }
+                    ],
+                    explanation: "MVCC permite que múltiples transacciones lean datos sin bloquearse entre sí. Cada transacción ve una 'versión' de los datos consistente con su punto de inicio, incluso si otras transacciones están modificando los datos."
+                },
+                {
+                    text: "¿Por qué es importante indexar las columnas FK?",
+                    options: [
+                        { text: "Permite búsquedas rápidas en las relaciones, crucial para JOINs eficientes", correct: true },
+                        { text: "Indexar FKs no tiene impacto en rendimiento", correct: false },
+                        { text: "Solo es necesario para tablas muy grandes", correct: false },
+                        { text: "Ralentiza las búsquedas porque los índices ocupan espacio", correct: false }
+                    ],
+                    explanation: "Indexar columnas FK es una práctica esencial de optimización. Las FKs se usan frecuentemente en operaciones JOIN para relacionar tablas. Un índice en la FK permite que PostgreSQL encuentre rápidamente los registros relacionados."
+                },
+                {
+                    text: "¿Cuáles son los principales tipos de datos en PostgreSQL?",
+                    options: [
+                        { text: "Números, texto, fechas, booleanos, binarios, arrays, JSON", correct: true },
+                        { text: "Solo números enteros y texto", correct: false },
+                        { text: "PostgreSQL solo soporta el tipo de dato 'DATOS'", correct: false },
+                        { text: "Únicamente tipos numéricos", correct: false }
+                    ],
+                    explanation: "PostgreSQL soporta: numéricos (INT, DECIMAL), texto (VARCHAR, TEXT), temporales (DATE, TIMESTAMP), booleanos, binarios (BYTEA), arrays, JSON/JSONB, y tipos personalizados."
+                },
+                {
+                    text: "¿Qué es Performance Tuning?",
+                    options: [
+                        { text: "Optimizar la configuración de BD para mejor rendimiento, depende del caso de uso", correct: true },
+                        { text: "Es un proceso que hace que todas las BDs sean más rápidas", correct: false },
+                        { text: "Solo se aplica a bases de datos muy grandes", correct: false },
+                        { text: "No tiene relación con la arquitectura de PostgreSQL", correct: false }
+                    ],
+                    explanation: "Performance Tuning es el proceso de cambiar configuración de BD para optimizar según el caso de uso: OLTP (transacciones pequeñas), DSS (consultas complejas), o BATCH (procesamiento masivo)."
+                },
+                {
+                    text: "¿Qué subdirectorios contiene PGDATA?",
+                    options: [
+                        { text: "Global, Base, PID, PG_VERSION, PG_NOTIFY", correct: true },
+                        { text: "Solo archivos SQL y configuración", correct: false },
+                        { text: "Un único archivo monolítico", correct: false },
+                        { text: "Carpetas de usuarios y contraseñas", correct: false }
+                    ],
+                    explanation: "PGDATA contiene: Global (tablas del cluster), Base (tablas de cada BD), PID (proceso actual), PG_VERSION (versión de BD), PG_NOTIFY (datos de LISTEN/NOTIFY)."
+                },
+                {
+                    text: "¿Qué factor de hardware afecta más el rendimiento?",
+                    options: [
+                        { text: "La RAM: más RAM = menos I/O en disco = mejor rendimiento", correct: true },
+                        { text: "El color del servidor", correct: false },
+                        { text: "El sistema operativo únicamente", correct: false },
+                        { text: "La cantidad de usuarios conectados", correct: false }
+                    ],
+                    explanation: "La RAM es crítica porque el buffer pool de PostgreSQL vive en RAM. Más memoria significa que más datos pueden estar en caché, reduciendo las costosas operaciones de lectura/escritura en disco."
+                },
+                {
+                    text: "¿Qué es el Catálogo del Sistema?",
+                    options: [
+                        { text: "Almacena información sobre bases de datos, tablas, índices, usuarios y otros objetos", correct: true },
+                        { text: "Un índice de todas las tablas de usuario", correct: false },
+                        { text: "Un archivo de logs de transacciones", correct: false },
+                        { text: "Un archivo de configuración de seguridad", correct: false }
+                    ],
+                    explanation: "El Catálogo del Sistema es la 'metabase' de PostgreSQL que almacena información sobre la estructura de la BD: qué bases de datos existen, qué tablas hay, qué índices, qué usuarios, etc."
+                },
+                {
+                    text: "¿Qué diferencia hay entre OLTP y DSS?",
+                    options: [
+                        { text: "OLTP: muchas transacciones pequeñas. DSS: consultas complejas de análisis", correct: true },
+                        { text: "No hay diferencia, son sinónimos", correct: false },
+                        { text: "OLTP es para backup, DSS es para consultas", correct: false },
+                        { text: "OLTP solo funciona en Oracle, DSS en PostgreSQL", correct: false }
+                    ],
+                    explanation: "OLTP (Online Transaction Processing) es para operaciones de negocio: muchas transacciones pequeñas de lectura/escritura. DSS (Decision Support System) es para análisis: consultas complejas que leen mucho datos."
+                },
+                {
+                    text: "¿Qué es la normalización de datos?",
+                    options: [
+                        { text: "Organizar datos en tablas para evitar redundancia y garantizar integridad", correct: true },
+                        { text: "Hacer que todos los datos sean números", correct: false },
+                        { text: "Comprimir los datos de una tabla", correct: false },
+                        { text: "Cifrar todos los datos de la BD", correct: false }
+                    ],
+                    explanation: "La normalización es un proceso de diseño de BD que organiza datos en tablas para minimizar redundancia, evitar anomalías de datos, y mejorar la integridad. Se llega hasta 3FN (Tercera Forma Normal)."
+                },
+                {
+                    text: "¿Qué componentes forman la Instancia PostgreSQL?",
+                    options: [
+                        { text: "Memoria Compartida + Procesos Background", correct: true },
+                        { text: "Solo el Postmaster", correct: false },
+                        { text: "Tablas + Índices", correct: false },
+                        { text: "Usuarios + Roles", correct: false }
+                    ],
+                    explanation: "La Instancia PostgreSQL = Memoria Compartida (Buffer Cache, WAL) + Procesos Background que ejecutan operaciones de limpieza, replicación, etc."
+                },
+                {
+                    text: "¿Qué es el CPU tuning en Performance Tuning?",
+                    options: [
+                        { text: "Optimizar cómo se usan los recursos de procesamiento, especialmente en operaciones complejas", correct: true },
+                        { text: "Cambiar el procesador del servidor", correct: false },
+                        { text: "Detener procesos innecesarios del SO", correct: false },
+                        { text: "No es posible optimizar el CPU", correct: false }
+                    ],
+                    explanation: "CPU tuning implica optimizar consultas complejas (agregaciones, JOINs, ordenamientos) y el plan de ejecución que genera el optimizador de PostgreSQL para usar eficientemente los ciclos de CPU disponibles."
+                },
+                {
+                    text: "¿Qué es Citus en el contexto de PostgreSQL?",
+                    options: [
+                        { text: "Una herramienta para escalabilidad horizontal distribuyendo datos entre múltiples nodos", correct: true },
+                        { text: "Un tipo de índice especial", correct: false },
+                        { text: "Un framework de desarrollo web", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false }
+                    ],
+                    explanation: "Citus es una extensión de PostgreSQL que permite escalabilidad horizontal: distribuye datos y consultas entre múltiples servidores PostgreSQL de forma transparente, permitiendo manejar volúmenes de datos muy grandes."
+                },
+                {
+                    text: "¿Cuál es la ventaja de usar tablespaces separados?",
+                    options: [
+                        { text: "Distribuir la carga I/O entre múltiples discos para mejor rendimiento", correct: true },
+                        { text: "Aumentar la capacidad de almacenamiento total", correct: false },
+                        { text: "Facilitar la administración de usuarios", correct: false },
+                        { text: "No hay ventajas reales", correct: false }
+                    ],
+                    explanation: "Usar tablespaces en discos separados permite distribuir la carga de I/O: índices en un disco, datos en otro, logs en otro. Esto evita que un disco se convierta en cuello de botella y mejora significativamente el rendimiento."
+                }
+            ],
+            3: [
+                {
+                    text: "¿Cuál es la diferencia fundamental entre PostgreSQL y SQL Server en licencia?",
+                    options: [
+                        { text: "PostgreSQL es código abierto (gratuito), SQL Server es producto comercial", correct: true },
+                        { text: "Ambos son completamente gratuitos", correct: false },
+                        { text: "SQL Server es de código abierto, PostgreSQL es comercial", correct: false },
+                        { text: "No hay diferencia en licencia", correct: false }
+                    ],
+                    explanation: "PostgreSQL es completamente de código abierto bajo licencia permisiva. SQL Server es un producto comercial de Microsoft con costos significativos de licenciamiento, especialmente en implementaciones empresariales."
+                },
+                {
+                    text: "¿Qué es T-SQL?",
+                    options: [
+                        { text: "Transact-SQL: SQL estándar + extensiones propietarias de Microsoft", correct: true },
+                        { text: "Un lenguaje completamente diferente de SQL", correct: false },
+                        { text: "La versión de SQL que usa PostgreSQL", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false }
+                    ],
+                    explanation: "T-SQL es el dialecto de SQL de Microsoft SQL Server. Incluye SQL estándar ANSI plus extensiones como bloques TRY...CATCH, variables con @, funciones específicas como GETDATE(), DATEPART(), etc."
+                },
+                {
+                    text: "¿Cuál es la sintaxis para limitar filas en cada sistema?",
+                    options: [
+                        { text: "SQL Server: TOP. PostgreSQL: LIMIT", correct: true },
+                        { text: "Ambos usan LIMIT", correct: false },
+                        { text: "Ambos usan TOP", correct: false },
+                        { text: "SQL Server: LIMIT. PostgreSQL: TOP", correct: false }
+                    ],
+                    explanation: "SQL Server: SELECT TOP 10... PostgreSQL: SELECT ... LIMIT 10. Esta es una diferencia sintáctica importante al migrar entre sistemas."
+                },
+                {
+                    text: "¿Qué es una relación N:M?",
+                    options: [
+                        { text: "Cuando muchos registros de tabla A se relacionan con muchos de tabla B, resuelta con tabla intermedia", correct: true },
+                        { text: "Es lo mismo que una relación 1:1", correct: false },
+                        { text: "Significa que no puede haber relación entre tablas", correct: false },
+                        { text: "Solo existe en PostgreSQL, no en SQL Server", correct: false }
+                    ],
+                    explanation: "Una relación N:M ocurre cuando un registro de tabla A se relaciona con MUCHOS de tabla B, y cada registro de tabla B se relaciona con MUCHOS de tabla A. Se resuelve con una tabla intermedia."
+                },
+                {
+                    text: "¿Por qué es necesaria una tabla intermedia para N:M?",
+                    options: [
+                        { text: "Evita redundancia, mantiene integridad referencial, permite agregar atributos de la relación", correct: true },
+                        { text: "No es necesaria, solo se usa para complicar la BD", correct: false },
+                        { text: "Porque las BD no soportan relaciones N:M directamente", correct: false },
+                        { text: "Solo es necesaria en SQL Server, no en PostgreSQL", correct: false }
+                    ],
+                    explanation: "Sin tabla intermedia: redundancia de datos e imposibilidad de agregar información de la relación. La tabla intermedia conecta ambas tablas con FKs y permite agregar sus propios atributos. Es la solución estándar."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre PL/pgSQL y T-SQL?",
+                    options: [
+                        { text: "PL/pgSQL es lenguaje de procedimientos de PostgreSQL, T-SQL es de SQL Server", correct: true },
+                        { text: "Son exactamente lo mismo", correct: false },
+                        { text: "PL/pgSQL es para gráficos, T-SQL para datos", correct: false },
+                        { text: "No existen, no se usan procedimientos", correct: false }
+                    ],
+                    explanation: "PL/pgSQL es el lenguaje para procedimientos almacenados en PostgreSQL con BEGIN...END. T-SQL es el equivalente de SQL Server con TRY...CATCH. Ambos son fundamentales para lógica compleja en la BD."
+                },
+                {
+                    text: "¿Qué es una Clave Primaria (PK)?",
+                    options: [
+                        { text: "Identificador único de cada fila, nunca puede repetirse ni ser NULL", correct: true },
+                        { text: "Un campo que apunta a otra tabla", correct: false },
+                        { text: "Una contraseña de la base de datos", correct: false },
+                        { text: "El primer índice creado en una tabla", correct: false }
+                    ],
+                    explanation: "La Primary Key es el identificador único de cada registro. Su valor debe ser único y no puede ser NULL. Ejemplo: id_estudiante en tabla estudiantes. La BD garantiza automáticamente que no habrá duplicados."
+                },
+                {
+                    text: "¿Qué es una Clave Foránea (FK)?",
+                    options: [
+                        { text: "Un campo que apunta a la PK de otra tabla, establece relación entre tablas", correct: true },
+                        { text: "Una clave de seguridad para acceso remoto", correct: false },
+                        { text: "Un identificador único como la PK", correct: false },
+                        { text: "Un tipo de índice de la tabla", correct: false }
+                    ],
+                    explanation: "La Foreign Key contiene la PK de otro registro en otra tabla. Ejemplo: tabla 'pedido' tiene id_cliente que es FK a tabla 'cliente'. Esto establece la relación y garantiza integridad referencial."
+                },
+                {
+                    text: "¿Qué representa una cardinalidad 1:N?",
+                    options: [
+                        { text: "Un registro de tabla A se relaciona con MUCHOS registros de tabla B", correct: true },
+                        { text: "Ambas tablas tienen exactamente un registro", correct: false },
+                        { text: "Una tabla tiene cero registros", correct: false },
+                        { text: "Significa que no hay relación entre tablas", correct: false }
+                    ],
+                    explanation: "Cardinalidad 1:N: un registro del lado '1' se relaciona con MUCHOS (N) del otro lado. Ejemplo: un profesor (1) dicta muchos cursos (N). En SQL, el lado N lleva la FK al lado 1."
+                },
+                {
+                    text: "¿Cuál es el orden correcto para crear tablas con relaciones?",
+                    options: [
+                        { text: "Primero tablas 'padre' (sin FK), luego tablas 'hijo' (con FK)", correct: true },
+                        { text: "Primero tablas 'hijo', luego tablas 'padre'", correct: false },
+                        { text: "El orden no importa", correct: false },
+                        { text: "Siempre primero la tabla de la derecha del diagrama", correct: false }
+                    ],
+                    explanation: "El orden es crucial: debes crear PRIMERO las tablas sin FK, luego las que sí tienen FK. Si intentas crear una tabla con FK a una tabla inexistente, obtendrás error."
+                },
+                {
+                    text: "¿Qué es el MER (Modelo Entidad-Relación)?",
+                    options: [
+                        { text: "Herramienta de diseño conceptual para representar la estructura de una BD antes de implementarla", correct: true },
+                        { text: "Un lenguaje de consulta SQL", correct: false },
+                        { text: "Un tipo de índice en la BD", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false }
+                    ],
+                    explanation: "El MER es una representación gráfica de la estructura de una BD: entidades, atributos, relaciones. Permite visualizar y validar el diseño ANTES de escribir SQL, detectando problemas tempranamente."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre PostgreSQL y SQL Server en cuanto a MVCC?",
+                    options: [
+                        { text: "PostgreSQL tiene MVCC, SQL Server usa bloqueos predeterminados", correct: true },
+                        { text: "Ambos tienen MVCC", correct: false },
+                        { text: "Ninguno tiene MVCC", correct: false },
+                        { text: "Solo MySQL tiene MVCC", correct: false }
+                    ],
+                    explanation: "PostgreSQL implementa MVCC (Multiversion Concurrency Control) para transacciones sin conflictos. SQL Server usa bloqueos como mecanismo predeterminado, lo que puede causar contención en alta concurrencia."
+                },
+                {
+                    text: "¿Cuándo usar PostgreSQL vs SQL Server?",
+                    options: [
+                        { text: "PostgreSQL: presupuesto limitado. SQL Server: ecosistema Microsoft", correct: true },
+                        { text: "Siempre usar PostgreSQL", correct: false },
+                        { text: "Siempre usar SQL Server", correct: false },
+                        { text: "Da igual, son idénticos", correct: false }
+                    ],
+                    explanation: "PostgreSQL es mejor para startups y proyectos con presupuesto limitado (es gratuito, extensible, multi-lenguaje). SQL Server es mejor en empresas Microsoft (integración, OLTP, soporte oficial)."
+                },
+                {
+                    text: "¿Qué es pg_dump?",
+                    options: [
+                        { text: "Herramienta para hacer backup lógico: genera script SQL para recrear la BD", correct: true },
+                        { text: "Un software para optimizar consultas", correct: false },
+                        { text: "Un protocolo de comunicación", correct: false },
+                        { text: "Un tipo de índice", correct: false }
+                    ],
+                    explanation: "pg_dump es una herramienta de backup lógico que genera un script SQL que contiene todas las instrucciones para recrear la BD y sus datos. Es útil para migrar entre versiones de PostgreSQL."
+                },
+                {
+                    text: "¿Qué es pg_basebackup?",
+                    options: [
+                        { text: "Herramienta para hacer backup físico del directorio de datos completo", correct: true },
+                        { text: "Una herramienta de restauración de datos", correct: false },
+                        { text: "Un software para optimizar el servidor", correct: false },
+                        { text: "Un tipo de compresión de datos", correct: false }
+                    ],
+                    explanation: "pg_basebackup hace backup físico del directorio PGDATA completo. Es más rápido que pg_dump para BDs grandes y permite hacer backups incrementales usando WAL archiving."
+                },
+                {
+                    text: "¿Qué es pg_hba.conf?",
+                    options: [
+                        { text: "Archivo que configura métodos de autenticación y acceso a la BD", correct: true },
+                        { text: "Un archivo de contraseñas de usuarios", correct: false },
+                        { text: "Un archivo de configuración de rendimiento", correct: false },
+                        { text: "Un archivo de logs de transacciones", correct: false }
+                    ],
+                    explanation: "pg_hba.conf (Host-Based Authentication) es el archivo de configuración que define: qué usuarios pueden conectarse, desde qué hosts, usando qué método de autenticación (MD5, SCRAM-SHA-256, LDAP, Kerberos, etc.)."
+                },
+                {
+                    text: "¿Cuál es la función de una tabla intermedia en N:M?",
+                    options: [
+                        { text: "Conectar dos tablas, llevando FKs a ambas, permitiendo agregar atributos propios", correct: true },
+                        { text: "Hacer más rápidas las consultas JOIN", correct: false },
+                        { text: "Reemplazar una de las tablas originales", correct: false },
+                        { text: "Duplicar datos para seguridad", correct: false }
+                    ],
+                    explanation: "La tabla intermedia en N:M: 1) Conecta las dos tablas con FKs. 2) Su PK es compuesta de ambas FKs. 3) Permite agregar atributos propios de la relación (ej: fecha_inscripcion, nota)."
+                },
+                {
+                    text: "¿Qué problemas surgirían sin tabla intermedia en N:M?",
+                    options: [
+                        { text: "Redundancia, anomalías de datos, imposibilidad de agregar atributos de la relación", correct: true },
+                        { text: "Solo problemas de rendimiento menor", correct: false },
+                        { text: "Ningún problema real", correct: false },
+                        { text: "Solo problemas en SQL Server, no en PostgreSQL", correct: false }
+                    ],
+                    explanation: "Sin tabla intermedia: necesitarías columnas duplicadas (redundancia), actualizaciones inconsistentes (anomalías), e imposibilidad de guardar información de la relación misma (fecha, cantidad, nota, etc.)."
+                },
+                {
+                    text: "¿Cuáles son los lenguajes soportados en PostgreSQL?",
+                    options: [
+                        { text: "Python, PHP, Perl, Tcl, .Net, C, C++, Delphi, Java, JavaScript y más", correct: true },
+                        { text: "Solo SQL puro", correct: false },
+                        { text: "Solo lenguajes de Microsoft", correct: false },
+                        { text: "Solo C y C++", correct: false }
+                    ],
+                    explanation: "PostgreSQL es muy versátil: soporta PL/Python, PL/Perl, PL/Tcl, PL/pgsql además de interfaces para Java, PHP, Node.js, Delphi, .Net, etc."
+                },
+                {
+                    text: "¿Qué es el método de autenticación SCRAM-SHA-256?",
+                    options: [
+                        { text: "Un método de autenticación seguro que no envía contraseñas en texto plano", correct: true },
+                        { text: "Un tipo de cifrado de datos en la BD", correct: false },
+                        { text: "Un protocolo de comunicación de red", correct: false },
+                        { text: "Un tipo de índice en PostgreSQL", correct: false }
+                    ],
+                    explanation: "SCRAM-SHA-256 (Salted Challenge Response Authentication Mechanism) es un método seguro donde la contraseña nunca se envía en texto plano. En su lugar, se envían hashes que se validan en el servidor. Es mucho más seguro que MD5."
+                }
+            ],
+            4: [
+                {
+                    text: "¿En qué año fue fundada Oracle y quiénes fueron sus fundadores?",
+                    options: [
+                        { text: "1977, fundada por Larry Ellison, Bob Miner y Ed Oates", correct: true },
+                        { text: "1980, fundada por Bill Gates", correct: false },
+                        { text: "1985, fundada por Steve Jobs", correct: false },
+                        { text: "1990, fundada por Linus Torvalds", correct: false }
+                    ],
+                    explanation: "Oracle fue fundada en 1977 por Larry Ellison, Bob Miner y Ed Oates. Se convirtió rápidamente en una empresa líder en software de bases de datos. Larry Ellison fue CEO durante décadas."
+                },
+                {
+                    text: "¿Qué es Oracle Database 23C?",
+                    options: [
+                        { text: "La última versión de Oracle, con automatización, seguridad e IA integrada", correct: true },
+                        { text: "Una herramienta para crear gráficos en Excel", correct: false },
+                        { text: "Un lenguaje de programación similar a C", correct: false },
+                        { text: "Un protocolo de comunicación de redes", correct: false }
+                    ],
+                    explanation: "Oracle Database 23C es la versión más reciente, enfocada en: Autonomía (automatización), Seguridad mejorada, Rendimiento/escalabilidad, facilidad de uso, e integración de IA/ML."
+                },
+                {
+                    text: "¿Qué es la Autonomía en Oracle Database 23C?",
+                    options: [
+                        { text: "Auto-aprovisionamiento, auto-tuning y auto-reparación sin intervención humana", correct: true },
+                        { text: "Una función que permite múltiples conexiones simultáneas", correct: false },
+                        { text: "Un tipo de índice especial", correct: false },
+                        { text: "Un protocolo de seguridad de red", correct: false }
+                    ],
+                    explanation: "Autonomía en Oracle 23C: auto-gestión de recursos, auto-ajuste de parámetros, auto-detección y auto-reparación de problemas, adaptación dinámica a cambios de carga. Reduce significativamente la intervención de DBAs."
+                },
+                {
+                    text: "¿Qué es RAC (Real Application Clusters)?",
+                    options: [
+                        { text: "Arquitectura de cluster que distribuye una BD en múltiples servidores para alta disponibilidad", correct: true },
+                        { text: "Un tipo de índice para búsquedas rápidas", correct: false },
+                        { text: "Un protocolo de compresión de datos", correct: false },
+                        { text: "Una herramienta de auditoría de seguridad", correct: false }
+                    ],
+                    explanation: "RAC es la solución de Oracle para alta disponibilidad: múltiples servidores ejecutan una sola instancia de BD de forma compartida. Si un servidor falla, los otros continúan. Distribuye la carga para mejor rendimiento."
+                },
+                {
+                    text: "¿Cuál es la principal ventaja de Oracle frente a PostgreSQL?",
+                    options: [
+                        { text: "Rendimiento superior, seguridad más avanzada y RAC para alta disponibilidad", correct: true },
+                        { text: "Oracle es completamente gratuito", correct: false },
+                        { text: "Oracle es más fácil de administrar", correct: false },
+                        { text: "Oracle no tiene desventajas", correct: false }
+                    ],
+                    explanation: "Oracle destaca por: rendimiento de clase empresarial, seguridad extremadamente robusta, y características de alta disponibilidad como RAC que PostgreSQL no tiene de serie."
+                },
+                {
+                    text: "¿Cuál es la principal desventaja de Oracle?",
+                    options: [
+                        { text: "Costos de licenciamiento muy elevados y complejidad de administración", correct: true },
+                        { text: "No soporta SQL estándar", correct: false },
+                        { text: "Solo funciona en un sistema operativo", correct: false },
+                        { text: "No tiene capacidades de seguridad", correct: false }
+                    ],
+                    explanation: "La desventaja principal: licencias costosas, especialmente para grandes empresas. Más costos de soporte técnico. Su administración es compleja y requiere personal especializado (DBAs certificados)."
+                },
+                {
+                    text: "¿Qué significa que Oracle DB 23C tenga IA/ML integrada?",
+                    options: [
+                        { text: "Los modelos ML pueden entrenarse y desplegarse directamente en la BD", correct: true },
+                        { text: "Oracle vende productos de IA por separado", correct: false },
+                        { text: "La BD automáticamente predice resultados sin datos", correct: false },
+                        { text: "Es una característica solo para análisis de texto", correct: false }
+                    ],
+                    explanation: "Oracle 23C permite entrenar modelos de ML directamente en la BD: no necesitas mover datos externamente, el ML se ejecuta donde viven los datos (más rápido), el modelo accede a toda la BD."
+                },
+                {
+                    text: "¿Para qué tipo de empresas es recomendable Oracle?",
+                    options: [
+                        { text: "Grandes corporaciones, bancos e instituciones con datos críticos", correct: true },
+                        { text: "Todas las empresas, sin importar tamaño", correct: false },
+                        { text: "Solo para startups de tecnología", correct: false },
+                        { text: "Para proyectos personales de aprendizaje", correct: false }
+                    ],
+                    explanation: "Oracle es ideal para: bancos (confiabilidad ACID), grandes corporaciones (datos críticos), gobiernos (auditoría/control), organizaciones donde disponibilidad y seguridad de datos son misión crítica."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre NUMBER y VARCHAR2 en Oracle?",
+                    options: [
+                        { text: "NUMBER es para valores numéricos, VARCHAR2 es para texto", correct: true },
+                        { text: "Son sinónimos, significan lo mismo", correct: false },
+                        { text: "NUMBER es para texto, VARCHAR2 es para números", correct: false },
+                        { text: "No se usan en Oracle", correct: false }
+                    ],
+                    explanation: "NUMBER es para datos numéricos (ej: NUMBER(10,2) = 10 dígitos totales, 2 decimales). VARCHAR2 es para texto variable (ej: VARCHAR2(100) = máximo 100 caracteres). Equivalentes a INT/DECIMAL e VARCHAR en PostgreSQL."
+                },
+                {
+                    text: "¿Qué es SYSDATE en Oracle?",
+                    options: [
+                        { text: "La fecha/hora actual en Oracle, equivalente a NOW() en PostgreSQL", correct: true },
+                        { text: "Un identificador único de sistema", correct: false },
+                        { text: "Una función para calcular diferencias de fecha", correct: false },
+                        { text: "No existe equivalente en PostgreSQL", correct: false }
+                    ],
+                    explanation: "SYSDATE en Oracle retorna la fecha y hora del servidor al momento de la consulta. En PostgreSQL: NOW() retorna timestamp, CURRENT_DATE retorna fecha. Es uno de los ejemplos de diferencias sintácticas."
+                },
+                {
+                    text: "¿Cuáles son las características clave de Oracle DB 23C?",
+                    options: [
+                        { text: "Gestión automatizada, seguridad mejorada, rendimiento, facilidad de uso e IA/ML", correct: true },
+                        { text: "Solo mejoras de velocidad", correct: false },
+                        { text: "Cambios principalmente visuales", correct: false },
+                        { text: "Incompatible con versiones anteriores", correct: false }
+                    ],
+                    explanation: "Oracle 23C enfatiza: 1) Autonomía (auto-management). 2) Seguridad: cifrado avanzado, detección de amenazas. 3) Rendimiento: procesamiento paralelo, compresión. 4) IA/ML integrada. 5) Facilidad de uso mejorada."
+                },
+                {
+                    text: "¿Qué es Oracle Cloud?",
+                    options: [
+                        { text: "Servicios en la nube: IaaS, PaaS y SaaS ofrecidos por Oracle", correct: true },
+                        { text: "Un servidor de bases de datos tradicional", correct: false },
+                        { text: "Un software de escritorio", correct: false },
+                        { text: "Un navegador web", correct: false }
+                    ],
+                    explanation: "Oracle Cloud ofrece: IaaS (infraestructura en la nube), PaaS (plataforma para desarrollo), SaaS (aplicaciones web). Permite a empresas ejecutar aplicaciones, almacenar datos y usar herramientas en un entorno escalable."
+                },
+                {
+                    text: "¿Cuál es la posición de Oracle en el mercado?",
+                    options: [
+                        { text: "Uno de los líderes mundiales en SGBD y soluciones empresariales", correct: true },
+                        { text: "Una empresa pequeña especializada solo en bases de datos", correct: false },
+                        { text: "La empresa número 1 absoluta sin competencia", correct: false },
+                        { text: "Una empresa en declive sin relevancia actual", correct: false }
+                    ],
+                    explanation: "Oracle es uno de los líderes mundiales en SGBD: usado por bancos, gobiernos, grandes corporaciones. Compite con Microsoft SQL Server y PostgreSQL, pero es la opción preferida para misiones críticas en grandes organizaciones."
+                },
+                {
+                    text: "¿Qué es el Cifrado en Oracle DB 23C?",
+                    options: [
+                        { text: "Protección de datos en reposo y en tránsito con algoritmos avanzados", correct: true },
+                        { text: "Solo protege datos en tránsito", correct: false },
+                        { text: "Es una característica opcional muy complicada", correct: false },
+                        { text: "Oracle no implementa cifrado", correct: false }
+                    ],
+                    explanation: "Oracle 23C implementa cifrado mejorado: datos en reposo (almacenamiento), datos en tránsito (comunicación), control de acceso por columnas/filas, certificados SSL, protección contra amenazas en tiempo real."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre GENERATED ALWAYS AS IDENTITY y SERIAL?",
+                    options: [
+                        { text: "GENERATED es de Oracle (más moderno), SERIAL es de PostgreSQL", correct: true },
+                        { text: "No hay diferencia, son exactamente lo mismo", correct: false },
+                        { text: "GENERATED solo funciona en Windows", correct: false },
+                        { text: "SERIAL es más nuevo que GENERATED", correct: false }
+                    ],
+                    explanation: "GENERATED ALWAYS AS IDENTITY es la sintaxis de Oracle para auto-incremento (más estándar SQL). SERIAL es la sintaxis de PostgreSQL. Cumplen la misma función: generar valores secuenciales únicos."
+                },
+                {
+                    text: "¿Cuándo se fundó Oracle Corporation?",
+                    options: [
+                        { text: "En 1977 por Larry Ellison y su equipo", correct: true },
+                        { text: "En 1992 como división de Hewlett-Packard", correct: false },
+                        { text: "En 2000 como startup de la era de internet", correct: false },
+                        { text: "En 1960 como empresa de mainframes", correct: false }
+                    ],
+                    explanation: "Oracle fue fundada en 1977 (oficialmente como 'Relational Software Inc.', renombrada a Oracle en 1982). Fue una de las primeras compañías en comercializar una BD relacional basada en SQL."
+                },
+                {
+                    text: "¿Qué ventaja tiene RAC sobre replicación simple?",
+                    options: [
+                        { text: "Múltiples servidores ejecutan UNA sola instancia compartida, distribuyendo carga activamente", correct: true },
+                        { text: "RAC es más lento pero más seguro", correct: false },
+                        { text: "RAC solo es para backup", correct: false },
+                        { text: "No hay diferencia real", correct: false }
+                    ],
+                    explanation: "RAC: múltiples nodos ejecutan activamente UNA sola instancia de BD compartida (cluster). Distribuye la carga de trabajo entre servidores. Replicación simple: copia pasiva de datos. RAC es más sofisticado y poderoso."
+                },
+                {
+                    text: "¿Qué significa que Oracle sea robusto?",
+                    options: [
+                        { text: "Que es confiable, estable y capaz de manejar cargas extremas sin fallos", correct: true },
+                        { text: "Que tiene mucho tamaño de archivo", correct: false },
+                        { text: "Que es complicado de usar", correct: false },
+                        { text: "Que es el SGBD más rápido siempre", correct: false }
+                    ],
+                    explanation: "Robustez en Oracle significa: confiabilidad comprobada (usado en misiones críticas), estabilidad bajo cargas extremas, recuperación ante fallos, garantía de integridad de datos ACID. Es por eso que lo eligen en bancos y gobiernos."
+                },
+                {
+                    text: "¿Cuál es la diferencia entre Oracle y PostgreSQL en cuanto a costo?",
+                    options: [
+                        { text: "Oracle muy costoso (licencias + soporte), PostgreSQL es gratuito", correct: true },
+                        { text: "Ambos tienen el mismo costo", correct: false },
+                        { text: "PostgreSQL es más costoso que Oracle", correct: false },
+                        { text: "El costo no es una diferencia importante", correct: false }
+                    ],
+                    explanation: "Oracle tiene costos muy altos: licencias de software, soporte técnico oficial, personal especializado (DBAs certificados). PostgreSQL es completamente gratuito: software, soporte comunitario. Esto es crucial en decisiones empresariales."
+                }
+            ]
+        };
+
+        // Estado del quiz
+        let currentWeek = 1;
+        let scores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+        let answered = { 1: {}, 2: {}, 3: {}, 4: {} };
+
+        // Renderizar preguntas de una semana
+        function renderQuestions(week) {
+            const container = document.getElementById(`questions-${week}`);
+            container.innerHTML = '';
+
+            quizzes[week].forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-container';
+                questionDiv.id = `question-${week}-${index}`;
+
+                // Mezclar opciones
+                const shuffledOptions = shuffleOptions(question.options);
+
+                let optionsHTML = '';
+                shuffledOptions.forEach((option, optIndex) => {
+                    optionsHTML += `
+                        <div class="option">
+                            <input type="radio" id="q${week}_${index}_${optIndex}"
+                                   name="question${index}" value="${optIndex}"
+                                   onchange="handleAnswer(${week}, ${index}, ${optIndex}, ${shuffledOptions.findIndex(o => o.correct)})">
+                            <label for="q${week}_${index}_${optIndex}">${option.text}</label>
+                        </div>
+                    `;
+                });
+
+                questionDiv.innerHTML = `
+                    <div class="question-number">Pregunta ${index + 1} de 20</div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options">${optionsHTML}</div>
+                    <div class="feedback" id="feedback-${week}-${index}"></div>
+                `;
+
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // Manejar respuesta
+        function handleAnswer(week, questionIndex, selectedOption, correctIndex) {
+            const question = quizzes[week][questionIndex];
+            const feedbackDiv = document.getElementById(`feedback-${week}-${questionIndex}`);
+            const isCorrect = selectedOption === correctIndex;
+
+            // Marcar opciones
+            const options = document.querySelectorAll(`input[name="question${questionIndex}"]`);
+            options.forEach((opt, idx) => {
+                const optionDiv = opt.parentElement;
+                optionDiv.classList.remove('disabled-option', 'correct-answer', 'incorrect-answer');
+
+                if (idx === selectedOption) {
+                    if (isCorrect) {
+                        optionDiv.classList.add('correct-answer');
+                    } else {
+                        optionDiv.classList.add('incorrect-answer');
+                    }
+                    opt.disabled = true;
+                }
+
+                // Mostrar respuesta correcta si fue incorrecta
+                if (!isCorrect && idx === correctIndex) {
+                    optionDiv.classList.add('correct-answer');
+                    optionDiv.classList.add('disabled-option');
+                }
+
+                if (idx !== selectedOption) {
+                    optionDiv.classList.add('disabled-option');
+                    opt.disabled = true;
+                }
+            });
+
+            // Mostrar feedback
+            const feedbackClass = isCorrect ? 'correct' : 'incorrect';
+            const feedbackTitle = isCorrect ? '✅ ¡Correcto!' : '❌ Incorrecto';
+
+            feedbackDiv.className = `feedback show ${feedbackClass}`;
+            feedbackDiv.innerHTML = `
+                <div class="feedback-title">${feedbackTitle}</div>
+                <div class="feedback-text"><strong>Explicación:</strong> ${question.explanation}</div>
+            `;
+
+            // Registrar respuesta y actualizar puntuación
+            if (!answered[week][questionIndex]) {
+                answered[week][questionIndex] = true;
+                if (isCorrect) {
+                    scores[week]++;
+                }
+                updateScore(week);
+            }
+        }
+
+        // Actualizar puntuación
+        function updateScore(week) {
+            const total = Object.keys(answered[week]).length;
+            document.getElementById(`score-${week}`).textContent = `${scores[week]}/20`;
+
+            const progress = (total / 20) * 100;
+            document.getElementById(`progress-${week}`).style.width = progress + '%';
+
+            if (total === 20) {
+                showCompletion(week);
+            }
+        }
+
+        // Mostrar mensaje de finalización
+        function showCompletion(week) {
+            const percentage = (scores[week] / 20) * 100;
+            let message = '';
+
+            if (percentage === 100) {
+                message = `🎉 ¡Perfecto! Obtuviste ${scores[week]}/20. ¡Dominas completamente la Semana ${week}!`;
+            } else if (percentage >= 80) {
+                message = `👏 ¡Muy bien! Obtuviste ${scores[week]}/20. Solo necesitas reforzar algunos conceptos.`;
+            } else if (percentage >= 60) {
+                message = `💪 Buen trabajo. Obtuviste ${scores[week]}/20. Te recomendamos repasar los conceptos débiles.`;
+            } else {
+                message = `📚 Necesitas estudiar más. Obtuviste ${scores[week]}/20. Repasa el material de la semana ${week}.`;
+            }
+
+            const completionDiv = document.getElementById(`completion-${week}`);
+            completionDiv.textContent = message;
+            completionDiv.classList.add('show');
+        }
+
+        // Cambiar de semana
+        function switchWeek(week) {
+            // Ocultar todos los contenidos
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`week-${i}`).classList.remove('active');
+                document.querySelectorAll('.week-btn')[i-1].classList.remove('active');
+            }
+
+            // Mostrar semana seleccionada
+            document.getElementById(`week-${week}`).classList.add('active');
+            document.querySelectorAll('.week-btn')[week-1].classList.add('active');
+
+            // Renderizar preguntas si no existen
+            if (document.getElementById(`questions-${week}`).innerHTML === '') {
+                renderQuestions(week);
+            }
+        }
+
+        // Reset completo
+        function resetAllQuiz() {
+            if (confirm('¿Estás seguro de que deseas borrar todo el progreso? Esta acción no se puede deshacer.')) {
+                scores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+                answered = { 1: {}, 2: {}, 3: {}, 4: {} };
+
+                // Limpiar y renderizar todas las semanas
+                for (let week = 1; week <= 4; week++) {
+                    document.getElementById(`questions-${week}`).innerHTML = '';
+                    document.getElementById(`score-${week}`).textContent = '0/20';
+                    document.getElementById(`progress-${week}`).style.width = '0%';
+                    document.getElementById(`completion-${week}`).classList.remove('show');
+                }
+
+                // Renderizar la semana actual
+                renderQuestions(currentWeek);
+                alert('✅ Quiz reseteado. ¡Puedes empezar de nuevo!');
+            }
+        }
+
+        // Inicializar con Semana 1
+        renderQuestions(1);
+    </script>
+</body>
+</html>
