@@ -943,9 +943,18 @@
                 <div style="font-size: 3em; font-weight: bold; margin: 20px 0;">${percent}%</div>
                 <p style="font-size: 1.2em;">Has acertado <strong>${score}</strong> de <strong>${total}</strong> preguntas.</p>
                 <p>${message}</p>
-                <button class="btn-nav" style="margin-top:20px;" onclick="changeWeek('${currentWeek}')">Reiniciar Semana</button>
+                <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                    <button class="btn-nav" onclick="changeWeek('${currentWeek}')">Reiniciar Semana</button>
+                    <button class="btn-nav" style="background:#777;" onclick="resetCurrentQuestion()">Reintentar esta Pregunta</button>
+                </div>
             </div>
         `;
+    }
+
+    function resetCurrentQuestion() {
+        if (currentQuestionIdx > 0) currentQuestionIdx--;
+        answered = false;
+        renderQuestion();
     }
 
     // Inicializar
