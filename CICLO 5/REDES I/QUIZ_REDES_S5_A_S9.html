@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Examen - Redes y Comunicación de Datos I</title>
+    <style>
+        :root {
+            --primary-color: #c41e3a; /* Rojo UTP */
+            --secondary-color: #2c3e50;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        h1 { margin: 0; color: var(--secondary-color); }
+        .author { font-size: 0.9em; color: #666; margin-top: 5px; }
+
+        /* Pestañas */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            border: none;
+            background: #ddd;
+            cursor: pointer;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #ccc;
+        }
+
+        /* Quiz Card */
+        .quiz-container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .question-meta {
+            font-size: 0.85em;
+            color: #777;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .option-item {
+            margin-bottom: 12px;
+        }
+
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            border: 2px solid #eee;
+            background: #fff;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1em;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            background: #fff8f8;
+        }
+
+        .option-btn.correct {
+            border-color: var(--success-color);
+            background: #e9f7ef;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--error-color);
+            background: #fdf2f2;
+            color: var(--error-color);
+        }
+
+        /* Retroalimentación */
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .feedback.visible { display: block; }
+        .feedback.correct-bg { background: #e9f7ef; border-left: 5px solid var(--success-color); }
+        .feedback.wrong-bg { background: #fdf2f2; border-left: 5px solid var(--error-color); }
+
+        .feedback-title { font-weight: bold; margin-bottom: 5px; }
+        .feedback-concept { font-size: 0.95em; color: #444; }
+
+        /* Controles */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-nav {
+            padding: 10px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: var(--secondary-color);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .btn-nav:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-nav:hover:not(:disabled) { opacity: 0.9; }
+
+        .score-display { font-weight: bold; color: var(--primary-color); }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate { animation: fadeIn 0.4s ease-out; }
+
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .quiz-container { padding: 15px; }
+            .tab-btn { padding: 8px 12px; font-size: 0.9em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Simulador de Examen: Redes y Comunicación de Datos I</h1>
+        <div class="author">Preparado para: <strong>Max Anderson Benites Corazón</strong> - Senior Technical Implementation Specialist</div>
+    </header>
+
+    <div class="tabs" id="tabBar">
+        <button class="tab-btn active" onclick="changeWeek('S5')">Semana 5</button>
+        <button class="tab-btn" onclick="changeWeek('S6')">Semana 6</button>
+        <button class="tab-btn" onclick="changeWeek('S7')">Semana 7</button>
+        <button class="tab-btn" onclick="changeWeek('S8')">Semana 8</button>
+        <button class="tab-btn" onclick="changeWeek('S9')">Semana 9</button>
+    </div>
+
+    <div class="quiz-container" id="quizBox">
+        <!-- Contenido dinámico -->
+    </div>
+</div>
+
+<script>
+    const quizData = {
+        'S5': [
+            {
+                q: "¿Qué comando se utiliza para proteger el modo EXEC con privilegios con una contraseña cifrada?",
+                o: ["enable password password", "enable secret password", "service password-encryption", "line console 0"],
+                a: 1,
+                f: "El comando 'enable secret' utiliza un algoritmo de hashing fuerte (como MD5 o SHA-256) para proteger el acceso al modo privilegiado, a diferencia de 'enable password' que es texto plano."
+            },
+            {
+                q: "Para permitir el acceso remoto vía SSH en un router Cisco, ¿qué comando es indispensable en la configuración de la 'line vty'?",
+                o: ["login local", "transport input telnet", "transport input ssh", "no shutdown"],
+                a: 2,
+                f: "El comando 'transport input ssh' especifica explícitamente qué protocolos están permitidos para las sesiones remotas. Por seguridad, se recomienda desactivar telnet."
+            },
+            {
+                q: "Usted desea ver una lista resumida del estado de las interfaces, sus IPs y si están operativas. ¿Qué comando utiliza?",
+                o: ["show ip route", "show interfaces", "show ip interface brief", "show running-config"],
+                a: 2,
+                f: "'show ip interface brief' es el comando de diagnóstico más rápido para verificar el estado de Capa 1 (Status) y Capa 2 (Protocol) de todas las interfaces."
+            },
+            {
+                q: "¿Cuál es el propósito del comando 'no shutdown' en una interfaz de router?",
+                o: ["Reiniciar el router", "Eliminar la dirección IP", "Activar administrativamente la interfaz", "Guardar la configuración"],
+                a: 2,
+                f: "Por defecto, las interfaces de los routers Cisco están 'administrativamente inactivas'. El comando 'no shutdown' las activa."
+            },
+            {
+                q: "Si un router tiene 3 interfaces GigabitEthernet conectadas a diferentes switches, ¿cuántas redes (dominios de broadcast) está separando?",
+                o: ["1", "2", "3", "6"],
+                a: 2,
+                f: "Cada interfaz de un router representa una red distinta. El router detiene los broadcasts de una red para que no afecten a las demás."
+            },
+            {
+                q: "¿En qué memoria se guarda el archivo 'startup-config'?",
+                o: ["RAM", "NVRAM", "ROM", "Flash"],
+                a: 1,
+                f: "La NVRAM (Non-Volatile RAM) mantiene la configuración grabada incluso si el equipo se apaga. La RAM contiene el 'running-config'."
+            },
+            {
+                q: "¿Qué comando cifra todas las contraseñas de texto plano en el archivo de configuración?",
+                o: ["cifrado enable", "service password-encryption", "encrypt-all", "security passwords"],
+                a: 1,
+                f: "Este comando global aplica un cifrado débil (Tipo 7) a las contraseñas que de otro modo serían visibles al hacer un 'show run'."
+            },
+            {
+                q: "¿Cuál es la función del comando 'copy running-config startup-config'?",
+                o: ["Borrar la configuración", "Reiniciar el router", "Guardar los cambios actuales en la memoria no volátil", "Cargar la configuración de fábrica"],
+                a: 2,
+                f: "Asegura que los cambios realizados en la sesión actual (en RAM) persistan tras un reinicio del equipo."
+            },
+            {
+                q: "¿Qué muestra el comando 'show ip route'?",
+                o: ["La tabla de direcciones MAC", "La tabla de enrutamiento", "El historial de comandos", "Las estadísticas de tráfico"],
+                a: 1,
+                f: "La tabla de enrutamiento contiene las redes conocidas por el router y las interfaces de salida para llegar a ellas."
+            },
+            {
+                q: "En la configuración de interfaces, ¿para qué sirve el comando 'description'?",
+                o: ["Es obligatorio para que funcione la red", "Ayuda a identificar el propósito del enlace para gestión y resolución de problemas", "Configura el nombre del router", "Cifra la interfaz"],
+                a: 1,
+                f: "Es una buena práctica de ingeniería para documentar a qué red o equipo está conectada la interfaz."
+            },
+            {
+                q: "¿Qué ocurre si ingresa el comando 'exit' en el modo de configuración de interfaz?",
+                o: ["Se cierra la sesión", "Vuelve al modo privilegiado", "Vuelve al modo de configuración global", "Apaga la interfaz"],
+                a: 2,
+                f: "Sube un nivel en la jerarquía de modos de configuración de Cisco IOS."
+            },
+            {
+                q: "¿Qué comando permite configurar el mensaje legal que aparece al intentar acceder al equipo?",
+                o: ["message-day", "banner motd #", "legal-notice", "warning-text"],
+                a: 1,
+                f: "MOTD significa 'Message Of The Day' y se usa para advertencias legales sobre acceso no autorizado."
+            },
+            {
+                q: "¿Cómo se entra al modo de configuración global desde el modo privilegiado?",
+                o: ["enable", "configure terminal", "setup", "config global"],
+                a: 1,
+                f: "'configure terminal' (o 'conf t') es el comando para realizar cambios globales en el dispositivo."
+            },
+            {
+                q: "¿Qué significa que el protocolo de línea esté 'down' en 'show ip interface brief'?",
+                o: ["Problema físico del cable", "Falta dirección IP", "Problema de Capa 2 (encapsulación, Keepalives)", "La interfaz está apagada manualmente"],
+                a: 2,
+                f: "Status es Capa 1 (Físico), Protocol es Capa 2 (Enlace de datos)."
+            },
+            {
+                q: "¿Cuál es la diferencia entre un Router y un Switch?",
+                o: ["El router conecta hosts, el switch conecta redes", "El router trabaja en Capa 3 (Red), el switch en Capa 2 (Enlace de datos)", "No hay diferencia", "El switch es más lento"],
+                a: 1,
+                f: "Los routers usan direcciones IP para mover paquetes entre redes; los switches usan direcciones MAC para mover tramas dentro de una red."
+            },
+            {
+                q: "Para configurar la IP 192.168.1.1 con máscara 255.255.255.0 en una interfaz, el comando es:",
+                o: ["ip address 192.168.1.1 255.255.255.0", "set ip 192.168.1.1/24", "address ipv4 192.168.1.1 mask 255.255.255.0", "ip 192.168.1.1 0.0.0.255"],
+                a: 0,
+                f: "La sintaxis correcta en Cisco IOS requiere la palabra 'ip address' seguida de la IP y la máscara en formato decimal punteado."
+            },
+            {
+                q: "¿Qué comando permite verificar las estadísticas detalladas (errores, MTU, ancho de banda) de una interfaz específica?",
+                o: ["show ip interface brief", "show interfaces [interface-id]", "show protocols", "show controllers"],
+                a: 1,
+                f: "Este comando proporciona detalles exhaustivos incluyendo errores de CRC, colisiones y estado del hardware."
+            },
+            {
+                q: "¿Cómo se accede al modo EXEC Privilegiado?",
+                o: ["password cisco", "login", "enable", "sudo"],
+                a: 2,
+                f: "El comando 'enable' nos lleva del modo de usuario '>' al modo privilegiado '#' donde podemos ejecutar comandos de visualización y configuración."
+            },
+            {
+                q: "¿Cuál es el comando para configurar el nombre del dispositivo?",
+                o: ["name-host [nombre]", "set-name [nombre]", "hostname [nombre]", "device [nombre]"],
+                a: 2,
+                f: "El comando 'hostname' cambia el prompt del CLI para reflejar el nombre asignado al equipo."
+            },
+            {
+                q: "¿Para qué sirve el comando 'line console 0'?",
+                o: ["Configurar acceso por red", "Configurar el acceso físico directo por el puerto de consola", "Habilitar SSH", "Configurar el módem"],
+                a: 1,
+                f: "Permite entrar al sub-modo de configuración para proteger el puerto físico del dispositivo."
+            }
+        ],
+        'S6': [
+            {
+                q: "Convierta el número binario 10101000 a decimal.",
+                o: ["168", "192", "172", "200"],
+                a: 0,
+                f: "Cálculo: (1*128) + (0*64) + (1*32) + (0*16) + (1*8) + (0*4) + (0*2) + (0*1) = 128+32+8 = 168."
+            },
+            {
+                q: "¿Cuántos bits componen una dirección IPv4?",
+                o: ["16", "32", "64", "128"],
+                a: 1,
+                f: "IPv4 usa 32 bits divididos en 4 octetos de 8 bits cada uno."
+            },
+            {
+                q: "¿Qué parte de la dirección IP identifica a la red en una dirección 192.168.10.15 con máscara 255.255.255.0?",
+                o: ["192", "192.168.10", "15", "255.255.255"],
+                a: 1,
+                f: "Con una máscara /24, los primeros 3 octetos representan la red y el último el host."
+            },
+            {
+                q: "Convierta el decimal 192 a binario.",
+                o: ["11000000", "10101000", "11111111", "10000001"],
+                a: 0,
+                f: "192 = 128 + 64. Por lo tanto, los bits de posición 128 y 64 están en 1 y los demás en 0."
+            },
+            {
+                q: "¿Cuál es el valor decimal máximo de un octeto en IPv4?",
+                o: ["254", "255", "256", "128"],
+                a: 1,
+                f: "Un octeto tiene 8 bits. 2^8 = 256 combinaciones (0 a 255)."
+            },
+            {
+                q: "¿Qué operación lógica utiliza un router para determinar la dirección de red comparando la IP del host y la máscara de subred?",
+                o: ["OR", "XOR", "AND", "NOT"],
+                a: 2,
+                f: "La operación AND bit a bit resulta en 1 solo si ambos bits son 1. IP AND Máscara = Dirección de Red."
+            },
+            {
+                q: "¿Cuál es el rango de la primera dirección de host utilizable en la red 10.0.0.0 /8?",
+                o: ["10.0.0.0", "10.0.0.1", "10.1.1.1", "10.255.255.254"],
+                a: 1,
+                f: "La primera IP útil es siempre la Dirección de Red + 1."
+            },
+            {
+                q: "Dada la IP 172.16.10.10 y la máscara 255.255.0.0, ¿cuál es la dirección de red?",
+                o: ["172.0.0.0", "172.16.10.0", "172.16.0.0", "172.16.255.255"],
+                a: 2,
+                f: "La máscara /16 indica que los primeros dos octetos (172.16) son la red y el resto se pone en 0 para la dirección de red."
+            },
+            {
+                q: "¿Cuál es la representación decimal del binario 11111111?",
+                o: ["254", "255", "256", "224"],
+                a: 1,
+                f: "Es la suma de 128+64+32+16+8+4+2+1 = 255."
+            },
+            {
+                q: "Un host tiene la IP 192.168.1.10 /24. ¿Cuál es la dirección de broadcast de su red?",
+                o: ["192.168.1.0", "192.168.1.255", "192.168.1.1", "192.168.255.255"],
+                a: 1,
+                f: "En una red /24, el último octeto en binario todo 1s (255) es el broadcast."
+            },
+            {
+                q: "¿Qué indica un bit '0' en la máscara de subred?",
+                o: ["Posición de red", "Posición de host", "Gateway", "Error de configuración"],
+                a: 1,
+                f: "En la máscara, los 1s representan la porción de red y los 0s la porción de host."
+            },
+            {
+                q: "Convierta 10.10.10.1 a binario.",
+                o: ["00001010.00001010.00001010.00000001", "1010.1010.1010.1", "00001011.00001011.00001011.00000001", "11110000.11110000.11110000.00000001"],
+                a: 0,
+                f: "El valor 10 en binario es 8 + 2, es decir, posiciones 8 y 2 activas: 00001010."
+            },
+            {
+                q: "¿Cuántas direcciones IP utilizables hay en una red con máscara 255.255.255.0?",
+                o: ["256", "255", "254", "252"],
+                a: 2,
+                f: "Fórmula 2^h - 2. Donde h=8 bits. 256 - 2 = 254."
+            },
+            {
+                q: "¿A qué clase tradicional (Classful) pertenece la IP 10.1.1.1?",
+                o: ["Clase A", "Clase B", "Clase C", "Clase D"],
+                a: 0,
+                f: "Clase A: 0-127 en el primer octeto. Máscara por defecto /8."
+            },
+            {
+                q: "¿Para qué sirve la dirección de loopback 127.0.0.1?",
+                o: ["Conectar a Internet", "Probar la pila TCP/IP interna del propio host", "Configurar el router", "Asignar a servidores web"],
+                a: 1,
+                f: "Es una dirección reservada para que el host se comunique consigo mismo para diagnósticos de red locales."
+            },
+            {
+                q: "¿Qué organización se encarga de asignar bloques de direcciones IP a nivel global?",
+                o: ["IEEE", "IANA / ICANN", "Cisco", "ISO"],
+                a: 1,
+                f: "IANA gestiona el espacio global de direcciones IP y delega a los RIRs."
+            },
+            {
+                q: "En binario, si tengo la máscara 255.255.240.0, ¿cuántos bits de red tengo?",
+                o: ["16", "20", "24", "28"],
+                a: 1,
+                f: "255.255 (16 bits) + 240 (11110000, 4 bits) = 20 bits. Es un prefijo /20."
+            },
+            {
+                q: "Convierta el binario 01111011 a decimal.",
+                o: ["121", "123", "125", "127"],
+                a: 1,
+                f: "64+32+16+8+2+1 = 123."
+            },
+            {
+                q: "¿Cuál es la máscara de subred para un prefijo /26?",
+                o: ["255.255.255.0", "255.255.255.128", "255.255.255.192", "255.255.255.224"],
+                a: 2,
+                f: "/24 es 255.255.255.0. Agregamos 2 bits (128+64) = 192."
+            },
+            {
+                q: "Si la IP es 192.168.1.5 y la máscara es 255.255.255.252 (/30), ¿cuál es la dirección de red?",
+                o: ["192.168.1.0", "192.168.1.4", "192.168.1.1", "192.168.1.8"],
+                a: 1,
+                f: "Los múltiplos de 4 en el último octeto son las redes: 0, 4, 8... El host .5 pertenece a la red .4."
+            }
+        ],
+        'S7': [
+            {
+                q: "¿Cuántos bits tiene una dirección IPv6?",
+                o: ["32", "64", "128", "256"],
+                a: 2,
+                f: "IPv6 utiliza 128 bits, lo que permite un espacio de direcciones virtualmente inagotable (340 sextillones)."
+            },
+            {
+                q: "¿Cómo se llama cada grupo de 4 dígitos hexadecimales en una dirección IPv6?",
+                o: ["Octeto", "Hexteto", "Segmento binario", "Cuarteto"],
+                a: 1,
+                f: "Hexteto es el término no oficial común para referirse a los 16 bits (4 hex) separados por dos puntos."
+            },
+            {
+                q: "Comprima la siguiente dirección IPv6 usando las reglas oficiales: 2001:0db8:0000:0000:0000:0000:0000:0001",
+                o: ["2001:db8::1", "2001:0db8::0001", "2001:db8:0:0:0:0:0:1", "2001:db8:0::1"],
+                a: 0,
+                f: "Se omiten ceros a la izquierda y se reemplaza la cadena más larga de ceros contiguos por '::'. Solo se puede usar '::' una vez."
+            },
+            {
+                q: "¿Qué técnica de transición permite que IPv4 e IPv6 funcionen simultáneamente en el mismo dispositivo?",
+                o: ["Tunneling", "Dual Stack", "Translation (NAT64)", "Subnetting"],
+                a: 1,
+                f: "Dual Stack es la técnica recomendada donde el dispositivo tiene ambas pilas de protocolos configuradas."
+            },
+            {
+                q: "¿Cuál es el prefijo típico para una dirección IPv6 de Link-Local (LLA)?",
+                o: ["2001::/3", "FE80::/10", "FC00::/7", "FF00::/8"],
+                a: 1,
+                f: "Las direcciones Link-Local siempre empiezan por FE80 y solo tienen alcance dentro del segmento de red local."
+            },
+            {
+                q: "¿Cuántas veces se puede usar el símbolo '::' en una dirección IPv6 comprimida?",
+                o: ["Ninguna", "Una sola vez", "Dos veces", "Sin límite"],
+                a: 1,
+                f: "Solo una vez para evitar ambigüedad en la expansión de la dirección."
+            },
+            {
+                q: "Convierta el hexadecimal 'A' a decimal.",
+                o: ["10", "11", "12", "15"],
+                a: 0,
+                f: "Hexadecimal usa A=10, B=11, C=12, D=13, E=14, F=15."
+            },
+            {
+                q: "¿Cuál es el formato comprimido correcto de '2001:0db8:0000:1111:0000:0000:0000:0200'?",
+                o: ["2001:db8:0:1111::200", "2001:db8::1111::200", "2001:db8:0:1111:0:0:0:200", "2001:db8:0:1111::0200"],
+                a: 0,
+                f: "Eliminamos ceros iniciales en cada hexteto y usamos '::' para los tres grupos de ceros."
+            },
+            {
+                q: "¿Para qué sirve el comando 'ipv6 unicast-routing' en un router Cisco?",
+                o: ["Asignar una IP al router", "Habilitar al router para que reenvíe paquetes IPv6 (Enrutamiento)", "Activar una interfaz", "Cifrar el tráfico"],
+                a: 1,
+                f: "Sin este comando global, el router actúa como un host IPv6 y no enrutará tráfico entre interfaces."
+            },
+            {
+                q: "¿Qué indica una dirección IPv6 que empieza por FF00::/8?",
+                o: ["Unicast Global", "Link-Local", "Multicast", "Loopback"],
+                a: 2,
+                f: "FF es el prefijo para tráfico Multicast en IPv6."
+            },
+            {
+                q: "¿Cuál es la dirección de Loopback en IPv6?",
+                o: ["127.0.0.1", "::1", "FE80::1", "::"],
+                a: 1,
+                f: "La dirección ::1 (127 ceros y un 1) equivale al 127.0.0.1 de IPv4."
+            },
+            {
+                q: "En el comando 'ipv6 address 2001:db8:acad:1::1/64', ¿qué representa el /64?",
+                o: ["El número de hosts", "La longitud del prefijo de red", "La velocidad de la interfaz", "El ID de la interfaz"],
+                a: 1,
+                f: "Es el equivalente a la máscara de subred. Indica que los primeros 64 bits son la red."
+            },
+            {
+                q: "¿Cuál de estas direcciones es una GUA (Global Unicast Address) válida?",
+                o: ["FE80::1", "2001:db8:cafe::1", "FF02::1", "::1"],
+                a: 1,
+                f: "Las GUAs son enrutables en Internet y actualmente se asignan en el rango que empieza con el binario 001 (2000::/3)."
+            },
+            {
+                q: "¿Qué técnica encapsula paquetes IPv6 dentro de paquetes IPv4 para atravesar redes que solo soportan IPv4?",
+                o: ["Dual Stack", "Tunneling", "NAT64", "Subnetting"],
+                a: 1,
+                f: "El Tunneling permite 'pasar' tráfico IPv6 por 'túneles' IPv4."
+            },
+            {
+                q: "Convierta el hexadecimal 'F' a binario.",
+                o: ["1010", "1100", "1111", "0000"],
+                a: 2,
+                f: "F es 15 en decimal, que en binario de 4 bits es 1111."
+            },
+            {
+                q: "¿Qué parte de la dirección IPv6 GUA es asignada generalmente por el ISP al cliente?",
+                o: ["Global Routing Prefix", "Subnet ID", "Interface ID", "Hexteto 8"],
+                a: 0,
+                f: "El ISP entrega un prefijo (comúnmente /48), el cliente gestiona el Subnet ID (16 bits) y el host el Interface ID (64 bits)."
+            },
+            {
+                q: "Si una interfaz tiene configurada 'ipv6 address FE80::1 link-local', ¿puede hacer ping a un host en otra red a través de un router?",
+                o: ["Sí", "No, solo sirve para la red local (mismo switch)", "Solo si tiene Internet", "Depende del DNS"],
+                a: 1,
+                f: "Las direcciones Link-Local no son enrutables. No pasan de un router a otra red."
+            },
+            {
+                q: "Expanda la dirección comprimida '2001:db8::ab' a su forma completa.",
+                o: ["2001:0db8:0000:0000:0000:0000:0000:00ab", "2001:db80:0000:0000:0000:0000:0000:00ab", "2001:0db8:0000:0000:0000:0000:0000:ab00", "2001:db8:0:0:0:0:0:ab"],
+                a: 0,
+                f: "Rellenamos con ceros a la izquierda hasta tener 4 hex por grupo y completamos los grupos faltantes con ceros."
+            },
+            {
+                q: "¿Cuál es el valor decimal de '10' en hexadecimal?",
+                o: ["10", "16", "2", "32"],
+                a: 1,
+                f: "En base 16, la posición '1' vale 16^1 = 16. Entonces 1*16 + 0*1 = 16."
+            },
+            {
+                q: "¿Qué protocolo de resolución de direcciones reemplaza a ARP en IPv6?",
+                o: ["ICMPv6 (NDP - Neighbor Discovery Protocol)", "DHCPv6", "DNS", "LLDP"],
+                a: 0,
+                f: "IPv6 no usa broadcasts. Usa Multicast e ICMPv6 para encontrar la MAC de los vecinos."
+            }
+        ],
+        'S8': [
+            {
+                q: "Usted tiene la red 192.168.1.0 /24 y necesita crear 2 subredes. ¿Cuál será la nueva máscara?",
+                o: ["255.255.255.0", "255.255.255.128", "255.255.255.192", "255.255.255.224"],
+                a: 1,
+                f: "Para 2 subredes ($2^1=2$), prestamos 1 bit. Prefijo /25. El primer bit del último octeto es 128."
+            },
+            {
+                q: "En una subred /26, ¿cuántos hosts utilizables hay por subred?",
+                o: ["64", "62", "30", "126"],
+                a: 1,
+                f: "Quedan 6 bits de host (32-26). $2^6 - 2 = 64 - 2 = 62$."
+            },
+            {
+                q: "Dada la red 10.0.0.0 /8, si pedimos prestados 8 bits adicionales (máscara /16), ¿cuántas subredes obtenemos?",
+                o: ["2", "8", "256", "65536"],
+                a: 2,
+                f: "Prestamos 8 bits. $2^8 = 256$ subredes."
+            },
+            {
+                q: "¿Cuál es el broadcast de la subred 192.168.1.0 /25?",
+                o: ["192.168.1.255", "192.168.1.127", "192.168.1.128", "192.168.1.63"],
+                a: 1,
+                f: "La subred va de 0 a 127. La última dirección (.127) es el broadcast."
+            },
+            {
+                q: "¿Cuál es la máscara decimal para un prefijo /30?",
+                o: ["255.255.255.252", "255.255.255.248", "255.255.255.240", "255.255.255.0"],
+                a: 0,
+                f: "/30 deja 2 bits de host ($2^2-2 = 2$ hosts), ideal para enlaces punto a punto entre routers. 252 = 255 - 3."
+            },
+            {
+                q: "Usted necesita 30 hosts por subred. ¿Cuál es el prefijo de máscara más eficiente?",
+                o: ["/24", "/25", "/26", "/27"],
+                a: 3,
+                f: "$2^5-2 = 30$. Necesitamos 5 bits de host. $32 - 5 = 27$. Máscara /27."
+            },
+            {
+                q: "Si la dirección de red es 192.168.1.64 /26, ¿cuál es la primera IP útil?",
+                o: ["192.168.1.1", "192.168.1.64", "192.168.1.65", "192.168.1.63"],
+                a: 2,
+                f: "La primera IP útil es siempre Red + 1. 64 + 1 = 65."
+            },
+            {
+                q: "¿Por qué restamos 2 en la fórmula de hosts ($2^n - 2$)?",
+                o: ["Por el router y el switch", "Por la dirección de red y la de broadcast", "Por seguridad", "Es una constante arbitraria"],
+                a: 1,
+                f: "La dirección de red (todo ceros en host) y el broadcast (todo unos en host) no pueden asignarse a dispositivos."
+            },
+            {
+                q: "Dada la red 172.16.0.0 /16, si usamos la máscara 255.255.255.0 (/24), ¿cuántas subredes creamos?",
+                o: ["256", "512", "1024", "128"],
+                a: 0,
+                f: "Prestamos 8 bits (del bit 17 al 24). $2^8 = 256$."
+            },
+            {
+                q: "¿Cuál es el broadcast de la subred 192.168.1.128 /26?",
+                o: ["192.168.1.127", "192.168.1.255", "192.168.1.191", "192.168.1.192"],
+                a: 2,
+                f: "Salto de red: 64. Próxima red: 128+64 = 192. Broadcast anterior: 191."
+            },
+            {
+                q: "¿Cuántos hosts permite una máscara /29?",
+                o: ["2", "4", "6", "8"],
+                a: 2,
+                f: "$2^{(32-29)} - 2 = 2^3 - 2 = 8 - 2 = 6$."
+            },
+            {
+                q: "Si tomo prestados 4 bits de host en una red /24, ¿cuántas subredes tengo?",
+                o: ["4", "8", "16", "32"],
+                a: 2,
+                f: "$2^4 = 16$ subredes."
+            },
+            {
+                q: "¿Cuál es la dirección de red de un host con IP 10.1.1.100 y máscara 255.255.255.192?",
+                o: ["10.1.1.0", "10.1.1.64", "10.1.1.128", "10.1.1.96"],
+                a: 1,
+                f: "Máscara /26 (saltos de 64). Redes: 0, 64, 128... El .100 está entre 64 y 127."
+            },
+            {
+                q: "Para una empresa con 500 hosts, ¿qué máscara de red es la más adecuada sin desperdiciar demasiado?",
+                o: ["255.255.255.0", "255.255.254.0", "255.255.0.0", "255.255.252.0"],
+                a: 1,
+                f: "/23 (255.255.254.0) da $2^9-2 = 512-2 = 510$ hosts. Es la más ajustada."
+            },
+            {
+                q: "¿Qué sucede con el dominio de broadcast cuando se subtea una red?",
+                o: ["Se hace más grande", "Se divide en dominios más pequeños", "Desaparece", "Se vuelve inestable"],
+                a: 1,
+                f: "El objetivo principal del subneteo es reducir el tamaño de los dominios de broadcast para mejorar el rendimiento."
+            },
+            {
+                q: "Dada la red 192.168.10.0 /24, usted crea subredes /28. ¿Cuál es el salto entre redes?",
+                o: ["8", "16", "32", "64"],
+                a: 1,
+                f: "/28 deja 4 bits de host. $2^4 = 16$. El salto es de 16 en el último octeto."
+            },
+            {
+                q: "¿Cuál es la última IP utilizable en la red 192.168.1.0 /24?",
+                o: ["192.168.1.255", "192.168.1.254", "192.168.1.1", "192.168.1.250"],
+                a: 1,
+                f: "Última IP útil = Broadcast - 1. 255 - 1 = 254."
+            },
+            {
+                q: "Un router tiene una interfaz en 192.168.1.1 /24. ¿Qué máscara debe configurar en la PC?",
+                o: ["255.255.255.0", "255.255.255.128", "255.0.0.0", "255.255.255.255"],
+                a: 0,
+                f: "La PC y la interfaz del router deben estar en la misma subred (misma máscara)."
+            },
+            {
+                q: "En una red IPv6, si el prefijo es /48 y usamos un Subnet ID de 16 bits, ¿cuál es el prefijo final de las subredes?",
+                o: ["/48", "/56", "/64", "/128"],
+                a: 2,
+                f: "48 (Global) + 16 (Subnet ID) = 64. El estándar para LANs IPv6 es /64."
+            },
+            {
+                q: "¿Cuántas subredes /64 se pueden crear con un prefijo /48 en IPv6?",
+                o: ["256", "65536", "16 millones", "2"],
+                a: 1,
+                f: "$2^{16} = 65536$. Son los 16 bits disponibles entre 48 y 64."
+            }
+        ],
+        'S9': [
+            {
+                q: "¿Qué significa VLSM?",
+                o: ["Virtual Local Subnet Mask", "Variable Length Subnet Mask", "Very Long Subnet Mask", "Validated Link Static Mask"],
+                a: 1,
+                f: "VLSM permite asignar máscaras de diferentes tamaños a diferentes subredes, optimizando el uso de IPs."
+            },
+            {
+                q: "¿Cuál es la principal ventaja de VLSM sobre FLSM (longitud fija)?",
+                o: ["Es más fácil de calcular", "Reduce el desperdicio de direcciones IP", "No requiere routers", "Es más seguro"],
+                a: 1,
+                f: "Con FLSM todas las subredes tienen el mismo tamaño. Con VLSM, podemos dar 100 hosts a una oficina y solo 2 a un enlace punto a punto."
+            },
+            {
+                q: "Usted tiene la red 192.168.1.0/24. Necesita una subred de 100 hosts y otra de 50. Usando VLSM, ¿qué prefijos usaría?",
+                o: ["/24 y /24", "/25 y /26", "/26 y /26", "/24 y /25"],
+                a: 1,
+                f: "100 hosts necesitan /25 (126 útiles). 50 hosts necesitan /26 (62 útiles). /25 usa la mitad del bloque, /26 usa la cuarta parte."
+            },
+            {
+                q: "¿Qué técnica se utiliza para agrupar varias rutas de red en una sola entrada de la tabla de enrutamiento?",
+                o: ["VLSM", "CIDR (Summarization)", "OSPF", "NAT"],
+                a: 1,
+                f: "CIDR permite la agregación de rutas (Route Summarization), reduciendo el tamaño de las tablas de enrutamiento."
+            },
+            {
+                q: "En VLSM, ¿cuál es la regla de oro para evitar el traslape de redes?",
+                o: ["Usar siempre la misma máscara", "Subnetear de la red más grande a la más pequeña", "Usar solo clases A y B", "No usar la subred cero"],
+                a: 1,
+                f: "Siempre se asignan primero los bloques más grandes para asegurar que los bloques pequeños encajen en los espacios restantes sin solaparse."
+            },
+            {
+                q: "¿Cuál es la máscara más eficiente para un enlace serial punto a punto entre dos routers?",
+                o: ["/24", "/28", "/30", "/32"],
+                a: 2,
+                f: "El prefijo /30 proporciona 2 IPs útiles ($2^2-2$), justo lo necesario para dos interfaces de router."
+            },
+            {
+                q: "Dada la red 192.168.1.0 /24, si asigno 192.168.1.0 /25 a la LAN A, ¿cuál es la siguiente dirección de red disponible para la LAN B?",
+                o: ["192.168.1.1", "192.168.1.64", "192.168.1.128", "192.168.2.0"],
+                a: 2,
+                f: "La red /25 ocupa de .0 a .127. El siguiente bloque disponible empieza en .128."
+            },
+            {
+                q: "En CIDR, ¿cómo se representa una máscara 255.255.252.0?",
+                o: ["/20", "/22", "/23", "/24"],
+                a: 1,
+                f: "255.255 (16 bits) + 252 (11111100, 6 bits) = 22. Prefijo /22."
+            },
+            {
+                q: "¿Qué campo de la dirección IPv6 GUA se incrementa para crear nuevas subredes?",
+                o: ["Global Routing Prefix", "Subnet ID", "Interface ID", "Hexteto 1"],
+                a: 1,
+                f: "El Subnet ID de 16 bits permite crear hasta 65,536 subredes locales."
+            },
+            {
+                q: "Si un router recibe un paquete para 192.168.1.10 y tiene dos rutas: 192.168.1.0/24 y 192.168.1.0/28, ¿cuál elegirá?",
+                o: ["La de /24 por ser más corta", "La de /28 por ser la coincidencia más larga (Longest Match)", "Cualquiera", "La que tenga menos carga"],
+                a: 1,
+                f: "Los routers siempre eligen la ruta más específica (máscara más larga) para reenviar un paquete."
+            },
+            {
+                q: "¿Cuál de estos prefijos CIDR representa una red de Clase C completa?",
+                o: ["/8", "/16", "/24", "/32"],
+                a: 2,
+                f: "La clase C usa tradicionalmente una máscara de 24 bits."
+            },
+            {
+                q: "Para una subred que requiere 10 hosts, ¿qué prefijo VLSM es el más adecuado?",
+                o: ["/27", "/28", "/29", "/30"],
+                a: 1,
+                f: "/28 da $2^4-2 = 14$ hosts útiles. /29 solo da 6."
+            },
+            {
+                q: "¿Qué ocurre si dos subredes configuradas con VLSM se solapan (overlap)?",
+                o: ["El router explota", "Hay conflictos de direcciones e inestabilidad en el enrutamiento", "Internet va más rápido", "El switch corrige el error"],
+                a: 1,
+                f: "El solapamiento causa que los paquetes se envíen a destinos incorrectos o se pierdan."
+            },
+            {
+                q: "En IPv6, ¿cuál es el prefijo estándar recomendado para una subred LAN?",
+                o: ["/48", "/56", "/64", "/128"],
+                a: 2,
+                f: "El estándar de la industria para cualquier subred final en IPv6 es /64 para soportar autoconfiguración (SLAAC)."
+            },
+            {
+                q: "CIDR permitió eliminar la rigidez de:",
+                o: ["Los protocolos de enrutamiento", "Las clases de direcciones (A, B, C)", "El modelo OSI", "El cableado estructurado"],
+                a: 1,
+                f: "CIDR introdujo el concepto 'Classless' (sin clases), permitiendo máscaras de cualquier longitud."
+            },
+            {
+                q: "Si tengo una red /24 y necesito 4 subredes de 20 hosts cada una, ¿es posible con FLSM?",
+                o: ["Sí, usando /26", "No", "Sí, usando /27", "Solo con IPv6"],
+                a: 2,
+                f: "Sí, /27 da 30 hosts y permite hasta 8 subredes en un bloque /24."
+            },
+            {
+                q: "Calcule la dirección de resumen (summary) para 192.168.0.0/24 y 192.168.1.0/24.",
+                o: ["192.168.0.0/23", "192.168.0.0/22", "192.168.1.0/23", "192.168.0.0/25"],
+                a: 0,
+                f: "Ambas redes coinciden en los primeros 23 bits. Solo varía el bit 24."
+            },
+            {
+                q: "En VLSM, si uso /30 para mis enlaces WAN, ¿cuántas IPs desperdicio por cada enlace?",
+                o: ["0", "2", "6", "30"],
+                a: 1,
+                f: "En realidad no desperdicias IP útiles (usas 2 de 2), pero pierdes la red y el broadcast de ese bloque de 4. Es lo más eficiente posible."
+            },
+            {
+                q: "¿Qué comando en IPv6 muestra si el enrutamiento unicast está habilitado?",
+                o: ["show ip interface brief", "show ipv6 route", "show ipv6 interface brief", "show running-config"],
+                a: 3,
+                f: "Se debe revisar en la configuración si 'ipv6 unicast-routing' está presente."
+            },
+            {
+                q: "Un bloque /20 CIDR contiene cuántas redes de clase C (/24)?",
+                o: ["4", "8", "16", "32"],
+                a: 2,
+                f: "$2^{(24-20)} = 2^4 = 16$. Un /20 equivale a 16 redes /24 contiguas."
+            }
+        ]
+    };
+
+    let currentWeek = 'S5';
+    let currentQuestionIdx = 0;
+    let score = 0;
+    let answered = false;
+
+    function initQuiz() {
+        renderQuestion();
+    }
+
+    function changeWeek(week) {
+        currentWeek = week;
+        currentQuestionIdx = 0;
+        score = 0;
+        answered = false;
+        
+        // Update tabs UI
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.textContent.includes(week.replace('S', '')));
+        });
+        
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const quizBox = document.getElementById('quizBox');
+        const questions = quizData[currentWeek];
+        const q = questions[currentQuestionIdx];
+
+        quizBox.innerHTML = `
+            <div class="animate">
+                <div class="question-meta">
+                    <span>Semana ${currentWeek.replace('S','')}</span>
+                    <span>Pregunta ${currentQuestionIdx + 1} de ${questions.length}</span>
+                </div>
+                <div class="question-text">${q.q}</div>
+                <div class="options-list" id="options">
+                    ${q.o.map((opt, i) => `
+                        <div class="option-item">
+                            <button class="option-btn" onclick="checkAnswer(${i})">${opt}</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="feedback" class="feedback">
+                    <div class="feedback-title" id="feedbackTitle"></div>
+                    <div class="feedback-concept" id="feedbackConcept">${q.f}</div>
+                </div>
+                <div class="controls">
+                    <div class="score-display">Puntaje: ${score}/${questions.length}</div>
+                    <button class="btn-nav" id="nextBtn" onclick="nextQuestion()" disabled>Siguiente</button>
+                </div>
+            </div>
+        `;
+        answered = false;
+    }
+
+    function checkAnswer(idx) {
+        if (answered) return;
+        answered = true;
+
+        const q = quizData[currentWeek][currentQuestionIdx];
+        const options = document.querySelectorAll('.option-btn');
+        const feedback = document.getElementById('feedback');
+        const feedbackTitle = document.getElementById('feedbackTitle');
+        const nextBtn = document.getElementById('nextBtn');
+
+        options.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.a) {
+                btn.classList.add('correct');
+            } else if (i === idx) {
+                btn.classList.add('wrong');
+            }
+        });
+
+        if (idx === q.a) {
+            score++;
+            feedback.classList.add('visible', 'correct-bg');
+            feedbackTitle.innerText = "¡Correcto!";
+        } else {
+            feedback.classList.add('visible', 'wrong-bg');
+            feedbackTitle.innerText = "Incorrecto";
+        }
+
+        nextBtn.disabled = false;
+        // Update score in UI immediately
+        document.querySelector('.score-display').innerText = `Puntaje: ${score}/${quizData[currentWeek].length}`;
+    }
+
+    function nextQuestion() {
+        currentQuestionIdx++;
+        if (currentQuestionIdx < quizData[currentWeek].length) {
+            renderQuestion();
+        } else {
+            showFinalScore();
+        }
+    }
+
+    function showFinalScore() {
+        const quizBox = document.getElementById('quizBox');
+        const total = quizData[currentWeek].length;
+        const percent = Math.round((score / total) * 100);
+        
+        let message = "";
+        if (percent === 100) message = "¡Excelente, Max! Dominas perfectamente los conceptos.";
+        else if (percent >= 80) message = "¡Muy bien! Estás listo para el examen.";
+        else if (percent >= 60) message = "Buen trabajo, pero te recomiendo repasar algunos conceptos.";
+        else message = "Necesitas repasar más los materiales de esta semana.";
+
+        quizBox.innerHTML = `
+            <div class="animate" style="text-align:center; padding: 40px 0;">
+                <h2 style="color: var(--primary-color);">Simulacro Finalizado</h2>
+                <div style="font-size: 3em; font-weight: bold; margin: 20px 0;">${percent}%</div>
+                <p style="font-size: 1.2em;">Has acertado <strong>${score}</strong> de <strong>${total}</strong> preguntas.</p>
+                <p>${message}</p>
+                <button class="btn-nav" style="margin-top:20px;" onclick="changeWeek('${currentWeek}')">Reiniciar Semana</button>
+            </div>
+        `;
+    }
+
+    // Inicializar
+    window.onload = initQuiz;
+</script>
+
+</body>
+</html>
