@@ -31,3 +31,7 @@ Thumbs.db
 # Node (just in case)
 node_modules/
 npm-debug.log
+
+# AI assistant context files (local only)
+CLAUDE.md
+GEMINI.md
