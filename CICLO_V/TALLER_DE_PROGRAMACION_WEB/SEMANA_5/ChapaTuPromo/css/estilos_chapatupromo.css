@@ -1,0 +1,353 @@
+/* ===================== GENERAL ===================== */
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
+  background-color: #f5f5f5;
+  color: #333333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-height: 100vh;
+}
+
+/* ===================== HEADER ===================== */
+header {
+  background-color: #6c3483;
+  color: #ffffff;
+  padding: 20px 30px 0 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+header img {
+  width: 65px;
+  height: 65px;
+  object-fit: contain;
+}
+
+header h1 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px #3b1a5a;
+}
+
+header p {
+  margin: 2px 0 0 0;
+  font-size: 13px;
+  font-style: italic;
+  color: #ddc6f5;
+}
+
+/* fila superior: logo + titulo + tagline */
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 15px;
+}
+
+.header-texto {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===================== NAVEGACION ===================== */
+nav {
+  background-color: #4a235a;
+  padding: 10px 0;
+  margin: 0 -30px;
+  padding-left: 30px;
+}
+
+nav a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+nav a:hover {
+  text-decoration: underline;
+  color: #ffd700;
+}
+
+/* ===================== CONTENIDO ===================== */
+section {
+  max-width: 1000px;
+  min-width: 280px;
+  margin: 20px auto;
+  padding: 0 20px;
+}
+
+h2 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #6c3483;
+  border-bottom: 2px solid #6c3483;
+  padding-bottom: 5px;
+}
+
+h3 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  font-style: normal;
+  color: #555555;
+}
+
+p {
+  line-height: 1.7;
+  text-wrap: wrap;
+}
+
+/* ===================== TABLAS ===================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+}
+
+th {
+  background-color: #6c3483;
+  color: #ffffff;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+td {
+  padding: 8px 10px;
+  border: 1px solid #dddddd;
+  font-size: 14px;
+}
+
+tr:hover {
+  background-color: #f5eef8;
+}
+
+/* ===================== FORMULARIOS ===================== */
+form {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #dddddd;
+  max-width: 600px;
+  min-width: 280px;
+}
+
+label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #cccccc;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+input[type="text"]:hover,
+select:hover {
+  border-color: #6c3483;
+}
+
+/* ===================== BOTON ===================== */
+button[type="submit"] {
+  background-color: #6c3483;
+  color: #ffffff;
+  padding: 10px 25px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Poppins', Arial, sans-serif;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background-color: #4a235a;
+  text-shadow: 1px 1px 3px #000000;
+}
+
+/* ===================== ENLACES ===================== */
+a {
+  color: #6c3483;
+}
+
+a:hover {
+  color: #4a235a;
+}
+
+/* ===================== FOOTER ===================== */
+footer {
+  background-color: #1a0a2e;
+  color: #ffffff;
+  text-align: center;
+  padding: 25px 20px 15px 20px;
+  margin-top: auto;
+}
+
+.footer-siguenos {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #aaaaaa;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+}
+
+.footer-redes {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.footer-redes a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+  background-color: #6c3483;
+  padding: 8px 16px;
+  border: 2px solid #6c3483;
+}
+
+.footer-redes a:hover {
+  background-color: #ffffff;
+  color: #6c3483;
+}
+
+.footer-redes i {
+  margin-right: 6px;
+  font-size: 16px;
+}
+
+.footer-copy {
+  font-size: 12px;
+  color: #888888;
+  margin: 0;
+}
+
+/* ===================== INDEX - HERO ===================== */
+.hero {
+  background-color: #6c3483;
+  color: #ffffff;
+  text-align: center;
+  padding: 50px 30px;
+  max-width: 100%;
+  margin: 0;
+}
+
+.hero h2 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  border-bottom: none;
+  text-shadow: 2px 2px 6px #3b1a5a;
+  margin-bottom: 15px;
+}
+
+.hero p {
+  font-size: 16px;
+  color: #e8d5f5;
+  max-width: 650px;
+  margin: 0 auto 25px auto;
+}
+
+.hero-botones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.btn-hero {
+  background-color: #ffd700;
+  color: #3b1a5a;
+  padding: 12px 28px;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid #ffd700;
+}
+
+.btn-hero:hover {
+  background-color: #e6c200;
+  color: #1a0a2e;
+  border-color: #e6c200;
+}
+
+.btn-hero-outline {
+  background-color: transparent;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+}
+
+.btn-hero-outline:hover {
+  background-color: #ffd700;
+  color: #3b1a5a;
+}
+
+/* ===================== INDEX - SECCION INFO ===================== */
+.seccion-info {
+  background-color: #ffffff;
+  border-left: 5px solid #711894;
+  padding: 25px 30px;
+  max-width: 960px;
+  margin: 25px auto;
+}
+
+/* ===================== INDEX - SECCION PASOS ===================== */
+.seccion-pasos {
+  max-width: 960px;
+  margin: 0 auto 25px auto;
+  padding: 0 20px;
+}
+
+.seccion-pasos ol {
+  padding-left: 20px;
+  line-height: 2.2;
+}
+
+.seccion-pasos ol li {
+  font-size: 15px;
+  padding: 5px 0;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.seccion-pasos ol li i {
+  color: #6c3483;
+  margin-right: 10px;
+  width: 18px;
+  text-align: center;
+}
+
+/* ===================== INDEX - SECCION TIENDAS ===================== */
+.seccion-tiendas {
+  max-width: 960px;
+  margin: 0 auto 25px auto;
+  padding: 0 20px;
+}
+
+/* ===================== HR ===================== */
+hr {
+  border: none;
+  border-top: 1px solid #dddddd;
+  margin: 0;
+}

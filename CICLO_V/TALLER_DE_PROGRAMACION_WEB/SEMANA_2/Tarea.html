@@ -1,0 +1,261 @@
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Studio Code for the Web</title>
+</head>
+<style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #1e1e1e;
+        }
+
+        header, footer, .banner {
+            width: 100%;
+        }
+
+        header, footer {
+            background-color: black;
+            color: #ffffff;
+            text-align: center;
+            padding: 10px;
+        }
+
+        header h1 {
+            margin: 5px 0;
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 10px;
+        }
+
+        nav ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        .banner {
+            background-color: blue;
+            color: #ffffff;
+            text-align: center;
+            padding: 8px;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .banner a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .izquierda {
+            padding: 15px;
+            width: 220px;
+
+        }
+
+        .izquierda h3 {
+            font-size: 12px;
+            color: black;
+        }
+
+        .izquierda a {
+            font-size: 13px;
+            color: blue;
+            text-decoration: none;
+            display: block;
+            padding: 3px;
+        }
+
+        .centrado {
+            padding: 30px 50px;
+            flex: 1;
+            max-width: 800px;
+        }
+
+        .centrado h2 {
+            font-size: 28px;
+            font-weight: 400;
+            margin-top: 0;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .centrado p {
+            font-size: 12px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .centrado a {
+            color: blue;
+            text-decoration: none;
+        }
+
+        .derecha {
+            width: 200px;
+            padding: 20px 15px;
+            font-size: 12px;
+        }
+
+        .derecha h3 {
+            font-size: 12px;
+        }
+
+        .derecha a {
+            display: block;
+            color: blue;
+            text-decoration: none;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 12px;
+            padding: 15px 10px;
+        }
+
+        footer nav ul li {
+            display: inline;
+            margin: 0;
+        }
+
+        footer nav ul li a {
+            color: rgb(53, 53, 252);
+            text-decoration: none;
+        }
+    </style>
+<body>
+
+    <header>
+        <h1>Visual Studio Code</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Docs</a></li>
+                <li><a href="#">Updates</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">API</a></li>
+                <li><a href="#">Extensions</a></li>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">GitHub Copilot</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <p class="banner">Get <a href="#">GitHub Copilot Free</a> in VS Code!</p>
+
+    <aside class="izquierda">
+        <h3>SETUP</h3>
+        <a href="#">Overview</a>
+        <a href="#">Linux</a>
+        <a href="#">macOS</a>
+        <a href="#">Windows</a>
+        <a href="#"><strong>VS Code for the Web</strong></a>
+        <a href="#">Raspberry Pi</a>
+        <a href="#">Network</a>
+        <a href="#">Additional Components</a>
+        <a href="#">Enterprise</a>
+        <a href="#">Uninstall</a>
+
+        <h3>GET STARTED</h3>
+        <a href="#">Configure</a>
+        <a href="#">Edit Code</a>
+        <a href="#">Build, Debug, Test</a>
+        <a href="#">Source Control</a>
+        <a href="#">Terminal</a>
+        <a href="#">GitHub Copilot</a>
+
+        <h3>LANGUAGES</h3>
+        <a href="#">Node.js / JavaScript</a>
+        <a href="#">TypeScript</a>
+        <a href="#">Python</a>
+        <a href="#">Java</a>
+        <a href="#">C++</a>
+    </aside>
+
+    <section class="centrado">
+        <h2>Visual Studio Code for the Web</h2>
+        <p>
+            Visual Studio Code for the Web provides a free, zero-install
+            Microsoft Visual Studio Code experience running entirely in your
+            browser, allowing you to quickly and safely browse source code
+            repositories and make lightweight code changes. To get started,
+            go to <a href="https://vscode.dev">https://vscode.dev</a> in
+            your browser.
+        </p>
+        <p>
+            VS Code for the Web has many of the features of VS Code Desktop
+            that you love, including search and syntax highlighting while
+            browsing and editing, along with extension support to work on
+            your codebase and make simpler edits. In addition to opening
+            repositories, forks, and pull requests from source control
+            providers like GitHub and Azure Repos, you can also work with
+            code that is stored on your local machine.
+        </p>
+        <p>
+            VS Code for the Web runs entirely in your web browser, so there
+            are certain limitations compared to the desktop experience,
+            which you can read more about <a href="#">below</a>.
+        </p>
+        <p>
+            The following video gives a quick overview of Visual Studio Code
+            for the Web.
+        </p>
+    </section>
+
+    <nav class="derecha">
+        <h3>IN THIS ARTICLE</h3>
+        <a href="#">Relationship to VS Code Desktop</a>
+        <a href="#">Opening a project</a>
+        <a href="#">GitHub repos</a>
+        <a href="#">Azure Repos</a>
+        <a href="#">More custom URLs</a>
+        <a href="#">Continue working in a different environment</a>
+        <a href="#">Saving and sharing work</a>
+        <a href="#">Use your own compute instance with Remote Tunnels</a>
+        <a href="#">Safe exploration</a>
+        <a href="#">Run anywhere</a>
+        <a href="#">Language support</a>
+        <a href="#">Limitations</a>
+        <a href="#">Additional browser setup</a>
+    </nav>
+
+    <footer>
+        <nav>
+            <ul>
+                <li><a href="#">Docs |</a></li>
+                <li><a href="#">Updates |</a></li>
+                <li><a href="#">Blog |</a></li>
+                <li><a href="#">API |</a></li>
+                <li><a href="#">Extensions |</a></li>
+                <li><a href="#">FAQ |</a></li>
+                <li><a href="#">GitHub Copilot</a></li>
+            </ul>
+        </nav>
+        <p>&copy; 2025 Microsoft - Replica educativa</p>
+    </footer>
+
+</body>
+</html>

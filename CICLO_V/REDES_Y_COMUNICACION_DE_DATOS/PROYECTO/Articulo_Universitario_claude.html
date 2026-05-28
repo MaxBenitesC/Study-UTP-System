@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Artículo Académico — UTP — Redes y Comunicación de Datos I</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Artículo Académico — UTP — Redes y Comunicación de
+Datos I</h1>
+</header>
+<p align="center">
+  <img src="Utplogonuevo.svg.png" alt="Universidad Tecnológica del Perú" width="320" />
+</p>
+
+<h1
+id="propuesta-de-arquitectura-de-red-convergente-para-la-optimización-de-infraestructura-voip-en-un-call-center-multi-sede-caso-de-estudio">Propuesta
+de arquitectura de red convergente para la optimización de
+infraestructura VoIP en un call center multi-sede: caso de estudio</h1>
+<p>Universidad Tecnológica del Perú FACULTAD DE INGENIERÍA CARRERA
+PROFESIONAL DE INGENIERÍA DE SISTEMAS E INFORMÁTICA Redes y Comunicación
+de Datos I</p>
+<p>Artículo Académico</p>
+<p><strong>Alumno(s)</strong></p>
+<ul>
+<li>Vega Jauregui Diego Joaquín – U21205723</li>
+<li>Benites Corazón Max Anderson – U24217839</li>
+<li>Quispe Arias Kevin Antonio – U19213082</li>
+<li>Tasayco Magallanes Giordano Martin – U22216715</li>
+</ul>
+<p><strong>Docente</strong> Gerald Paul Medina Perez</p>
+<p>Lima, mayo del 2025</p>
+<hr />
+<h2
+id="propuesta-de-arquitectura-de-red-convergente-para-la-optimización-de-infraestructura-voip-en-un-call-center-multi-sede-caso-de-estudio-1">Propuesta
+de arquitectura de red convergente para la optimización de
+infraestructura VoIP en un call center multi-sede: caso de estudio</h2>
+<p>Vega Jauregui, D. J. | Benites Corazón, M. A. | Quispe Arias, K. A. |
+Tasayco Magallanes, G. M.</p>
+<h2 id="abstract">ABSTRACT</h2>
+<p>Call centers operating with Voice over IP (VoIP) technology are
+highly sensitive to network quality degradation. This article presents
+an engineering proposal — backed by field diagnostics, simulation and a
+controlled pilot — for the network infrastructure of a call center with
+four operational sites in Lima, Peru (Bellavista, Magdalena, Los Olivos
+and Independencia), supporting approximately 100 to 140 simultaneous
+agents on the ViciDial v11 platform. The current infrastructure operates
+without formal segmentation, without configured Quality of Service (QoS)
+policies, without inter-site interconnection and without automatic
+Internet Service Provider (ISP) failover mechanisms. As a result, the
+network registers between two and four weekly audio incidents or dropped
+calls, uncorrelated with peak hours, indicating that the root cause is
+network misconfiguration rather than bandwidth saturation. Field
+baseline metrics (Wireshark RTP analysis, MikroTik Torch and ViciDial
+logs) are captured per the protocol of §5.9 and consolidated as evidence
+EV-01 to EV-04. The proposed solution consists of six components:
+site-to-site VPN tunnelling using WireGuard over MikroTik routers, VLAN
+segmentation (voice, data, management), QoS policies prioritising
+RTP/SIP traffic, automatic ISP failover at the main site, a ViciDial
+master-replica architecture with high availability, and a formal
+operating procedure with active Zabbix monitoring. The architecture is
+validated through Packet Tracer / GNS3 simulation and a controlled pilot
+at the Bellavista site, with expected results — supported by ITU-T G.114
+thresholds and recent literature — of latency below 150 ms, jitter below
+30 ms, packet loss below 1 % and a reduction of audio incidents above 70
+%.</p>
+<h2 id="keywords">KEYWORDS</h2>
+<p>VoIP, QoS, VLAN, VPN site-to-site, network failover, ViciDial,
+MikroTik, RTP, SIP, network convergence, High Availability, Packet
+Tracer simulation.</p>
+<hr />
+<h2 id="i-introducción">I. INTRODUCCIÓN</h2>
+<p>Los call centers constituyen uno de los sectores con mayor
+dependencia de infraestructura de red estable y de baja latencia. La voz
+sobre IP (VoIP), tecnología que codifica y transmite señales de audio
+como paquetes de datos sobre redes TCP/IP, es el pilar tecnológico sobre
+el cual operan estas organizaciones (Thangam et al., 2024). A diferencia
+de las llamadas telefónicas tradicionales, el tráfico VoIP es
+extremadamente sensible a variaciones en la red: la pérdida de paquetes,
+la latencia elevada y el jitter generan degradación perceptible en la
+calidad del audio o cortes totales en las llamadas (Thangam et al.,
+2024).</p>
+<p>El presente proyecto de ingeniería resuelve un problema real
+diagnosticado en un call center con cuatro sedes operativas en Lima. La
+investigación parte de un diagnóstico empírico realizado en campo con el
+equipo técnico de la empresa — entrevistas con el administrador de red,
+recolección de configuraciones de los equipos MikroTik en producción y
+evidencia documental de los proveedores de servicios de internet — y se
+complementa con la captura de métricas de línea base (latencia, jitter,
+pérdida y uso de ancho de banda) y de evidencias gráficas (capturas
+Wireshark, MikroTik Torch y logs ViciDial) que sustituyen las
+descripciones genéricas por datos verificables.</p>
+<p>La propuesta desarrollada aplica técnicas documentadas en la
+literatura académica — segmentación VLAN (Álvarez et al., 2023),
+políticas QoS (Thangam et al., 2024), interconexión VPN site-to-site
+(Aung &amp; Thein, 2020; Pudelko et al., 2020) y mecanismos de failover
+automático (Simanjuntak et al., 2023) — adaptadas al contexto específico
+de la empresa, con énfasis en la viabilidad económica y la reutilización
+de la infraestructura existente. El diseño se valida mediante simulación
+en Cisco Packet Tracer y GNS3, y mediante un piloto controlado en la
+sede principal, generando una comparativa cuantitativa Antes vs. Después
+que demuestra la mejora.</p>
+<hr />
+<h2 id="ii-definición-del-problema">II. DEFINICIÓN DEL PROBLEMA</h2>
+<p>Un call center con cuatro sedes operativas en Lima, con
+aproximadamente 100 a 140 agentes simultáneos sobre la plataforma
+ViciDial v11, registra entre 2 y 4 incidencias semanales de degradación
+de audio o caídas de llamadas, según el registro operativo provisto por
+la coordinación del call center. La ausencia de correlación con horas
+pico descarta la saturación de ancho de banda como causa raíz e indica
+que el problema reside en la configuración de la red.</p>
+<h3 id="21-parámetros-críticos-y-línea-base">2.1 Parámetros críticos y
+línea base</h3>
+<p>Los parámetros que definen el problema y que se cuantifican como
+línea base con las herramientas descritas en §5.9 son:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Parámetro</th>
+<th>Estado actual (línea base)</th>
+<th>Umbral de referencia</th>
+<th>Evidencia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Latencia extremo a extremo (RTP)</td>
+<td><em>Por capturar — ver EV-01</em></td>
+<td>&lt; 150 ms (ITU-T G.114)</td>
+<td>EV-01</td>
+</tr>
+<tr class="even">
+<td>Jitter</td>
+<td><em>Por capturar — ver EV-01</em></td>
+<td>&lt; 30 ms (Thangam et al., 2024)</td>
+<td>EV-01</td>
+</tr>
+<tr class="odd">
+<td>Pérdida de paquetes</td>
+<td><em>Por capturar — ver EV-02</em></td>
+<td>&lt; 1 % (Thangam et al., 2024)</td>
+<td>EV-02</td>
+</tr>
+<tr class="even">
+<td>Uso de ancho de banda en pico</td>
+<td><em>Por capturar — ver EV-03</em></td>
+<td>Tráfico VoIP ≈ 87 kbps por llamada G.711</td>
+<td>EV-03</td>
+</tr>
+<tr class="odd">
+<td>Frecuencia de caídas</td>
+<td>2–4 incidencias / semana (bitácora interna, EV-04)</td>
+<td>0 incidencias atribuibles a configuración</td>
+<td>EV-04</td>
+</tr>
+<tr class="even">
+<td>Tiempo de recuperación ante caída de ISP</td>
+<td>Manual, varios minutos</td>
+<td>&lt; 10 s (failover automático)</td>
+<td>EV-13</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 0. Parámetros críticos del problema, línea base y umbrales de
+referencia.</p>
+<blockquote>
+<p><strong>📷 EV-01 — Captura Wireshark: análisis RTP Stream (latencia y
+jitter)</strong></p>
+<p><strong>Qué insertar:</strong> captura de pantalla del menú
+<em>Telephony → RTP → RTP Streams</em> de Wireshark, mostrando las
+columnas <em>Max Delta</em>, <em>Max Jitter</em>, <em>Mean Jitter</em> y
+<em>Lost Packets</em> de al menos 3 streams RTP en hora pico.
+<strong>Punto de captura:</strong> espejo de puerto (mirror) del switch
+MikroTik en la sede Bellavista. <strong>Herramienta:</strong> Wireshark
+≥ 4.x sobre laptop conectada al puerto espejo. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-02 — Captura Wireshark: estadísticas de pérdida de
+paquetes RTP</strong></p>
+<p><strong>Qué insertar:</strong> captura de <em>Telephony → RTP →
+Stream Analysis</em> mostrando porcentaje de paquetes perdidos por
+stream durante ventana de 30 minutos en franja 10:00–10:30.
+<strong>Herramienta:</strong> Wireshark, misma sesión que EV-01.
+<strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-03 — Captura MikroTik Torch: uso de ancho de banda
+WAN</strong></p>
+<p><strong>Qué insertar:</strong> captura de la herramienta
+<em>Torch</em> en Winbox sobre la interfaz WAN principal (Claro 600
+Mbps) durante hora pico, mostrando el desglose de tráfico por
+protocolo/puerto y el total transmitido/recibido. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-04 — Bitácora ViciDial: registro de incidencias últimas
+4 semanas</strong></p>
+<p><strong>Qué insertar:</strong> export en tabla o captura del log de
+incidencias mantenido por la coordinación del call center, mostrando
+fecha, sede, duración y descripción de cada caída/degradación de audio.
+<strong>Herramienta:</strong> sistema interno de tickets / hoja de
+cálculo de coordinación. <strong>Capturado por:</strong>
+____________________ <strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar tabla/imagen al exportar a
+PDF]</em></p>
+</blockquote>
+<h3 id="22-causas-raíz-identificadas">2.2 Causas raíz identificadas</h3>
+<p>El problema se origina en cuatro fallas estructurales de la
+infraestructura de red:</p>
+<ol type="1">
+<li><strong>Tráfico VoIP no priorizado.</strong> El tráfico RTP/SIP
+compite en igualdad de condiciones con el tráfico de datos (descargas,
+navegación, actualizaciones), lo que provoca degradación de audio cuando
+la red está en uso simultáneo por múltiples aplicaciones.</li>
+<li><strong>Sedes aisladas.</strong> Las cuatro sedes operan como redes
+completamente independientes, sin mecanismo de respaldo cruzado ante la
+caída de una sede.</li>
+<li><strong>Failover manual.</strong> La sede de Bellavista cuenta con
+dos ISP contratados pero sin failover automático configurado, lo que
+hace que la recuperación ante fallos dependa de intervención
+manual.</li>
+<li><strong>Ausencia de procesos y monitoreo.</strong> No existe
+documentación de red, monitoreo activo ni un procedimiento operativo
+estándar (SOP) de respuesta ante incidencias, lo que impide detectar y
+diagnosticar fallas de forma proactiva.</li>
+</ol>
+<p>Estas deficiencias afectan directamente la continuidad operativa de
+la empresa, la experiencia de los clientes que reciben las llamadas y la
+productividad de los agentes, quienes deben interrumpir su trabajo
+durante cada incidencia.</p>
+<hr />
+<h2 id="iii-objetivos">III. OBJETIVOS</h2>
+<h3 id="31-objetivo-general">3.1 Objetivo General</h3>
+<p>Diseñar y validar mediante simulación y piloto una arquitectura de
+red convergente y de alta disponibilidad que optimice la infraestructura
+VoIP del call center multi-sede, reduciendo la latencia VoIP por debajo
+de 150 ms y el jitter por debajo de 30 ms conforme a la recomendación
+ITU-T G.114, y eliminando las incidencias semanales atribuibles a
+configuración de red.</p>
+<h3 id="32-objetivos-específicos">3.2 Objetivos Específicos</h3>
+<ol type="1">
+<li><strong>Diagnosticar</strong> la situación actual de la
+infraestructura de red en las cuatro sedes mediante entrevistas,
+recolección de configuraciones y captura de métricas reales (latencia,
+jitter, pérdida, uso de ancho de banda), identificando las causas raíz
+de las incidencias de audio recurrentes.</li>
+<li><strong>Diseñar</strong> una topología convergente segmentada
+mediante VLANs (voz, datos, gestión), priorizada mediante QoS EF para
+tráfico RTP/SIP y segura mediante VPN site-to-site WireGuard entre las
+cuatro sedes.</li>
+<li><strong>Configurar</strong> el failover automático de ISP en la sede
+principal con tiempo objetivo de recuperación menor a 10 segundos.</li>
+<li><strong>Simular</strong> la propuesta en Cisco Packet Tracer y GNS3
+con pruebas controladas de caídas, failover, latencia y carga, y validar
+las métricas en un piloto en la sede principal.</li>
+<li><strong>Definir</strong> un procedimiento operativo estándar (SOP)
+de respuesta ante incidencias de red que establezca roles, responsables,
+tiempos y flujo de atención.</li>
+<li><strong>Comparar</strong> cuantitativamente las métricas de la red
+actual versus la red propuesta (Antes vs. Después), aportando evidencia
+gráfica de la mejora.</li>
+</ol>
+<hr />
+<h2 id="iv-marco-teórico">IV. MARCO TEÓRICO</h2>
+<h3 id="41-voz-sobre-ip-voip">4.1 Voz sobre IP (VoIP)</h3>
+<p>La Voz sobre IP (VoIP) es una tecnología que permite la transmisión
+de comunicaciones de audio en tiempo real mediante el protocolo de
+internet (IP). A diferencia de la telefonía tradicional basada en
+circuitos conmutados, VoIP convierte la señal de voz en paquetes
+digitales que se transmiten sobre redes de datos compartidas (Thangam et
+al., 2024). Los protocolos principales que intervienen en una
+comunicación VoIP son el Protocolo de Iniciación de Sesión (SIP),
+encargado del establecimiento y terminación de llamadas (puerto UDP
+5060), y el Protocolo de Transporte en Tiempo Real (RTP), responsable de
+la transmisión del audio codificado durante la llamada (puertos UDP
+10000–20000) (Thangam et al., 2024).</p>
+<p>El rendimiento de una comunicación VoIP depende de tres parámetros
+críticos de red: la latencia (retardo de extremo a extremo), el jitter
+(variación en el retardo entre paquetes consecutivos) y la pérdida de
+paquetes. La recomendación ITU-T G.114 establece que la latencia máxima
+aceptable para comunicaciones de voz es de 150 ms, el jitter no debe
+superar los 30 ms y la pérdida de paquetes debe mantenerse por debajo
+del 1 % para garantizar una calidad de audio satisfactoria (Thangam et
+al., 2024).</p>
+<h3 id="42-calidad-de-servicio-qos">4.2 Calidad de Servicio (QoS)</h3>
+<p>La Calidad de Servicio (QoS) es el conjunto de técnicas y mecanismos
+que permiten gestionar el tráfico de red de manera diferenciada,
+asignando prioridades distintas a diferentes tipos de tráfico según sus
+requisitos de latencia, ancho de banda y tolerancia a pérdidas. En redes
+convergentes donde coexisten tráfico de voz, video y datos, la
+implementación de QoS es fundamental para garantizar que el tráfico
+sensible al tiempo, como VoIP, reciba el tratamiento preferencial
+necesario (Thangam et al., 2024).</p>
+<p>Thangam et al. (2024) demostraron que la implementación de algoritmos
+de buffer adaptativo combinados con políticas QoS reduce
+significativamente el jitter en redes VoIP, mejorando la calidad
+percibida por el usuario. En equipos MikroTik, el QoS se implementa
+mediante marcado de paquetes (DSCP 46 — <em>Expedited Forwarding</em>) y
+colas de prioridad (Priority Queues / Queue Tree), asignando la clase de
+servicio EF al tráfico RTP/SIP, lo que garantiza su procesamiento
+preferente sobre cualquier otro flujo de datos.</p>
+<h3 id="43-segmentación-de-red-mediante-vlans">4.3 Segmentación de red
+mediante VLANs</h3>
+<p>Una Red de Área Local Virtual (VLAN, IEEE 802.1Q) es una técnica de
+segmentación lógica que permite dividir una red física en múltiples
+dominios de broadcast independientes, sin necesidad de modificar la
+infraestructura de cableado existente. La segmentación VLAN mejora el
+rendimiento de la red al reducir el tráfico innecesario en cada
+segmento, fortalece la seguridad al aislar grupos de dispositivos y
+facilita la administración de políticas de red diferenciadas (Álvarez et
+al., 2023).</p>
+<p>Álvarez et al. (2023) demostraron que la segmentación mediante VLANs,
+combinada con redes definidas por software, reduce significativamente el
+impacto de ataques laterales y mejora el rendimiento general en entornos
+corporativos. En el contexto del presente caso de estudio, se propone la
+implementación de tres VLANs: VLAN 10 para tráfico de voz (RTP/SIP),
+VLAN 20 para tráfico de datos (navegación, correo, aplicaciones) y VLAN
+30 para gestión de equipos de red y servidores.</p>
+<h3 id="44-vpn-site-to-site">4.4 VPN site-to-site</h3>
+<p>Una Red Privada Virtual (VPN) site-to-site establece un canal de
+comunicación cifrado y autenticado entre dos o más redes geográficamente
+distribuidas, utilizando internet como medio de transporte. A diferencia
+de las VPN de acceso remoto, que conectan usuarios individuales a una
+red corporativa, la VPN site-to-site interconecta redes completas,
+permitiendo que los dispositivos de cada sede se comuniquen como si
+pertenecieran a la misma red local (Aung &amp; Thein, 2020).</p>
+<p>Aung y Thein (2020) realizaron un análisis comparativo de tecnologías
+VPN site-to-site incluyendo L2TP, PPTP, OpenVPN, EoIP y MPLS/VPLS,
+concluyendo que WireGuard y OpenVPN ofrecen el mejor equilibrio entre
+seguridad y rendimiento para entornos empresariales de mediana escala.
+Pudelko et al. (2020) complementaron este análisis demostrando que
+WireGuard supera a OpenVPN en throughput y latencia gracias a su
+implementación en el espacio del kernel del sistema operativo y a su
+overhead reducido (≈ 20 bytes por paquete), lo que lo convierte en la
+opción técnicamente superior para interconexión de sedes con tráfico
+VoIP.</p>
+<h3 id="45-failover-automático-de-isp">4.5 Failover automático de
+ISP</h3>
+<p>El failover de red es el mecanismo mediante el cual un sistema
+conmuta automáticamente a un enlace de comunicaciones alternativo cuando
+detecta la falla del enlace principal, con el objetivo de minimizar el
+tiempo de indisponibilidad del servicio. En infraestructuras críticas
+como los call centers, donde la caída del enlace de internet equivale a
+la pérdida total de la capacidad de llamadas, la implementación de un
+mecanismo de failover automático es esencial para garantizar la
+continuidad operativa (Simanjuntak et al., 2023).</p>
+<p>Simanjuntak et al. (2023) analizaron la implementación de failover de
+enlace mediante protocolos de enrutamiento dinámico, demostrando que los
+mecanismos de conmutación automática reducen el tiempo de recuperación
+ante fallos de enlace de varios minutos (intervención manual) a segundos
+(conmutación automática). En equipos MikroTik RouterOS, el failover se
+implementa mediante la configuración de rutas con distancia
+administrativa diferenciada, verificación de gateway mediante ping
+periódico (<em>Check Gateway</em>) y scripts de <em>Netwatch</em>, sin
+necesidad de protocolos de enrutamiento adicionales.</p>
+<h3 id="46-vicidial-como-plataforma-de-call-center">4.6 ViciDial como
+plataforma de call center</h3>
+<p>ViciDial es una plataforma de call center de código abierto basada en
+Asterisk, el servidor de comunicaciones VoIP más utilizado a nivel
+mundial. Desarrollada sobre CentOS/Linux, ViciDial integra un marcador
+predictivo, gestión de agentes, enrutamiento de llamadas entrantes y
+salientes, y generación de reportes operativos. Su arquitectura permite
+despliegues distribuidos en múltiples servidores con roles
+diferenciados: servidor de telefonía (Asterisk), servidor de base de
+datos (MySQL) y servidor web (Apache), lo que posibilita la
+escalabilidad horizontal necesaria para entornos multi-sede como el
+analizado en el presente artículo.</p>
+<h3 id="47-plan-de-direccionamiento-ip">4.7 Plan de direccionamiento
+IP</h3>
+<p>Un plan de direccionamiento IP es el diseño documentado que define
+los rangos, máscaras y asignaciones de direcciones IPv4 para cada
+segmento lógico de una red corporativa. La selección de rangos privados
+conforme a RFC 1918 (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) es la
+práctica estándar para redes internas. En entornos multi-sede
+interconectados por VPN, el plan debe garantizar la no superposición de
+subredes entre sedes para evitar conflictos de enrutamiento. El presente
+artículo adopta el esquema 10.<sede>.<vlan>.0/24, donde el segundo
+octeto identifica la sede y el tercero identifica la VLAN, reservando
+10.0.0.0/24 para el direccionamiento de los túneles WireGuard inter-sede
+(ver §7.2).</p>
+<h3 id="48-seguridad-de-red">4.8 Seguridad de red</h3>
+<p>La seguridad de red en entornos VoIP requiere proteger
+simultáneamente la confidencialidad del audio (cifrado de RTP), la
+integridad del control de llamadas (autenticación SIP) y la
+disponibilidad de la infraestructura (resistencia a denegación de
+servicio). La segmentación VLAN reduce la superficie de ataque al aislar
+el plano de voz del plano de datos de usuario, limitando el alcance de
+un compromiso en estaciones de trabajo (Álvarez et al., 2023). La VPN
+site-to-site complementa esta defensa al cifrar todo el tráfico
+inter-sede, eliminando la exposición de SIP y RTP al internet público
+(Aung &amp; Thein, 2020). Adicionalmente, se aplican reglas de firewall
+en el MikroTik para restringir el acceso de gestión a la VLAN 30, y se
+habilita autenticación por par de claves pública/privada (criptografía
+de curva elíptica) en WireGuard, conforme a las recomendaciones de
+Pudelko et al. (2020).</p>
+<h3 id="49-cálculo-de-ancho-de-banda-voip">4.9 Cálculo de ancho de banda
+VoIP</h3>
+<p>El ancho de banda requerido por una llamada VoIP depende del códec
+utilizado, el tamaño de la trama, el intervalo de paquetización y la
+sobrecarga de los encabezados de los protocolos involucrados (Ethernet,
+IP, UDP, RTP). Para el códec G.711 — el más común en despliegues
+empresariales por su calidad de voz y compatibilidad universal — el
+cálculo es:</p>
+<pre><code>Ancho de banda por llamada = (tamaño payload + overhead) × paquetes/seg × 8 bits
+                           ≈ (160 B + 58 B) × 50 pps × 8
+                           ≈ 87.2 kbps por sentido (≈ 174 kbps full-dúplex)</code></pre>
+<p>Para un escenario de 140 agentes concurrentes, el tráfico VoIP
+agregado en el peor caso es:</p>
+<pre><code>140 llamadas × 87.2 kbps ≈ 12.2 Mbps por sentido (≈ 24.4 Mbps full-dúplex)</code></pre>
+<p>Este consumo representa menos del 4 % del enlace de 600 Mbps
+disponible en Bellavista, lo que confirma que la saturación de ancho de
+banda no es la causa raíz de las incidencias y que el problema debe
+atribuirse a la ausencia de QoS y a la configuración de red (ver §5.2 y
+§5.4).</p>
+<h3
+id="410-arquitectura-ubicación-de-servidores-y-balanceo-de-carga">4.10
+Arquitectura, ubicación de servidores y balanceo de carga</h3>
+<p>La distribución física de los servidores de telefonía
+(Asterisk/ViciDial) y de base de datos (MySQL) impacta directamente en
+la latencia percibida por el agente y en la resiliencia operativa. La
+arquitectura propuesta sitúa el servidor maestro de ViciDial en la sede
+de Bellavista — la de mayor capacidad e infraestructura — y desplegará
+nodos réplica en las sedes restantes (ver §6.5). Esta topología
+hub-and-spoke permite balanceo de carga a nivel de agentes mediante
+enrutamiento basado en disponibilidad, donde el dialer central asigna
+llamadas al nodo con menor ocupación. El balanceo se complementa con la
+capacidad de modo degradado: si el maestro deja de responder, cada nodo
+réplica continúa operando localmente con su última copia sincronizada,
+garantizando que la sede afectada no pierda totalmente su capacidad de
+llamadas.</p>
+<h3 id="411-alta-disponibilidad-ha">4.11 Alta disponibilidad (HA)</h3>
+<p>La alta disponibilidad es la propiedad de un sistema que garantiza la
+continuidad del servicio ante fallas de componentes individuales,
+típicamente expresada como un porcentaje de tiempo activo (por ejemplo,
+99.9 % = "tres nueves" ≈ 8.76 horas de caída anual). En el contexto del
+presente artículo, la HA se sustenta en tres mecanismos complementarios:
+(a) failover automático de ISP en la sede principal (Simanjuntak et al.,
+2023), que elimina el punto único de falla del acceso a internet; (b)
+VPN site-to-site mallada que permite el reenrutamiento de tráfico ante
+la caída de un túnel (Aung &amp; Thein, 2020); y (c) arquitectura
+ViciDial maestro-réplica que conserva la operación local de cada sede
+ante la caída del nodo central. La combinación de estos tres niveles
+eleva el objetivo de disponibilidad de la infraestructura por encima del
+99.5 % sin requerir inversión en equipos de respaldo dedicados.</p>
+<hr />
+<h2 id="v-diagnóstico--situación-actual">V. DIAGNÓSTICO — SITUACIÓN
+ACTUAL</h2>
+<p>A partir del levantamiento de información realizado en campo, se
+identificaron seis problemas principales que afectan la calidad del
+servicio y la resiliencia operativa del call center:</p>
+<h3 id="51-ausencia-de-interconexión-entre-sedes">5.1 Ausencia de
+interconexión entre sedes</h3>
+<p>Las cuatro sedes operan como entidades completamente aisladas. No
+existe ningún mecanismo de VPN ni red privada que las vincule. Ante la
+caída de una sede, el traslado de agentes a otra requiere intervención
+manual, elevando el tiempo de recuperación y afectando directamente la
+disponibilidad del servicio.</p>
+<h3 id="52-qos-no-configurado">5.2 QoS no configurado</h3>
+<p>El tráfico VoIP (RTP/SIP) compite en igualdad de condiciones con el
+tráfico de datos. El switch MikroTik gestionable disponible en
+Bellavista tiene capacidad nativa para establecer políticas de prioridad
+de tráfico, pero esta funcionalidad no ha sido implementada, lo que
+genera degradación de audio ante picos de uso de red (Thangam et al.,
+2024).</p>
+<h3 id="53-redundancia-de-isp-sin-política-de-failover">5.3 Redundancia
+de ISP sin política de failover</h3>
+<p>Bellavista cuenta con dos conexiones de internet: fibra empresarial
+de 75 Mbps y fibra Claro de 600 Mbps. No existe failover automático
+configurado. Ante la caída de una línea, el cambio al enlace alternativo
+se realiza manualmente, incrementando el tiempo de indisponibilidad
+(Simanjuntak et al., 2023).</p>
+<h3 id="54-incidencias-recurrentes-de-audio">5.4 Incidencias recurrentes
+de audio</h3>
+<p>Se registran entre 2 y 4 incidencias de caídas de llamadas o
+degradación de audio por semana (ver bitácora EV-04). La ausencia de
+correlación con horas pico descarta la saturación del ancho de banda
+como causa principal y apunta hacia problemas de configuración de red
+(Thangam et al., 2024).</p>
+<h3 id="55-gestión-de-agentes-silada-por-sede">5.5 Gestión de agentes
+silada por sede</h3>
+<p>Cada sede administra de forma independiente su pool de agentes en
+ViciDial. No existe un mecanismo centralizado que permita redistribuir
+carga entre sedes, implementar políticas de enrutamiento corporativo ni
+obtener reportes consolidados.</p>
+<h3 id="56-ausencia-de-documentación-de-red">5.6 Ausencia de
+documentación de red</h3>
+<p>No existe un diagrama de red formal para ninguna de las cuatro sedes.
+Esta carencia impide la gestión proactiva y dificulta el diagnóstico de
+fallas.</p>
+<h3 id="57-inventario-de-infraestructura-actual">5.7 Inventario de
+infraestructura actual</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Sede</th>
+<th>Agentes aprox.</th>
+<th>Servidores</th>
+<th>ISP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bellavista</td>
+<td>30 – 40</td>
+<td>3 (roles distintos)</td>
+<td>2 ISP: 75 Mbps (empresarial) + 600 Mbps (Claro)</td>
+</tr>
+<tr class="even">
+<td>Magdalena</td>
+<td>30 – 40</td>
+<td>1</td>
+<td>Propio</td>
+</tr>
+<tr class="odd">
+<td>Los Olivos</td>
+<td>20 – 30</td>
+<td>1</td>
+<td>Propio</td>
+</tr>
+<tr class="even">
+<td>Independencia</td>
+<td>20 – 30</td>
+<td>1</td>
+<td>Propio</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 1. Inventario de infraestructura actual por sede.</p>
+<blockquote>
+<p><strong>📷 EV-05 — Fotografías del rack de comunicaciones por
+sede</strong></p>
+<p><strong>Qué insertar:</strong> 4 fotografías (una por sede) del rack
+de comunicaciones mostrando router MikroTik, switch principal y, en
+Bellavista, los 3 servidores ViciDial. Incluir etiqueta con sede, fecha
+y nombre del personal que acompañó el levantamiento. <strong>Capturado
+por:</strong> ____________________ <strong>Fechas:</strong> Bellavista
+<em><strong>/</strong></em>, Magdalena <em><strong>/</strong></em>, Los
+Olivos <em><strong>/</strong></em>, Independencia
+<em><strong>/</strong></em></p>
+<p><em>[Espacio reservado — insertar 4 imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-06 — Export de configuración actual del MikroTik
+(Bellavista)</strong></p>
+<p><strong>Qué insertar:</strong> salida del comando
+<code>/export compact</code> del router MikroTik de Bellavista (o
+captura de Winbox), anonimizando contraseñas y claves. Sirve como
+evidencia documental del estado de configuración previo a la
+intervención. <strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar bloque de código / imagen al
+exportar a PDF]</em></p>
+</blockquote>
+<h3 id="58-metodología-de-investigación-de-campo">5.8 Metodología de
+investigación de campo</h3>
+<p>La caracterización del estado actual se sustenta en un trabajo de
+campo estructurado en tres frentes complementarios, orientado a
+sustituir las descripciones genéricas por evidencia verificable:</p>
+<ul>
+<li><strong>Entrevistas con personal técnico y de operación.</strong> Se
+realizaron entrevistas semi-estructuradas con el administrador de red
+responsable de las cuatro sedes y con el personal de soporte técnico de
+cada sede. Las entrevistas cubrieron: histórico de incidencias,
+procedimientos vigentes ante caídas, conocimiento de la topología,
+proveedores de servicios contratados y configuraciones previas
+conocidas.</li>
+<li><strong>Recolección documental.</strong> Se solicitaron y revisaron
+las facturas y contratos de los proveedores de servicios de internet
+(ISP) — incluyendo la doble contratación en Bellavista —, los registros
+de incidencias operativas mantenidos por la coordinación del call center
+y la información disponible sobre los equipos en producción (modelos de
+routers MikroTik, switches gestionables y servidores ViciDial).</li>
+<li><strong>Levantamiento técnico in situ.</strong> Se inspeccionaron
+los racks de comunicaciones de las cuatro sedes para verificar la
+presencia y modelo de routers, switches y servidores, así como el
+cableado físico y la organización de los puntos de red. Esta inspección
+permitió contrastar la información declarada por el personal con el
+estado real de la infraestructura y construir el inventario consolidado
+de la Tabla 1.</li>
+</ul>
+<p>La información obtenida en este proceso constituye la fuente primaria
+del diagnóstico y reemplaza supuestos no validados por datos
+verificables con el propio cliente.</p>
+<blockquote>
+<p><strong>📷 EV-07 — Acta / notas de entrevista con el administrador de
+red</strong></p>
+<p><strong>Qué insertar:</strong> documento firmado (o captura del
+documento) con las notas de la entrevista al administrador de red,
+incluyendo: nombre y cargo del entrevistado, fecha, preguntas
+formuladas, respuestas resumidas y firma de conformidad.
+<strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar documento/imagen al exportar a
+PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-08 — Evidencia documental de proveedores ISP
+(anonimizada)</strong></p>
+<p><strong>Qué insertar:</strong> captura o digitalización de las
+facturas/contratos de los dos ISP de Bellavista (fibra empresarial 75
+Mbps y fibra Claro 600 Mbps), anonimizando datos sensibles del cliente
+(RUC, razón social, números de cuenta). <strong>Capturado por:</strong>
+____________________ <strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<h3 id="59-metodología-de-medición-y-captura-de-evidencias">5.9
+Metodología de medición y captura de evidencias</h3>
+<p>Para sustituir las descripciones cualitativas por métricas
+cuantitativas que permitan validar la solución, se define el siguiente
+protocolo de medición de la línea base y de evidencia
+post-implementación. El plan emplea exclusivamente herramientas
+presentes en la infraestructura o de uso libre, sin costo adicional:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Herramienta</th>
+<th>Punto de captura</th>
+<th>Frecuencia</th>
+<th>Evidencia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Latencia y jitter RTP</td>
+<td>Wireshark + análisis RTP Stream</td>
+<td>Espejo de puerto en switch MikroTik (Bellavista)</td>
+<td>Muestreo de 30 min × 3 franjas/día durante 5 días</td>
+<td>EV-01</td>
+</tr>
+<tr class="even">
+<td>Pérdida de paquetes</td>
+<td>Wireshark + estadísticas RTP</td>
+<td>Mismo punto</td>
+<td>Mismo muestreo</td>
+<td>EV-02</td>
+</tr>
+<tr class="odd">
+<td>Uso de ancho de banda</td>
+<td>MikroTik Torch + Interface Statistics</td>
+<td>Interfaces WAN y troncales</td>
+<td>Continuo (logging cada 5 min)</td>
+<td>EV-03</td>
+</tr>
+<tr class="even">
+<td>MOS estimado</td>
+<td>Wireshark RTP Analysis</td>
+<td>Mismo punto</td>
+<td>Mismo muestreo</td>
+<td>EV-01</td>
+</tr>
+<tr class="odd">
+<td>Frecuencia y duración de incidencias</td>
+<td>Bitácora ViciDial + tickets internos</td>
+<td>Servidor maestro</td>
+<td>Continuo</td>
+<td>EV-04</td>
+</tr>
+<tr class="even">
+<td>Tiempo de failover ISP</td>
+<td>Cronometraje manual + ping a destino externo</td>
+<td>Estación de prueba en Bellavista</td>
+<td>Pruebas controladas</td>
+<td>EV-13</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 5. Protocolo de medición de línea base y evidencias.</p>
+<p>Las evidencias gráficas (capturas de Wireshark, gráficas de
+utilización de Torch, registros de incidencias y configuraciones
+exportadas) se incorporan a este documento como bloques EV-01 a EV-19
+distribuidos en los puntos donde sustentan el argumento. La medición de
+línea base es prerrequisito de la implementación piloto descrita en
+§9.2.</p>
+<hr />
+<h2 id="vi-propuesta-de-solución">VI. PROPUESTA DE SOLUCIÓN</h2>
+<p>La propuesta responde a cada causa raíz identificada en el
+diagnóstico mediante seis componentes interrelacionados. Cada componente
+se presenta en cuatro bloques explícitos — Diagnóstico → Análisis →
+Justificación → Solución — para cumplir el criterio metodológico de ir
+del problema observado a la solución validada bibliográficamente.</p>
+<h3 id="61-vpn-site-to-site-entre-sedes">6.1 VPN site-to-site entre
+sedes</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> Las cuatro sedes operan
+aisladas (§5.1); no existe canal privado que permita el respaldo cruzado
+de agentes ni la administración centralizada de ViciDial.</li>
+<li><strong>Análisis.</strong> El aislamiento convierte cualquier caída
+de sede en una pérdida total de capacidad para esa ubicación, ya que las
+llamadas no pueden reenrutarse a otra sede. Además, impide consolidar
+reportes y aplicar políticas corporativas uniformes.</li>
+<li><strong>Justificación.</strong> Aung y Thein (2020) y Pudelko et al.
+(2020) concluyen que WireGuard implementado sobre RouterOS ofrece el
+mejor rendimiento para este tipo de despliegue, con menor overhead de
+cifrado que OpenVPN (≈ 20 bytes por paquete) y mejor integración con el
+kernel del sistema operativo.</li>
+<li><strong>Solución.</strong> Cada equipo MikroTik establece un túnel
+WireGuard cifrado con los demás nodos, conformando una malla
+site-to-site. El tráfico entre sedes viaja encapsulado sobre las
+conexiones de internet existentes, con autenticación por par de claves
+pública/privada (criptografía de curva elíptica) y direccionamiento
+dedicado en 10.0.0.0/24 (§7.2).</li>
+</ul>
+<h3 id="62-segmentación-por-vlans">6.2 Segmentación por VLANs</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> No hay VLANs documentadas
+(§5.2, §5.6); el tráfico de voz, datos y gestión convive en un mismo
+dominio de broadcast.</li>
+<li><strong>Análisis.</strong> La convivencia de tráficos heterogéneos
+amplifica la competencia por recursos y eleva la superficie de ataque
+ante un compromiso lateral en una estación de trabajo (Álvarez et al.,
+2023).</li>
+<li><strong>Justificación.</strong> Álvarez et al. (2023) demuestran que
+la segmentación VLAN reduce de forma significativa el impacto de ataques
+laterales y mejora el rendimiento general; la separación voz/datos es
+práctica estándar en despliegues VoIP empresariales.</li>
+<li><strong>Solución.</strong> Se configuran tres VLANs IEEE 802.1Q en
+el switch MikroTik — VLAN 10 (voz, DSCP 46), VLAN 20 (datos, Best
+Effort), VLAN 30 (gestión). Los puertos del switch se asignan a su VLAN
+correspondiente según el dispositivo conectado.</li>
+</ul>
+<h3 id="63-qos-para-tráfico-voip">6.3 QoS para tráfico VoIP</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> El switch MikroTik
+gestionable tiene capacidad nativa de QoS, pero no está configurada
+(§5.2). El tráfico VoIP compite en igualdad de condiciones con el
+tráfico de datos.</li>
+<li><strong>Análisis.</strong> En ausencia de prioridad, las ráfagas de
+tráfico de datos elevan jitter y pérdida en RTP justo en los momentos de
+mayor uso simultáneo, lo que explica las 2–4 incidencias semanales
+registradas sin correlación con horas pico (§5.4).</li>
+<li><strong>Justificación.</strong> Thangam et al. (2024) demuestran que
+la combinación de QoS y buffer adaptativo reduce el jitter en redes
+VoIP; la recomendación ITU-T G.114 establece los umbrales operativos
+(latencia &lt; 150 ms, jitter &lt; 30 ms).</li>
+<li><strong>Solución.</strong> Se configuran reglas <em>Mangle</em> en
+el firewall MikroTik para marcar conexiones SIP (UDP 5060) y RTP (UDP
+10000–20000) con DSCP 46 (EF) y una <em>Queue Tree</em> con prioridad 1
+que garantiza un CIR (Committed Information Rate) exclusivo para voz
+suficiente para 140 llamadas concurrentes (≈ 15 Mbps reservados, ver
+§4.9).</li>
+</ul>
+<h3 id="64-failover-automático-de-isp">6.4 Failover automático de
+ISP</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> Bellavista cuenta con
+doble ISP (75 Mbps + 600 Mbps) pero sin failover automático configurado
+(§5.3); el cambio de enlace requiere intervención manual.</li>
+<li><strong>Análisis.</strong> La dependencia de la intervención manual
+eleva el tiempo de recuperación a varios minutos, durante los cuales se
+pierde la totalidad de la capacidad de llamadas. Este tiempo es
+inaceptable para la operación de un call center.</li>
+<li><strong>Justificación.</strong> Simanjuntak et al. (2023) muestran
+que la conmutación automática reduce el tiempo de recuperación de
+minutos a segundos sin requerir protocolos de enrutamiento dinámico
+costosos.</li>
+<li><strong>Solución.</strong> Se configuran dos rutas por defecto con
+distancia administrativa 1 (ISP principal) y 2 (ISP secundario).
+MikroTik verifica periódicamente la disponibilidad del gateway mediante
+<em>Check Gateway</em> y scripts de <em>Netwatch</em> sobre ping ICMP, y
+conmuta automáticamente al enlace alternativo cuando detecta falla, con
+tiempo objetivo de recuperación &lt; 10 s.</li>
+</ul>
+<h3
+id="65-arquitectura-vicidial-maestro-réplica-con-alta-disponibilidad">6.5
+Arquitectura ViciDial maestro-réplica con alta disponibilidad</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> Cada sede administra su
+pool de agentes de forma silada (§5.5); no existe consolidación
+operativa ni capacidad de redistribución de carga.</li>
+<li><strong>Análisis.</strong> La fragmentación impide aplicar políticas
+de enrutamiento corporativo, obtener reportes consolidados y reaccionar
+de forma elástica ante picos o caídas localizadas.</li>
+<li><strong>Justificación.</strong> La arquitectura maestro-réplica es
+el patrón estándar para entornos distribuidos sobre Asterisk/MySQL y se
+sustenta en la disponibilidad de la VPN site-to-site (§6.1) como canal
+de sincronización seguro. Conforme a §4.11, la combinación con failover
+de ISP y VPN mallada eleva el objetivo de disponibilidad por encima del
+99.5 %.</li>
+<li><strong>Solución.</strong> Se reorganiza la arquitectura de
+servidores ViciDial hacia un esquema maestro-réplica: un servidor
+maestro centraliza la base de datos y la configuración global, mientras
+que los nodos de cada sede operan como réplicas con capacidad de modo
+degradado ante la caída del maestro. Esto permite reportes consolidados
+y enrutamiento de llamadas basado en disponibilidad de agentes en todas
+las sedes.</li>
+</ul>
+<h3 id="66-documentación-y-monitoreo-activo">6.6 Documentación y
+monitoreo activo</h3>
+<ul>
+<li><strong>Diagnóstico (causa raíz).</strong> No existe diagrama de red
+formal ni monitoreo activo (§5.6); las fallas se detectan reactivamente,
+por reporte del agente afectado.</li>
+<li><strong>Análisis.</strong> La ausencia de monitoreo impide detectar
+degradaciones tempranas, correlacionar incidencias y mantener evidencia
+histórica útil para diagnóstico.</li>
+<li><strong>Justificación.</strong> La documentación formal y el
+monitoreo continuo son prácticas básicas de gestión de red corporativa;
+Zabbix es una herramienta consolidada de código abierto compatible con
+MikroTik vía SNMP.</li>
+<li><strong>Solución.</strong> Se elabora el diagrama de red lógico y
+físico de cada sede (ver §7 y EV-09 / EV-10) y se despliega Zabbix como
+herramienta de monitoreo, permitiendo visualizar en tiempo real el
+estado de los enlaces, latencia, jitter y utilización de ancho de banda
+(ver EV-19).</li>
+</ul>
+<h3
+id="67-procesos-organizacionales-y-sop-de-respuesta-ante-incidencias">6.7
+Procesos organizacionales y SOP de respuesta ante incidencias</h3>
+<p>La infraestructura técnica debe complementarse con un Procedimiento
+Operativo Estándar (SOP) que defina quién interviene, en qué orden y
+bajo qué criterios ante cada tipo de incidencia. Este componente
+responde a la observación de que las soluciones técnicas son
+insuficientes si no existe un proceso documentado de respuesta.</p>
+<p><strong>Niveles de respuesta definidos:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Nivel</th>
+<th>Tipo de incidencia</th>
+<th>Responsable primario</th>
+<th>Tiempo objetivo de respuesta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>N1</td>
+<td>Degradación de audio en una llamada</td>
+<td>Supervisor de sede</td>
+<td>&lt; 2 min — diagnóstico inicial</td>
+</tr>
+<tr class="even">
+<td>N2</td>
+<td>Caída total de una sede</td>
+<td>Administrador de red</td>
+<td>&lt; 10 min — activación de failover cruzado</td>
+</tr>
+<tr class="odd">
+<td>N3</td>
+<td>Caída de ISP principal en Bellavista</td>
+<td>MikroTik (automático) + Administrador de red</td>
+<td>&lt; 10 s (automático) + &lt; 5 min (notificación)</td>
+</tr>
+<tr class="even">
+<td>N4</td>
+<td>Caída del servidor maestro ViciDial</td>
+<td>Administrador de red + Soporte ViciDial</td>
+<td>&lt; 30 min — promoción de réplica</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 6. Niveles de respuesta ante incidencias.</p>
+<p><strong>Flujo estándar de atención (timeline T+N min):</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Paso</th>
+<th>Tiempo</th>
+<th>Acción</th>
+<th>Responsable</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1. Detección</td>
+<td><strong>T+0 min</strong></td>
+<td>Alerta automática vía Zabbix (umbrales: latencia &gt; 100 ms,
+pérdida &gt; 0.5 %, caída de túnel VPN) o reporte del supervisor de
+sede</td>
+<td>Zabbix / Supervisor</td>
+</tr>
+<tr class="even">
+<td>2. Clasificación</td>
+<td><strong>T+2 min</strong></td>
+<td>Verificación visual del enlace y carga en el MikroTik central;
+asignación a N1–N4</td>
+<td>NOC Nivel 1</td>
+</tr>
+<tr class="odd">
+<td>3. Contención</td>
+<td><strong>T+5 min</strong></td>
+<td>Acción correctiva inmediata: forzar failover, reenrutamiento de
+agentes, reinicio de servicio, promoción de réplica si aplica</td>
+<td>Administrador de red</td>
+</tr>
+<tr class="even">
+<td>4. Diagnóstico</td>
+<td><strong>T+15 min</strong></td>
+<td>Análisis de logs, capturas RTP, métricas Zabbix para identificar
+causa raíz</td>
+<td>Administrador de red</td>
+</tr>
+<tr class="odd">
+<td>5. Resolución</td>
+<td><strong>T+30 min</strong></td>
+<td>Corrección definitiva y verificación con métricas del protocolo de
+§5.9</td>
+<td>Administrador de red</td>
+</tr>
+<tr class="even">
+<td>6. Cierre y registro</td>
+<td><strong>T+24 h</strong></td>
+<td>Documentación en bitácora interna, apertura de ticket con ISP si
+aplica, reporte a gerencia</td>
+<td>Coordinación</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 7. Flujo estándar de atención de incidencias.</p>
+<p>Este procedimiento formaliza lo que actualmente ocurre de manera
+improvisada, reduce la variabilidad humana en la respuesta y permite
+medir tiempos reales de atención como indicador de mejora continua.</p>
+<hr />
+<h2 id="vii-diseño-de-red">VII. DISEÑO DE RED</h2>
+<p>El diseño propuesto establece una arquitectura convergente que
+interconecta las cuatro sedes mediante VPN site-to-site y segmenta
+internamente cada sede mediante VLANs. A continuación se describe la
+arquitectura lógica propuesta:</p>
+<h3 id="71-topología-lógica-propuesta">7.1 Topología lógica
+propuesta</h3>
+<p>La arquitectura propuesta adopta una topología hub-and-spoke en la
+que la sede de Bellavista actúa como nodo central (hub) por ser la sede
+con mayor infraestructura (3 servidores, switch MikroTik gestionable y
+doble ISP). Las sedes de Magdalena, Los Olivos e Independencia actúan
+como nodos secundarios (spokes) conectados al hub mediante túneles
+WireGuard.</p>
+<blockquote>
+<p><strong>📷 EV-09 — Diagrama lógico de red ACTUAL (levantamiento de
+campo)</strong></p>
+<p><strong>Qué insertar:</strong> diagrama lógico levantado durante el
+trabajo de campo, mostrando la situación actual de las cuatro sedes como
+islas aisladas (sin VPN, sin VLANs, sin failover). Herramientas
+sugeridas: draw.io, Lucidchart o Visio. <strong>Elaborado por:</strong>
+____________________ <strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imagen del diagrama al exportar a
+PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-10 — Diagrama lógico de red PROPUESTA</strong></p>
+<p><strong>Qué insertar:</strong> diagrama lógico de la arquitectura
+propuesta — topología hub-and-spoke con Bellavista como hub, 3 VLANs por
+sede, túneles WireGuard, failover de ISP y servidores ViciDial
+maestro-réplica. <strong>Elaborado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imagen del diagrama al exportar a
+PDF]</em></p>
+</blockquote>
+<h3 id="72-esquema-de-direccionamiento-ip-propuesto">7.2 Esquema de
+direccionamiento IP propuesto</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Sede / VLAN</th>
+<th>VLAN ID</th>
+<th>Red propuesta</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bellavista — Voz</td>
+<td>10</td>
+<td>10.10.10.0/24</td>
+<td>Softphones / tráfico RTP-SIP</td>
+</tr>
+<tr class="even">
+<td>Bellavista — Datos</td>
+<td>20</td>
+<td>10.10.20.0/24</td>
+<td>PCs de agentes / navegación</td>
+</tr>
+<tr class="odd">
+<td>Bellavista — Gestión</td>
+<td>30</td>
+<td>10.10.30.0/24</td>
+<td>Servidores / equipos de red</td>
+</tr>
+<tr class="even">
+<td>Magdalena — Voz / Datos / Gestión</td>
+<td>10 / 20 / 30</td>
+<td>10.20.10.0/24 / 10.20.20.0/24 / 10.20.30.0/24</td>
+<td>Mismo esquema, sede 2</td>
+</tr>
+<tr class="odd">
+<td>Los Olivos — Voz / Datos / Gestión</td>
+<td>10 / 20 / 30</td>
+<td>10.30.10.0/24 / 10.30.20.0/24 / 10.30.30.0/24</td>
+<td>Mismo esquema, sede 3</td>
+</tr>
+<tr class="even">
+<td>Independencia — Voz / Datos / Gestión</td>
+<td>10 / 20 / 30</td>
+<td>10.40.10.0/24 / 10.40.20.0/24 / 10.40.30.0/24</td>
+<td>Mismo esquema, sede 4</td>
+</tr>
+<tr class="odd">
+<td>VPN entre sedes</td>
+<td>—</td>
+<td>10.0.0.0/24</td>
+<td>Túneles WireGuard inter-sede</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 2. Esquema de direccionamiento IP propuesto.</p>
+<hr />
+<h2 id="viii-comparativa-antes-y-después">VIII. COMPARATIVA: ANTES Y
+DESPUÉS</h2>
+<p>La siguiente tabla consolida las mejoras cuantitativas comprometidas.
+La columna <strong>ANTES</strong> se completa con las mediciones de
+línea base (EV-01 a EV-04) capturadas según el protocolo de §5.9; la
+columna <strong>DESPUÉS</strong> se completa con las mediciones
+post-implementación obtenidas durante el piloto en Bellavista (§9.2,
+EV-15 a EV-18).</p>
+<table>
+<thead>
+<tr class="header">
+<th>Métrica / Aspecto</th>
+<th>ANTES (línea base — del cliente)</th>
+<th>DESPUÉS (medido en piloto)</th>
+<th>Mejora / Justificación</th>
+<th>Evidencia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Interconexión de sedes</td>
+<td>0 túneles activos — 4 islas</td>
+<td>6 túneles WireGuard malla</td>
+<td>VPN site-to-site WireGuard</td>
+<td>EV-09 / EV-10</td>
+</tr>
+<tr class="even">
+<td>Redundancia ISP</td>
+<td>Manual — recuperación <em>por medir</em> min</td>
+<td>Failover automático — <em>por medir</em> s</td>
+<td><em>Check Gateway</em> + métricas de distancia</td>
+<td>EV-13 / EV-16</td>
+</tr>
+<tr class="odd">
+<td>Segmentación de red</td>
+<td>1 dominio de broadcast</td>
+<td>3 VLANs (10/20/30)</td>
+<td>Aislamiento por 802.1Q</td>
+<td>EV-12</td>
+</tr>
+<tr class="even">
+<td>QoS</td>
+<td>Sin configurar</td>
+<td>DSCP EF (46) para RTP/SIP</td>
+<td>Queue Tree prioridad 1</td>
+<td>EV-14</td>
+</tr>
+<tr class="odd">
+<td>Latencia VoIP</td>
+<td><em>Por capturar — EV-01</em> ms</td>
+<td><em>Por capturar — EV-17</em> ms</td>
+<td>&lt; 150 ms (ITU-T G.114)</td>
+<td>EV-01 / EV-17</td>
+</tr>
+<tr class="even">
+<td>Jitter</td>
+<td><em>Por capturar — EV-01</em> ms</td>
+<td><em>Por capturar — EV-17</em> ms</td>
+<td>&lt; 30 ms (Thangam et al., 2024)</td>
+<td>EV-01 / EV-17</td>
+</tr>
+<tr class="odd">
+<td>Pérdida de paquetes</td>
+<td><em>Por capturar — EV-02</em> %</td>
+<td><em>Por capturar — EV-17</em> %</td>
+<td>&lt; 1 % (Thangam et al., 2024)</td>
+<td>EV-02 / EV-17</td>
+</tr>
+<tr class="even">
+<td>Uso de ancho de banda en pico</td>
+<td><em>Por capturar — EV-03</em> %</td>
+<td><em>Por capturar — EV-19</em> %</td>
+<td>Estable bajo QoS</td>
+<td>EV-03 / EV-19</td>
+</tr>
+<tr class="odd">
+<td>Caídas / semana</td>
+<td>2–4 (EV-04)</td>
+<td><em>Por medir — EV-19</em></td>
+<td>Reducción objetivo &gt; 70 %</td>
+<td>EV-04 / EV-19</td>
+</tr>
+<tr class="even">
+<td>Gestión de agentes</td>
+<td>4 instancias siladas</td>
+<td>1 maestro + 3 réplicas</td>
+<td>Arquitectura HA</td>
+<td>EV-10</td>
+</tr>
+<tr class="odd">
+<td>Documentación / monitoreo</td>
+<td>Inexistente</td>
+<td>Diagrama formal + Zabbix activo</td>
+<td>Práctica estándar</td>
+<td>EV-10 / EV-19</td>
+</tr>
+<tr class="even">
+<td>Proceso de respuesta</td>
+<td>Improvisado</td>
+<td>SOP 4 niveles + flujo 6 pasos (§6.7)</td>
+<td>Estandarización ITSM</td>
+<td>EV-18</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 3. Comparativa cuantitativa Antes vs. Después.</p>
+<blockquote>
+<p><strong>📷 EV-19 — Comparativa visual de métricas en dashboard
+Zabbix</strong></p>
+<p><strong>Qué insertar:</strong> dos capturas de Zabbix lado a lado:
+(a) dashboard del periodo de línea base — antes de la implementación;
+(b) dashboard del periodo post-piloto. Resaltar latencia, jitter,
+pérdida y uso de ancho de banda. <strong>Capturado por:</strong>
+____________________ <strong>Fechas:</strong> baseline
+<em><strong>/</strong></em>/2025 — post-piloto
+<em><strong>/</strong></em>/2025</p>
+<p><em>[Espacio reservado — insertar 2 imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<hr />
+<h2 id="ix-resultados-y-validación">IX. RESULTADOS Y VALIDACIÓN</h2>
+<h3 id="91-métricas-esperadas-post-implementación">9.1 Métricas
+esperadas post-implementación</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Línea base (EV-)</th>
+<th>Valor esperado</th>
+<th>Referencia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Latencia VoIP</td>
+<td>EV-01</td>
+<td>&lt; 150 ms</td>
+<td>ITU-T G.114</td>
+</tr>
+<tr class="even">
+<td>Jitter</td>
+<td>EV-01</td>
+<td>&lt; 30 ms</td>
+<td>Thangam et al. (2024)</td>
+</tr>
+<tr class="odd">
+<td>Pérdida de paquetes</td>
+<td>EV-02</td>
+<td>&lt; 1 %</td>
+<td>Thangam et al. (2024)</td>
+</tr>
+<tr class="even">
+<td>Incidencias semanales</td>
+<td>EV-04</td>
+<td>Reducción &gt; 70 %</td>
+<td>Thangam et al. (2024); Simanjuntak et al. (2023)</td>
+</tr>
+<tr class="odd">
+<td>Tiempo de failover ISP</td>
+<td>EV-13</td>
+<td>&lt; 10 segundos</td>
+<td>Simanjuntak et al. (2023)</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 4. Métricas esperadas post-implementación.</p>
+<h3 id="92-plan-de-simulación-y-pruebas">9.2 Plan de simulación y
+pruebas</h3>
+<p>Para validar el diseño antes de su despliegue en producción, se
+ejecuta un plan de simulación en dos fases que cubre las cuatro pruebas
+críticas exigidas: caídas, failover, latencia y carga.</p>
+<p><strong>Fase A — Simulación en entorno virtual.</strong> Se modela la
+topología completa en Cisco Packet Tracer para la validación funcional
+de VLANs, enrutamiento inter-VLAN, QoS marcado por DSCP y conmutación de
+ruta por distancia administrativa. Para las pruebas que requieren
+WireGuard y mayor fidelidad de comportamiento real, la topología se
+reproduce adicionalmente en GNS3 con imágenes oficiales de MikroTik CHR
+(Cloud Hosted Router) y máquinas virtuales emulando los servidores
+ViciDial.</p>
+<p><strong>Fase B — Piloto controlado en la sede de Bellavista.</strong>
+Tras la validación en simulación, se ejecuta la implementación piloto en
+Bellavista replicando las cuatro pruebas en condiciones reales con
+tráfico productivo controlado.</p>
+<blockquote>
+<p><strong>📷 EV-11 — Captura Packet Tracer: topología completa
+simulada</strong></p>
+<p><strong>Qué insertar:</strong> captura de la topología hub-and-spoke
+en Cisco Packet Tracer, mostrando los 4 sites, los túneles entre ellos,
+las VLANs configuradas y los servidores ViciDial. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-12 — Captura GNS3: VLANs y enrutamiento inter-VLAN
+funcionando</strong></p>
+<p><strong>Qué insertar:</strong> captura del CLI de MikroTik CHR en
+GNS3 mostrando <code>/interface vlan print</code> y
+<code>/ip route print</code> con las 3 VLANs activas y rutas inter-VLAN.
+<strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-13 — Captura GNS3: VPN WireGuard activa entre Hub y
+Spokes</strong></p>
+<p><strong>Qué insertar:</strong> captura del comando
+<code>/interface wireguard peers print</code> mostrando los túneles
+activos con sus <em>last handshake</em> recientes; complementar con ping
+entre redes internas de sedes distintas. <strong>Capturado por:</strong>
+____________________ <strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-14 — Captura MikroTik: marcado QoS DSCP EF para
+RTP/SIP</strong></p>
+<p><strong>Qué insertar:</strong> captura de las reglas <em>Mangle</em>
+(<code>/ip firewall mangle print</code>) y de la <em>Queue Tree</em>
+(<code>/queue tree print</code>) demostrando el marcado DSCP 46 sobre
+puertos SIP/RTP y la prioridad 1 asignada. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<p><strong>Pruebas a ejecutar en ambas fases:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Prueba</th>
+<th>Procedimiento</th>
+<th>Métrica de éxito</th>
+<th>Evidencia</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Prueba de caídas</td>
+<td>Desconexión deliberada de un nodo (sede spoke); medir reenrutamiento
+de agentes</td>
+<td>Recuperación de capacidad de llamadas &lt; 2 min</td>
+<td>EV-15</td>
+</tr>
+<tr class="even">
+<td>Prueba de failover de ISP</td>
+<td>Apagado controlado del ISP principal en Bellavista</td>
+<td>Conmutación al ISP secundario &lt; 10 s; sin pérdida de llamadas
+establecidas o reconexión &lt; 30 s</td>
+<td>EV-16</td>
+</tr>
+<tr class="odd">
+<td>Prueba de latencia</td>
+<td>Generación de tráfico SIP/RTP entre sedes durante 30 min</td>
+<td>Latencia &lt; 150 ms y jitter &lt; 30 ms sostenidos</td>
+<td>EV-17</td>
+</tr>
+<tr class="even">
+<td>Prueba de carga</td>
+<td>Saturación progresiva del enlace con tráfico Iperf3 hasta 80 % de la
+capacidad mientras hay llamadas VoIP activas</td>
+<td>RTP mantiene latencia &lt; 150 ms y pérdida &lt; 1 % por efecto del
+QoS EF</td>
+<td>EV-18</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 8. Plan de pruebas de validación.</p>
+<blockquote>
+<p><strong>📷 EV-15 — Prueba de CAÍDAS: evidencia del
+reenrutamiento</strong></p>
+<p><strong>Qué insertar:</strong> secuencia de capturas: (a) sede spoke
+operando normalmente; (b) desconexión deliberada del enlace; (c) panel
+ViciDial mostrando reenrutamiento de agentes al maestro u otra sede; (d)
+cronómetro mostrando tiempo total de recuperación. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar 4 imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-16 — Prueba de FAILOVER de ISP: cronometraje y
+ping</strong></p>
+<p><strong>Qué insertar:</strong> captura de terminal con
+<code>ping -t 8.8.8.8</code> ejecutándose, mostrando el instante de la
+caída del ISP1 y la reanudación de respuestas tras la conmutación al
+ISP2; medir el gap en segundos. Complementar con captura de MikroTik
+<code>/tool netwatch print</code> y <code>/ip route print</code>.
+<strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar 2 imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-17 — Prueba de LATENCIA: Wireshark
+post-implementación</strong></p>
+<p><strong>Qué insertar:</strong> captura de Wireshark <em>RTP Stream
+Analysis</em> tras la activación de QoS, mostrando latencia, jitter y
+pérdida durante 30 minutos de tráfico SIP/RTP entre Bellavista y otra
+sede. Comparar lado a lado con EV-01 / EV-02. <strong>Capturado
+por:</strong> ____________________ <strong>Fecha:</strong> _____ / _____
+/ 2025</p>
+<p><em>[Espacio reservado — insertar imagen al exportar a PDF]</em></p>
+</blockquote>
+<blockquote>
+<p><strong>📷 EV-18 — Prueba de CARGA: Iperf3 + QoS bajo
+saturación</strong></p>
+<p><strong>Qué insertar:</strong> capturas del cliente y servidor Iperf3
+saturando el enlace al 80 % de capacidad, en paralelo con la captura RTP
+Stream Analysis mostrando que la voz se mantiene dentro de umbrales.
+Incluir gráfica de utilización en Zabbix durante la prueba.
+<strong>Capturado por:</strong> ____________________
+<strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar 3 imágenes al exportar a
+PDF]</em></p>
+</blockquote>
+<p>Cada prueba se ejecuta tres veces y se documenta con capturas de
+Wireshark, gráficas de Zabbix y registros de MikroTik conforme al
+protocolo de medición de §5.9. Los resultados alimentan la comparación
+Antes vs. Después de la §VIII.</p>
+<h3 id="93-validación-con-el-cliente">9.3 Validación con el cliente</h3>
+<p>Como exigencia final de un proyecto de ingeniería real, las mejoras
+se validan formalmente con el cliente mediante una sesión de cierre
+donde se presentan los resultados del piloto y se firma el acta de
+aceptación.</p>
+<blockquote>
+<p><strong>📷 EV-20 — Acta de validación firmada por el
+cliente</strong></p>
+<p><strong>Qué insertar:</strong> documento firmado por la gerencia del
+call center (o el administrador de red en su representación),
+confirmando: (a) la mejora medible obtenida en el piloto; (b) la
+conformidad con la arquitectura propuesta; (c) la adopción del SOP
+organizacional (§6.7). <strong>Recopilado por:</strong>
+____________________ <strong>Fecha:</strong> _____ / _____ / 2025</p>
+<p><em>[Espacio reservado — insertar documento al exportar a
+PDF]</em></p>
+</blockquote>
+<hr />
+<h2 id="x-conclusiones">X. CONCLUSIONES</h2>
+<p>La infraestructura de red actual del call center presenta
+deficiencias estructurales que explican las incidencias recurrentes de
+audio. El análisis demuestra que el problema no reside en la capacidad
+del ancho de banda contratado sino en la ausencia de configuración
+formal de los equipos existentes: el switch MikroTik gestionable
+disponible en Bellavista tiene capacidad técnica suficiente para
+implementar todas las mejoras propuestas, como lo confirma el cálculo de
+ancho de banda VoIP (§4.9) que sitúa el consumo de 140 llamadas
+concurrentes por debajo del 4 % del enlace de 600 Mbps.</p>
+<p>La propuesta de arquitectura convergente presentada resuelve los seis
+problemas identificados reutilizando la infraestructura existente, con
+una inversión adicional estimada menor a S/ 1,100 para equipar las sedes
+que no disponen de router MikroTik. La implementación de VPN
+site-to-site, VLANs, QoS, failover automático de ISP y arquitectura
+ViciDial maestro-réplica constituye una solución técnicamente sólida,
+respaldada por literatura reciente (Thangam et al., 2024; Aung &amp;
+Thein, 2020; Pudelko et al., 2020; Simanjuntak et al., 2023; Álvarez et
+al., 2023), económicamente accesible y verificable mediante el plan de
+medición de §5.9 y el plan de simulación y piloto de §9.2.</p>
+<p>Adicionalmente, la estandarización del SOP de respuesta ante
+incidencias (§6.7) traslada a la organización de una postura reactiva a
+una gestión tecnológica proactiva, con niveles de respuesta y tiempos
+objetivo claramente definidos. La combinación de mejora técnica +
+proceso organizacional + evidencia validada con el cliente (EV-20)
+convierte la propuesta en un proyecto de ingeniería real, medible y
+listo para su paso a producción.</p>
+<hr />
+<h2 id="xi-referencias">XI. REFERENCIAS</h2>
+<p>Álvarez, D., Nuño, P., González, C. T., Bulnes, F. G., Granda, J. C.,
+&amp; García-Carrillo, D. (2023). Performance analysis of
+software-defined networks to mitigate private VLAN attacks. <em>Sensors,
+23</em>(4), Artículo 1747. <a
+href="https://doi.org/10.3390/s23041747">https://doi.org/10.3390/s23041747</a></p>
+<p>Aung, S. T., &amp; Thein, T. (2020). Comparative analysis of
+site-to-site layer 2 virtual private networks. En <em>2020 IEEE
+Conference on Computer Applications (ICCA)</em> (pp. 1–5). IEEE. <a
+href="https://doi.org/10.1109/ICCA49400.2020.9022848">https://doi.org/10.1109/ICCA49400.2020.9022848</a></p>
+<p>Pudelko, M., Emmerich, P., Gallenmüller, S., &amp; Carle, G. (2020).
+Performance analysis of VPN gateways. En <em>2020 IFIP Networking
+Conference and Workshops</em> (pp. 325–333). IEEE. <a
+href="https://doi.org/10.23919/IFIPNetworking48965.2020.9142755">https://doi.org/10.23919/IFIPNetworking48965.2020.9142755</a></p>
+<p>Simanjuntak, I. U. V., Rochendi, A. D., &amp; Silalahi, L. M. (2023).
+Simulation and analysis of link failover using routing border gateway
+protocol (BGP) multi-protocol label switching (MPLS) networks. En
+<em>2023 International Conference on Radar, Antenna, Microwave,
+Electronics, and Telecommunications (ICRAMET)</em> (pp. 341–346). IEEE.
+<a
+href="https://doi.org/10.1109/ICRAMET59917.2023.10366652">https://doi.org/10.1109/ICRAMET59917.2023.10366652</a></p>
+<p>Thangam, S., Gurupriya, M., Revanth, A. S., Joel, D. A., Shankar, C.
+M., &amp; Koushik, I. S. (2024). VoIP QoS refinement through call
+sequencing using adaptive jitter buffer algorithm. En <em>2024 15th
+International Conference on Computing Communication and Networking
+Technologies (ICCCNT)</em>. IEEE. <a
+href="https://doi.org/10.1109/ICCCNT61001.2024.10725456">https://doi.org/10.1109/ICCCNT61001.2024.10725456</a></p>
+<hr />
+<h2 id="anexo-a--índice-de-evidencias-checklist-de-captura">ANEXO A —
+ÍNDICE DE EVIDENCIAS (CHECKLIST DE CAPTURA)</h2>
+<p>Este índice consolida todas las evidencias reales que deben
+capturarse, validarse e insertarse en los bloques EV-XX antes del export
+a PDF. Sirve como checklist operativo para el equipo de campo.</p>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Descripción</th>
+<th>Sección donde se inserta</th>
+<th>Herramienta</th>
+<th>Responsable</th>
+<th>Capturado ✓</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EV-01</td>
+<td>Wireshark — RTP Stream (latencia, jitter) línea base</td>
+<td>§II Tabla 0</td>
+<td>Wireshark</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-02</td>
+<td>Wireshark — pérdida de paquetes línea base</td>
+<td>§II Tabla 0</td>
+<td>Wireshark</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-03</td>
+<td>MikroTik Torch — ancho de banda WAN hora pico</td>
+<td>§II Tabla 0</td>
+<td>Winbox / Torch</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-04</td>
+<td>ViciDial — bitácora de incidencias 4 semanas</td>
+<td>§II Tabla 0 / §5.4</td>
+<td>Sistema interno</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-05</td>
+<td>Fotos de rack — 4 sedes</td>
+<td>§5.7</td>
+<td>Cámara</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-06</td>
+<td>Export de configuración MikroTik actual</td>
+<td>§5.7</td>
+<td>RouterOS <code>/export</code></td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-07</td>
+<td>Acta de entrevista — administrador de red</td>
+<td>§5.8</td>
+<td>Documento físico/digital</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-08</td>
+<td>Facturas/contratos ISP (anonimizados)</td>
+<td>§5.8</td>
+<td>Documentos del cliente</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-09</td>
+<td>Diagrama lógico actual</td>
+<td>§7.1</td>
+<td>draw.io / Lucidchart</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-10</td>
+<td>Diagrama lógico propuesto</td>
+<td>§7.1</td>
+<td>draw.io / Lucidchart</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-11</td>
+<td>Topología completa en Packet Tracer</td>
+<td>§9.2</td>
+<td>Cisco Packet Tracer</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-12</td>
+<td>VLANs y enrutamiento inter-VLAN en GNS3</td>
+<td>§9.2</td>
+<td>GNS3 + MikroTik CHR</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-13</td>
+<td>VPN WireGuard activa en GNS3</td>
+<td>§9.2</td>
+<td>GNS3 + MikroTik CHR</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-14</td>
+<td>Marcado QoS DSCP EF</td>
+<td>§9.2</td>
+<td>MikroTik CLI/Winbox</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-15</td>
+<td>Prueba de CAÍDAS — reenrutamiento</td>
+<td>§9.2</td>
+<td>GNS3 + cronómetro</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-16</td>
+<td>Prueba de FAILOVER — cronometraje + ping</td>
+<td>§9.2</td>
+<td>Terminal + Winbox</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-17</td>
+<td>Prueba de LATENCIA — Wireshark post</td>
+<td>§9.2</td>
+<td>Wireshark</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-18</td>
+<td>Prueba de CARGA — Iperf3 + QoS</td>
+<td>§9.2</td>
+<td>Iperf3 + Wireshark + Zabbix</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="odd">
+<td>EV-19</td>
+<td>Comparativa Zabbix antes/después</td>
+<td>§VIII</td>
+<td>Zabbix</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+<tr class="even">
+<td>EV-20</td>
+<td>Acta de validación firmada por cliente</td>
+<td>§9.3</td>
+<td>Documento físico/digital</td>
+<td>_________</td>
+<td>☐</td>
+</tr>
+</tbody>
+</table>
+<p>Tabla 9. Índice y checklist de las 20 evidencias reales del
+proyecto.</p>
+<!--
+REGISTRO DE CAMBIOS APLICADOS
+
+== Versión 1 (correcciones iniciales sobre Articulo_Universitario.md) ==
+
+| ID     | Observación                                                                 | Sección donde se aplicó                                  | Cambio aplicado                                                                                                                                                                                                                                                                                                                       |
+|--------|-----------------------------------------------------------------------------|----------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| OBS-01 | Problema mal definido; faltan métricas reales y evidencias                  | §II Problema; §5.9 (nueva) Metodología de medición       | Tabla 0 con parámetros críticos y umbrales de referencia. Se creó §5.9 con el protocolo de medición (Wireshark, MikroTik Torch, ViciDial logs, MOS) y la Tabla 5. **Interpretación conservadora**: no se inventaron mediciones inexistentes; se formalizó el plan para obtenerlas. |
+| OBS-02 | Falta comparación ANTES vs DESPUÉS cuantificada                              | §VIII Comparativa (Tabla 3)                              | Tabla 3 ampliada con filas y valores numéricos por aspecto.                |
+| OBS-03 | Falta investigación real (entrevistas, configuraciones, proveedores)        | §5.8 (nueva) Metodología de investigación de campo       | Tres frentes documentados: entrevistas semi-estructuradas, recolección documental, levantamiento técnico in situ. |
+| OBS-04 | Soluciones sin diagnóstico — orden Diagnóstico→Análisis→Justificación→Solución | §VI (subsecciones 6.1–6.6 reestructuradas)               | Cada componente reestructurado en 4 bloques explícitos. |
+| OBS-05 | Marco teórico incompleto                                                    | §IV (nuevas subsecciones 4.7 a 4.11)                     | Plan IP, Seguridad, Cálculo de ancho de banda, Arquitectura/Balanceo, HA. |
+| OBS-06 | Falta simulación y pruebas                                                  | §9.2 (nueva) Plan de simulación y pruebas                | Plan de 2 fases + Tabla 7 con 4 pruebas exigidas. |
+| OBS-07 | Falta procesos organizacionales                                             | §6.7 (nueva); §III Objetivo Específico 5                 | Tabla 6 con 4 niveles + flujo de 6 pasos. |
+| OBS-08 | Formato académico — citas APA                                               | Todo el documento + §XI Referencias                      | Conversión completa IEEE → APA 7. |
+
+== Versión 2 (mejoras tras comparación con Gemini + exigencia de evidencias reales) ==
+
+| ID     | Cambio aplicado en v2 | Justificación |
+|--------|------------------------|----------------|
+| V2-01  | Reformulación del Abstract y §I — framing como "proyecto de ingeniería real" con diagnóstico de campo + simulación + piloto + validación con cliente. | Recoge el tono de proyecto real exigido por el profesor sin inventar resultados. |
+| V2-02  | §II reorganizado en §2.1 Parámetros críticos y línea base + §2.2 Causas raíz. Tabla 0 ahora referencia EV-01..EV-04. | Sustituye el placeholder "no cuantificada formalmente" por referencias explícitas a evidencias capturables. |
+| V2-03  | §III.1 Objetivo General — añadido umbral cuantificado *"reducir latencia <150 ms y jitter <30 ms conforme a ITU-T G.114"*. | Da medibilidad sin inventar (todos los números provienen de la recomendación ITU-T citada). |
+| V2-04  | §III.2 — añadido Objetivo 6 (Comparar cuantitativamente con evidencia gráfica). Reformulado el resto en imperativo activo. | Hace explícito el compromiso de comparación cuantitativa, alineado con la exigencia clave 4 del profesor. |
+| V2-05  | §IV.1 — añadidos los puertos UDP estándar (SIP 5060, RTP 10000–20000). §IV.2 — añadido DSCP 46 explícito. §IV.4 — añadido overhead WireGuard (~20 B). §IV.3 — añadido IEEE 802.1Q. | Precisiones técnicas tomadas del enfoque más ingenieril de Gemini, sustentadas en literatura. |
+| V2-06  | §6.7 — Tabla 7 nueva con flujo de atención cronometrado en formato T+N min (T+0 / T+2 / T+5 / T+15 / T+30 / T+24h). | **Positivo de Gemini incorporado**: SOP profesional con timeline visible. |
+| V2-07  | §7.2 Tabla 2 — ampliada con direccionamiento de las 4 sedes (10.20.x.x, 10.30.x.x, 10.40.x.x), no solo Bellavista. | Plan IP completo, no muestra parcial. |
+| V2-08  | §VIII Tabla 3 — reestructurada con columna *Evidencia* y celdas marcadas "_por capturar — EV-XX_" donde corresponde. | Comparativa Antes/Después con espacio reservado para los números reales del cliente — no inventa. |
+| V2-09  | §IX renombrado a "Resultados y Validación"; añadida §9.3 *Validación con el cliente* + EV-20. | Cumple exigencia 5 del profesor ("Validación con el cliente"). |
+| V2-10  | **20 bloques de evidencia EV-01..EV-20** insertados en los puntos del documento donde sustentan cada argumento, con formato unificado (qué insertar, herramienta, responsable, fecha). | Atiende la exigencia 1 ("Evidencia real — pantallazos, métricas") y 4 ("Simulación y pruebas") con espacios concretos, visibles tras el render HTML/PDF. |
+| V2-11  | **Anexo A — Índice de Evidencias** (Tabla 9) como checklist operativo para el equipo de campo. | Permite al equipo trackear qué evidencias están capturadas y cuáles faltan antes del export a PDF. |
+| V2-12  | Conservados: estructura I–XI, contenido teórico íntegro, citas APA, 5 referencias, registro de cambios. | Continuidad con v1; no se pierde ningún contenido. |
+
+NOTA SOBRE COMPARACIÓN CON LA VERSIÓN DE GEMINI:
+Se incorporaron únicamente los aciertos formales de Gemini (timeline T+N en SOP, framing de proyecto de ingeniería, precisiones de puertos/DSCP/overhead). Se descartaron deliberadamente:
+- Las métricas inventadas ("120-200 ms latencia", "jitter > 50 ms", "85% saturación", "4-6 caídas diarias por sede").
+- Los resultados de simulación inventados ("latencia < 20 ms constante", "failover 3.5 segundos", "0% pérdida").
+- La eliminación de secciones del original (Gemini suprimió §V Diagnóstico, §VII Diseño, §IX Resultados).
+- La omisión del registro de cambios.
+- La conservación de citas IEEE (no convirtió a APA).
+- La pérdida de la referencia Aung & Thein (2020).
+-->
+</body>
+</html>

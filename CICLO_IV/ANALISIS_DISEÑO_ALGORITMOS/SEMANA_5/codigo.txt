@@ -1,0 +1,99 @@
+//main
+
+import java.util.Random;
+
+
+public class Ordenamiento_Interno {
+    public static void main(String[] args) {
+        int n = 100000;
+        int[] arreglo = generarArreglo(n);
+
+        // Clonar arreglo para probar cada algoritmo con la misma entrada
+        int[] arrBurbuja = arreglo.clone();
+        int[] arrSeleccion = arreglo.clone();
+        int[] arrInsercion = arreglo.clone();
+
+        // Burbuja
+        long inicio = System.nanoTime();
+        OrdenamientoInterno.burbuja(arrBurbuja);
+        long fin = System.nanoTime();
+        long tiempoBurbuja = fin - inicio;
+        System.out.println("Burbuja: \t" + tiempoBurbuja + " ns");
+
+        // Selección
+        inicio = System.nanoTime();
+        OrdenamientoInterno.seleccion(arrSeleccion);
+        fin = System.nanoTime();
+        long tiempoSeleccion = fin - inicio;
+        System.out.println("Selección: \t" + tiempoSeleccion + " ns");
+
+        // Inserción
+        inicio = System.nanoTime();
+        OrdenamientoInterno.insercion(arrInsercion);
+        fin = System.nanoTime();
+        long tiempoInsercion = fin - inicio;
+        System.out.println("Inserción: \t" + tiempoInsercion + " ns");
+
+        //INTERCALACION
+
+    }
+
+    // Genera arreglo aleatorio
+    public static int[] generarArreglo(int n) {
+        Random rnd = new Random();
+        int[] arr = new int[n];
+        for (int i = 0; i < n; i++) {
+            arr[i] = rnd.nextInt(100000); // valores entre 0 y 100000
+            System.out.println("Elemento "+i+" = "+arr[i]);
+        } 
+        return arr;
+    }
+}
+
+
+//CLASE OrdenamientoInterno
+
+public class OrdenamientoInterno {
+  public static void burbuja(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    public static void seleccion(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            int min = i;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] < arr[min]) {
+                    min = j;
+                }
+            }
+            int temp = arr[min];
+            arr[min] = arr[i];
+            arr[i] = temp;
+        }
+    }
+
+    public static void insercion(int[] arr) {
+        int n = arr.length;
+        for (int i = 1; i < n; i++) {
+            int key = arr[i];
+            int j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = key;
+        }
+    }
+  
+}
+

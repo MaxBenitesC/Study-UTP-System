@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v \"\\\\.class$\\\\|\\\\.rar$\\\\|\\\\.zip$\\\\|\\\\.jar$\\\\|\\\\.bin$\\\\|\\\\.dat$\\\\|\\\\.idx$\\\\|\\\\.pdf$\\\\|\\\\.docx$\")",
+      "Bash(grep -v \"\\\\.class$\\\\|\\\\.rar$\\\\|\\\\.zip$\\\\|\\\\.jar$\\\\|\\\\.bin$\\\\|\\\\.dat$\\\\|\\\\.idx$\\\\|\\\\.pdf$\\\\|\\\\.docx$\\\\|\\\\.xlsx$\\\\|\\\\.xls$\\\\|\\\\.png$\\\\|\\\\.jpg$\\\\|\\\\.jpeg$\\\\|\\\\.mp4$\\\\|\\\\.mp3$\\\\|\\\\.pptx$\\\\|\\\\.ppt$\")",
+      "Bash(java -version)",
+      "Bash(javac -version)",
+      "Bash(mvn -version)",
+      "Read(//home/ilkay/**)",
+      "Read(//home/ilkay/Downloads/**)",
+      "Bash(7z x *)",
+      "Bash(grep -v '.class$')",
+      "Bash(chmod +x /home/ilkay/Documentos/UTP/CICLO_V/HERRAMIENTA_PARA_LA_TOMA_DE_DECISIONES/excel_tool.sh)",
+      "Bash(bash -n /home/ilkay/Documentos/UTP/CICLO_V/HERRAMIENTA_PARA_LA_TOMA_DE_DECISIONES/excel_tool.sh)",
+      "Bash(grep -A8 \"^### Función SI$\\\\|^### Función SI ANIDADA\\\\|^### Función Y\\\\|^### Función O\")",
+      "Bash(python3 *)",
+      "Bash(dpkg -l flameshot scrot maim)",
+      "WebSearch",
+      "Bash(javac AlgoritmoBanquero.java)",
+      "Bash(java AlgoritmoBanquero)"
+    ]
+  }
+}

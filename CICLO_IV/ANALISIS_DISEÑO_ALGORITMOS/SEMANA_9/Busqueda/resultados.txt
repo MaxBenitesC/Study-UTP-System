@@ -1,0 +1,13 @@
+Comparación automática - Thu Oct 16 01:40:04 PET 2025
+auto_bloques,001,1,4.705899
+auto_bloques,005,3,0.071873
+auto_bloques,010,6,0.082589
+auto_bloques,013,10,0.072595
+auto_bloques,017,15,0.087442
+auto_bloques,020,20,0.091134
+auto_indice,001,-1,0.223666
+auto_indice,005,-1,0.050671
+auto_indice,010,-1,0.030723
+auto_indice,013,-1,0.031877
+auto_indice,017,-1,0.034716
+auto_indice,020,-1,0.037237

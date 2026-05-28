@@ -1,0 +1,216 @@
+/* UTP - Articulo Universitario - estilo APA-friendly para HTML/PDF */
+
+@page {
+  size: A4;
+  margin: 2.5cm 2cm;
+}
+
+html {
+  font-size: 11pt;
+}
+
+body {
+  font-family: "Times New Roman", Georgia, serif;
+  line-height: 1.5;
+  color: #1a1a1a;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1em 1.5em;
+  background: #fff;
+}
+
+/* Ocultar el bloque de título inyectado por pandoc (--metadata title)
+   para no duplicar el título real del artículo que va en el cuerpo. */
+header#title-block-header {
+  display: none;
+}
+
+/* Encabezado / portada */
+body > p:first-of-type img {
+  max-width: 320px;
+  display: block;
+  margin: 0 auto 1.5em auto;
+}
+
+/* La portada (todo lo previo al Abstract) debe llenar su propia página */
+body > h1:first-of-type {
+  margin-top: 0.5em;
+}
+
+h1 {
+  font-size: 1.7em;
+  color: #a6192e; /* rojo UTP */
+  text-align: center;
+  border-bottom: 3px solid #a6192e;
+  padding-bottom: 0.4em;
+  margin-bottom: 1em;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-size: 1.25em;
+  color: #a6192e;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 0.2em;
+  margin-top: 1.6em;
+  page-break-after: avoid;
+  page-break-before: always;
+  break-before: page;
+}
+
+/* No saltar página antes del primer H2 (Abstract) ni del bloque-título de portada */
+body > h2:first-of-type {
+  page-break-before: avoid;
+  break-before: auto;
+}
+
+h3 {
+  font-size: 1.08em;
+  color: #333;
+  margin-top: 1.2em;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 1em;
+  color: #444;
+  margin-top: 1em;
+}
+
+p {
+  text-align: justify;
+  margin: 0.55em 0;
+}
+
+/* Tablas */
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+  font-size: 0.92em;
+  page-break-inside: avoid;
+}
+
+th, td {
+  border: 1px solid #999;
+  padding: 0.45em 0.6em;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: #f0e6e8;
+  color: #a6192e;
+  font-weight: bold;
+}
+
+tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+/* Código y bloques pre */
+code {
+  font-family: "Courier New", monospace;
+  background: #f4f4f4;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+pre {
+  background: #f4f4f4;
+  border: 1px solid #ddd;
+  border-left: 4px solid #a6192e;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+  font-size: 0.9em;
+  page-break-inside: avoid;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+}
+
+/* Listas */
+ul, ol {
+  margin: 0.5em 0 0.5em 1.5em;
+  padding-left: 1em;
+}
+
+li {
+  margin: 0.25em 0;
+}
+
+/* Bloques EV-XX (placeholders de evidencia) — quote tipo callout */
+blockquote {
+  background: #fff8e1;
+  border-left: 5px solid #f9a825;
+  margin: 1.2em 0;
+  padding: 0.9em 1.2em;
+  border-radius: 4px;
+  page-break-inside: avoid;
+  color: #5d4037;
+}
+
+blockquote strong {
+  color: #a6192e;
+}
+
+blockquote p {
+  margin: 0.35em 0;
+  text-align: left;
+}
+
+blockquote em {
+  color: #888;
+  font-style: italic;
+}
+
+/* Referencias APA */
+h2#xi-referencias + p,
+h2:has(+ p:first-letter) {
+  padding-left: 2em;
+  text-indent: -2em;
+}
+
+/* Anexo / checklist */
+table th:last-child,
+table td:last-child {
+  text-align: center;
+}
+
+/* Separadores horizontales */
+hr {
+  border: none;
+  border-top: 2px solid #a6192e;
+  margin: 2em 0;
+}
+
+/* Énfasis */
+strong {
+  color: #1a1a1a;
+}
+
+em {
+  color: #444;
+}
+
+a {
+  color: #a6192e;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Saltos de página antes de secciones grandes (al imprimir) */
+@media print {
+  h2 { page-break-before: auto; }
+  h2.major-section { page-break-before: always; }
+  blockquote { page-break-inside: avoid; }
+  table { page-break-inside: avoid; }
+  pre { page-break-inside: avoid; }
+}

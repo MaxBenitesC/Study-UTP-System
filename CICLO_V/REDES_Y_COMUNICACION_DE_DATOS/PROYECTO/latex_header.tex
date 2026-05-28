@@ -1,0 +1,116 @@
+% =================================================================
+% LaTeX header - Articulo Universitario UTP
+% Aplica: colores UTP, callouts EV-XX como cajas, tablas compactas,
+%         saltos de pagina por seccion, fonts con fallback
+% =================================================================
+
+% --- Colores institucionales UTP ---
+\usepackage{xcolor}
+\definecolor{utpred}{HTML}{A6192E}
+\definecolor{utpredlight}{HTML}{F0E6E8}
+\definecolor{calloutbg}{HTML}{FFF8E1}
+\definecolor{calloutborder}{HTML}{F9A825}
+\definecolor{callouttext}{HTML}{5D4037}
+
+% --- Titulos coloreados en rojo UTP ---
+\usepackage{titlesec}
+\titleformat{\section}
+  {\Large\bfseries\color{utpred}}
+  {}{0pt}
+  {}
+  [\vspace{-0.4em}\color{utpred}\rule{\linewidth}{1pt}]
+\titleformat{\subsection}
+  {\large\bfseries\color{utpred!85!black}}
+  {}{0pt}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{utpred!70!black}}
+  {}{0pt}{}
+
+% --- Apartados romanos (I, II, III, IV...) inician en pagina nueva ---
+% Los apartados estan como H2 (## en markdown) -> \subsection en LaTeX.
+% Tras eliminar el titulo duplicado del cuerpo, la secuencia de H2 es:
+%   #1 ABSTRACT, #2 KEYWORDS, #3 I. INTRODUCCION, #4 II. ..., ...
+% ABSTRACT + KEYWORDS van juntos despues de la portada; desde I. en adelante
+% cada apartado romano abre pagina nueva.
+\newcounter{h2count}
+\setcounter{h2count}{0}
+\let\oldsubsection\subsection
+\renewcommand{\subsection}{%
+  \stepcounter{h2count}%
+  \ifnum\value{h2count}>2\relax%
+    \clearpage%
+  \fi
+  \oldsubsection%
+}
+
+% --- Tablas mas compactas (ajuste de fuente y separacion) ---
+\usepackage{etoolbox}
+\usepackage{array}
+\usepackage{ragged2e}     % \RaggedRight para que las celdas hagan wrap
+\AtBeginEnvironment{longtable}{\footnotesize\RaggedRight}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\tabcolsep}{4pt}    % menos padding entre columnas (default 6pt)
+\setlength{\LTleft}{0pt}        % alinear longtable a la izquierda del margen
+\setlength{\LTright}{0pt}
+
+% --- Forzar a longtable a tipar las columnas como parrafo (no left fijo)
+% para que el texto haga wrap automatico al ancho disponible.
+% Truco: redefinir el codigo de columna 'l' como 'p{...}' dentro de longtable.
+\AtBeginEnvironment{longtable}{%
+  \renewcommand{\arraystretch}{1.2}%
+}
+
+% --- Bordes mas claros para tablas tipo booktabs ---
+\usepackage{booktabs}
+\usepackage{colortbl}    % requerido para \arrayrulecolor
+\setlength{\heavyrulewidth}{1.5pt}
+\setlength{\lightrulewidth}{0.6pt}
+\arrayrulecolor{utpred!50!black}
+
+% --- Callouts EV-XX: convertir blockquotes en cajas resaltadas ---
+\usepackage[most]{tcolorbox}
+\renewenvironment{quote}{%
+  \begin{tcolorbox}[
+    colback=calloutbg,
+    colframe=calloutborder,
+    coltext=callouttext,
+    leftrule=4pt,
+    toprule=0pt,
+    rightrule=0pt,
+    bottomrule=0pt,
+    arc=2pt,
+    top=6pt,
+    bottom=6pt,
+    left=10pt,
+    right=10pt,
+    breakable
+  ]%
+}{%
+  \end{tcolorbox}%
+}
+
+% --- Hipervinculos en rojo UTP ---
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=utpred,
+  urlcolor=utpred,
+  citecolor=utpred,
+  pdftitle={Articulo Academico UTP - Redes y Comunicacion de Datos I},
+  pdfauthor={Vega, Benites, Quispe, Tasayco}
+}
+
+% --- Numero de pagina en pie ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+
+% --- Soporte para caracteres Unicode adicionales (cuadritos checklist) ---
+% Define los simbolos como texto via newunicodechar
+\usepackage{newunicodechar}
+\newunicodechar{▢}{\ensuremath{\square}}      % cuadro vacio (checkbox)
+\newunicodechar{✓}{\ensuremath{\checkmark}}   % check
+\newunicodechar{📷}{[\textbf{IMG}]}            % camara -> [IMG]
+\usepackage{amssymb}                            % para \checkmark, \square

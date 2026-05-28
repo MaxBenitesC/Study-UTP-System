@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config *)",
+      "Read(//home/ilkay/Documentos/UTP/**)",
+      "Bash(xargs -I {} dirname {})",
+      "Bash(xargs -I '{}' sh -c 'cd \"{}\" && remote=$\\(git remote get-url origin 2>/dev/null\\) && echo \"{} -> $remote\"')",
+      "Bash(rm -rf /tmp/study-utp-system)",
+      "Bash(git clone *)",
+      "Bash(curl -sI \"https://maxbenitesc.github.io/Study-UTP-System/CICLO%205/DISENO%20DE%20PATRONES/QUIZ_SEMANAS_6_A_9.html\")",
+      "Bash(curl -sI \"https://maxbenitesc.github.io/Study-UTP-System/CICLO%205/DISENO%20DE%20PATRONES/QUIZ_DISENO_PATRONES.html\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/pages/builds/latest\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/contents/CICLO%205/DISENO%20DE%20PATRONES/QUIZ_SEMANAS_6_A_9.html?ref=main\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/commits/main\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/pages\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/actions/runs?per_page=5\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/actions/runs?per_page=1\")",
+      "Bash(curl -s \"https://api.github.com/repos/MaxBenitesC/Study-UTP-System/actions/runs?per_page=2\")"
+    ]
+  }
+}

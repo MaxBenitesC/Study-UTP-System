@@ -1,0 +1,133 @@
+I04N-PA3-2026M
+
+Puntaje máximo: 20 pts
+
+Funciones matem�ticas de Excel
+4 pts
+ESTÁNDAR ESPERADO
+
+4 pts
+
+El estudiante utiliza las funciones matem�ticas en Excel y obtiene los resultados esperados.
+EN PROCESO 2
+
+2 pts
+
+El estudiante utiliza las funciones matem�ticas en Excel. Sin embargo, obtiene algunos resultados no esperados.
+EN PROCESO 1
+
+1 pts
+
+El estudiante emplea algunas funciones matem�ticas, obteniendo algunos resultados esperados.
+INICIAL
+
+0.5 pts
+
+El estudiante emplea algunas funciones matem�ticas, sin obtener los resultados esperados.
+NO CUMPLE
+
+0 pts
+
+Funciones y estad�sticas de Excel
+4 pts
+ESTÁNDAR ESPERADO
+
+4 pts
+
+El estudiante utiliza las funciones textuales en Excel y obtiene los resultados esperados
+EN PROCESO 2
+
+3 pts
+
+El estudiante utiliza las funciones textuales en Excel. Sin embargo, obtiene algunos resultados no esperados.
+EN PROCESO 1
+
+2 pts
+
+El estudiante utiliza algunas de las funciones textuales en Excel,obteniendo algunos resultados esperados.
+INICIAL
+
+1 pts
+
+El estudiante utiliza algunas de las funciones textuales en Excel, pero obtiene resultados no esperados.
+NO CUMPLE
+
+0 pts
+
+Funciones textuales de Excel
+4 pts
+ESTÁNDAR ESPERADO
+
+4 pts
+
+El estudiante utiliza las funciones estad�sticas en Excel y obtiene los resultados esperados.
+EN PROCESO 2
+
+3 pts
+
+El estudiante utiliza las funciones estad�sticas en Excel. Sin embargo, obtiene algunos resultados no esperados.
+EN PROCESO 1
+
+2 pts
+
+El estudiante emplea algunas funciones estad�sticas, sin obtener los resultados esperados
+INICIAL
+
+1 pts
+
+El estudiante emplea algunas funciones estad�sticas, sin obtener los resultados esperados.
+NO CUMPLE
+
+0 pts
+
+Funciones de b�squeda horizontal de Excel
+4 pts
+ESTÁNDAR ESPERADO
+
+4 pts
+
+El estudiante utiliza las funciones de b�squeda horizontal en Excel y obtiene los resultados esperados.
+EN PROCESO 2
+
+3 pts
+
+El estudiante utiliza las funciones de b�squeda horizontal en Excel. Sin embargo, obtiene algunos resultados no esperados.
+EN PROCESO 1
+
+2 pts
+
+El estudiante utiliza algunas de las funciones b�squeda horizontal en Excel, obteniendo algunos resultados esperados.
+INICIAL
+
+1 pts
+
+El estudiante utiliza algunas de las funciones b�squeda horizontal en Excel, pero obtiene resultados no esperados.
+NO CUMPLE
+
+0 pts
+
+Funciones de b�squeda vertical de Excel
+4 pts
+ESTÁNDAR ESPERADO
+
+4 pts
+
+El estudiante utiliza las funciones de b�squeda vertical en Excel y obtiene los resultados esperados.
+EN PROCESO 2
+
+3 pts
+
+El estudiante utiliza las funciones de b�squeda vertical en Excel. Sin embargo, obtiene algunos resultados no esperados.
+EN PROCESO 1
+
+2 pts
+
+El estudiante utiliza algunas de las funciones b�squeda vertical en Excel, obteniendo algunos resultados esperados.
+INICIAL
+
+1 pts
+
+El estudiante utiliza algunas de las funciones b�squeda vertical en Excel, pero obtiene resultados no esperados.
+NO CUMPLE
+
+0 pts

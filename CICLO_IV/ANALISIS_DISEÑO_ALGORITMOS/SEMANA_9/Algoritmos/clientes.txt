@@ -1,0 +1,5 @@
+001|Juan Perez|Lima
+002|Maria Lopez|Arequipa
+003|Pedro Ruiz|Cusco
+004|Ana Torres|Lima
+005|Luis Ramos|Piura

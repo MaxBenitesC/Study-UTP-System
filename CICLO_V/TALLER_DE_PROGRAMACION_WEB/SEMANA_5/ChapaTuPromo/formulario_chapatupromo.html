@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChapaTuPromo | Hacer Pedido</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos_chapatupromo.css">
+  <link rel="icon" href="logo/chapatupromo.png" type="image/png">
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <img src="logo/chapatupromo.png" alt="Logo ChapaTuPromo">
+      <div class="header-texto">
+        <h1>ChapaTuPromo</h1>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu_chapatupromo.html">Ver Menu</a> |
+      <a href="pedidos_chapatupromo.html">Mis Pedidos</a> |
+      <a href="ofertas_chapatupromo.html">Ofertas del Dia</a>
+    </nav>
+  </header>
+  <hr>
+  <section>
+    <h2>Hacer mi Pedido</h2>
+    <p>Completa el formulario, paga en linea y recoge en tienda o recibelo en casa.</p>
+
+    <form action="#" method="post">
+
+      <h3>1. Tus datos</h3>
+
+      <p>
+        <label for="nombre_cliente">Nombre completo:</label><br>
+        <input type="text" id="nombre_cliente" name="nombre_cliente"
+               placeholder="Ej: Carlos Quispe Mamani" required>
+      </p>
+      <p>
+        <label for="telefono">Celular de contacto:</label><br>
+        <input type="text" id="telefono" name="telefono"
+               placeholder="9XXXXXXXX" required>
+      </p>
+      <p>
+        <label for="correo_cliente">Correo (te avisamos cuando este listo):</label><br>
+        <input type="text" id="correo_cliente" name="correo_cliente"
+               placeholder="tucorreo@gmail.com" required>
+      </p>
+
+      <h3>2. Selecciona tus productos</h3>
+      <p><em>Marca los productos que quieres incluir en tu pedido:</em></p>
+
+      <p><label><input type="checkbox" name="productos" value="torta_chocolate"> Torta de Chocolate San Antonio 1kg - <strong>S/. 22.50</strong> (50% off, vence hoy)</label></p>
+      <p><label><input type="checkbox" name="productos" value="torta_tres_leches"> Torta Tres Leches 800g - <strong>S/. 22.80</strong> (40% off, vence manana)</label></p>
+      <p><label><input type="checkbox" name="productos" value="queque_donofrio"> Queque Marmoleado Donofrio 500g - <strong>S/. 9.80</strong> (30% off)</label></p>
+      <p><label><input type="checkbox" name="productos" value="pan_bimbo"> Pan de Molde Bimbo Integral 500g - <strong>S/. 4.80</strong> (20% off)</label></p>
+      <p><label><input type="checkbox" name="productos" value="yogurt_gloria"> Yogurt Gloria Fresa 1L - <strong>S/. 5.10</strong> (40% off, vence manana)</label></p>
+      <p><label><input type="checkbox" name="productos" value="queso_fresco"> Queso Fresco La Preferida 250g - <strong>S/. 6.30</strong> (30% off)</label></p>
+      <p><label><input type="checkbox" name="productos" value="crema_laive"> Crema de Leche Laive 200ml - <strong>S/. 3.50</strong> (30% off)</label></p>
+      <p><label><input type="checkbox" name="productos" value="pollo"> Pollo Entero Refrigerado aprox. 1.8kg - <strong>S/. 13.20</strong> (40% off, vence manana)</label></p>
+      <p><label><input type="checkbox" name="productos" value="jamon"> Jamon del Pais Suiza 200g - <strong>S/. 8.40</strong> (30% off)</label></p>
+
+
+      <h3>3. ¿Como quieres recibir tu pedido?</h3>
+      <p>
+        <label for="tipo_entrega">Tipo de entrega:</label><br>
+        <select id="tipo_entrega" name="tipo_entrega">
+          <option value="">Elige una opcion</option>
+          <option value="recojo">Recojo en tienda</option>
+          <option value="delivery">Delivery a domicilio - S/. 5.00 adicionales</option>
+        </select>
+      </p>
+
+      <h3>4. Tienda de recojo</h3>
+      <p>
+        <label for="tienda">Selecciona tu tienda mas cercana:</label><br>
+        <select id="tienda" name="tienda">
+          <option value="">Elige una tienda</option>
+          <option value="surco">Surco - Av. Primavera 1180, Santiago de Surco</option>
+          <option value="san_miguel">San Miguel - Av. La Marina 2000, San Miguel</option>
+          <option value="la_molina">La Molina - Av. La Molina 1318, La Molina</option>
+          <option value="san_borja">San Borja - Av. San Luis 1921, San Borja</option>
+          <option value="chorrillos">Chorrillos - Av. Huaylas 370, Chorrillos</option>
+          <option value="independencia">Independencia - Av. Tupac Amaru 3200, Independencia</option>
+        </select>
+      </p>
+
+      <h3>5. Direccion de delivery (si elegiste delivery a domicilio)</h3>
+      <p>
+        <label for="direccion">Direccion completa:</label><br>
+        <input type="text" id="direccion" name="direccion"
+               placeholder="Ej: Jr. Las Flores 234, Miraflores">
+      </p>
+      <p>
+        <label for="referencia">Referencia:</label><br>
+        <input type="text" id="referencia" name="referencia"
+               placeholder="Ej: Frente al parque, puerta azul">
+      </p>
+
+      <h3>6. Metodo de pago</h3>
+      <p>
+        <label for="pago">Selecciona tu metodo de pago:</label><br>
+        <select id="pago" name="pago">
+          <option value="">Elige un metodo de pago</option>
+          <option value="agora">Yape</option>
+          <option value="yape">Plin</option>
+          <option value="tarjeta">Tarjeta de credito o debito</option>
+        </select>
+      </p>
+
+      <p>
+        <button type="submit">Enviar Pedido</button>
+      </p>
+    </form>
+
+  </section>
+  <hr>
+  <footer>
+    <p class="footer-siguenos">Siguenos en nuestras redes</p>
+    <div class="footer-redes">
+      <a href="https://instagram.com/ChapaTuPromo" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="https://facebook.com/ChapaTuPromo" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      <a href="https://tiktok.com/@ChapaTuPromo" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+    </div>
+    <p class="footer-copy">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
+  </footer>
+</body>
+</html>

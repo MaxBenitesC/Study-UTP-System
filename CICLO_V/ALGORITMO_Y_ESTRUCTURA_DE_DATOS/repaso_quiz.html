@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Repaso - Algoritmo y Estructura de Datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .reset-btn {
+            padding: 10px 30px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .semana-section {
+            margin-bottom: 40px;
+        }
+
+        .semana-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .question-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .question-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            background: #e8eaff;
+            border-color: #667eea;
+        }
+
+        .option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex-grow: 1;
+            margin: 0;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .feedback::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .feedback.correct::before {
+            content: '✓';
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .feedback.incorrect::before {
+            content: '✗';
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .results {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .content {
+                max-height: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Quiz de Repaso</h1>
+            <p>Algoritmo y Estructura de Datos - Ciclo 5</p>
+        </header>
+
+        <div class="controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterSemana('all')">Todas las Semanas</button>
+                <button class="filter-btn" onclick="filterSemana('1')">Semana 1</button>
+                <button class="filter-btn" onclick="filterSemana('2')">Semana 2</button>
+                <button class="filter-btn" onclick="filterSemana('3')">Semana 3</button>
+                <button class="filter-btn" onclick="filterSemana('4')">Semana 4</button>
+            </div>
+            <button class="reset-btn" onclick="resetQuiz()">🔄 Resetear Todo</button>
+        </div>
+
+        <div class="content" id="content">
+            <!-- El contenido se generará con JavaScript -->
+        </div>
+
+        <div class="results" id="results">
+            <h3>Tu Puntuación</h3>
+            <div class="score" id="finalScore">0/0</div>
+        </div>
+
+        <footer>
+            <p>UTP - Material de Estudio - Ciclo 5</p>
+        </footer>
+    </div>
+
+    <script>
+        const quizData = {
+            semana1: [
+                {
+                    id: 'q1-1',
+                    question: '¿Cuál es la definición más correcta de una Estructura de Datos?',
+                    options: [
+                        { text: 'Un conjunto de variables declaradas en un programa', correct: false },
+                        { text: 'Una forma organizada de almacenar y acceder a datos de manera eficiente', correct: true },
+                        { text: 'Un tipo de dato primitivo en Java', correct: false },
+                        { text: 'Un sinónimo de variable de tipo array', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Una estructura de datos es una forma organizada de almacenar datos que permite realizar operaciones con eficiencia.',
+                        incorrect: 'Incorrecto. Una estructura de datos es mucho más que variables simples; es la forma de organizar datos para optimizar operaciones.'
+                    }
+                },
+                {
+                    id: 'q1-2',
+                    question: '¿Cuál es la principal diferencia entre estructuras estáticas y dinámicas?',
+                    options: [
+                        { text: 'Las estáticas son más rápidas que las dinámicas', correct: false },
+                        { text: 'Las estáticas tienen tamaño fijo, las dinámicas pueden crecer', correct: true },
+                        { text: 'Las dinámicas solo funcionan en Java', correct: false },
+                        { text: 'No hay diferencia real, es solo nomenclatura', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Las estructuras estáticas tienen tamaño fijo al crearse, mientras que las dinámicas pueden crecer y reducirse durante la ejecución.',
+                        incorrect: 'Incorrecto. La diferencia fundamental es que las estructuras estáticas tienen tamaño fijo, mientras que las dinámicas pueden cambiar de tamaño.'
+                    }
+                },
+                {
+                    id: 'q1-3',
+                    question: '¿Cuáles son las características principales de un arreglo?',
+                    options: [
+                        { text: 'Finita, homogénea y ordenada', correct: true },
+                        { text: 'Infinita, heterogénea y desordenada', correct: false },
+                        { text: 'Finita, heterogénea y ordenada', correct: false },
+                        { text: 'Dinámica, homogénea y sin orden específico', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Los arreglos son finitos (tienen límite), homogéneos (mismo tipo de dato) y ordenados (se accede por posición).',
+                        incorrect: 'Incorrecto. Los arreglos deben ser finitos, homogéneos (todos del mismo tipo) y ordenados (acceso por índice).'
+                    }
+                },
+                {
+                    id: 'q1-4',
+                    question: 'En la fórmula Di = B + [(i - li) * w], ¿qué representa "w"?',
+                    options: [
+                        { text: 'La posición del elemento', correct: false },
+                        { text: 'El número de bytes de cada elemento', correct: true },
+                        { text: 'El nombre del arreglo', correct: false },
+                        { text: 'El límite inferior del arreglo', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. "w" representa el número de bytes de cada elemento, necesario para calcular el desplazamiento en memoria.',
+                        incorrect: 'Incorrecto. "w" es el tamaño en bytes de cada elemento del arreglo. Se usa para calcular el desplazamiento de memoria.'
+                    }
+                }
+            ],
+            semana2: [
+                {
+                    id: 'q2-1',
+                    question: '¿Cuál es la sintaxis correcta para declarar un arreglo de 10 enteros en Java?',
+                    options: [
+                        { text: 'int numeros[] = 10;', correct: false },
+                        { text: 'int[] numeros = new int[10];', correct: true },
+                        { text: 'new int[] numeros = 10;', correct: false },
+                        { text: 'int[10] numeros;', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. La sintaxis es: tipo[] nombre = new tipo[tamaño];',
+                        incorrect: 'Incorrecto. La sintaxis correcta es: int[] nombre = new int[tamaño];'
+                    }
+                },
+                {
+                    id: 'q2-2',
+                    question: '¿En qué posición comienza la indexación de arreglos en Java?',
+                    options: [
+                        { text: 'Posición 1', correct: false },
+                        { text: 'Posición 0', correct: true },
+                        { text: 'Depende del tipo de dato', correct: false },
+                        { text: 'Posición -1', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. En Java, la indexación siempre comienza en 0.',
+                        incorrect: 'Incorrecto. La indexación en Java siempre comienza en 0, no en 1.'
+                    }
+                },
+                {
+                    id: 'q2-3',
+                    question: '¿Cuáles son las operaciones básicas con arreglos?',
+                    options: [
+                        { text: 'Solo lectura y escritura', correct: false },
+                        { text: 'Inserción, actualización, eliminación, recorrido y copia', correct: true },
+                        { text: 'Solo eliminación y búsqueda', correct: false },
+                        { text: 'Declaración, inicialización y visualización', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Las operaciones fundamentales son: inserción, actualización, eliminación, recorrido y copia.',
+                        incorrect: 'Incorrecto. Las operaciones básicas incluyen inserción, actualización, eliminación, recorrido y copia.'
+                    }
+                },
+                {
+                    id: 'q2-4',
+                    question: '¿Qué ocurre cuando asignas un arreglo a otro con arregloB = arregloA?',
+                    options: [
+                        { text: 'Se copian todos los valores de A a B', correct: false },
+                        { text: 'Se copia solo la referencia de memoria', correct: true },
+                        { text: 'Se crea un nuevo arreglo con los mismos valores', correct: false },
+                        { text: 'Se produce un error de compilación', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Se copia la referencia, no los valores. Ambas variables apuntan a la misma ubicación de memoria.',
+                        incorrect: 'Incorrecto. La asignación copia la referencia, no los valores. Para copiar valores, usa un bucle o Arrays.copyOf().'
+                    }
+                }
+            ],
+            semana3: [
+                {
+                    id: 'q3-1',
+                    question: '¿Cuál es la complejidad computacional del acceso por índice en un arreglo?',
+                    options: [
+                        { text: 'O(n)', correct: false },
+                        { text: 'O(1)', correct: true },
+                        { text: 'O(n²)', correct: false },
+                        { text: 'O(log n)', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. El acceso por índice es O(1) porque es directo, sin importar el tamaño del arreglo.',
+                        incorrect: 'Incorrecto. El acceso por índice tiene complejidad O(1) porque es una operación directa.'
+                    }
+                },
+                {
+                    id: 'q3-2',
+                    question: '¿Cuál es la diferencia entre igualdad superficial y profunda?',
+                    options: [
+                        { text: 'La superficial compara referencias, la profunda compara contenido', correct: true },
+                        { text: 'La profunda es más lenta pero menos precisa', correct: false },
+                        { text: 'No hay diferencia, son términos sinónimos', correct: false },
+                        { text: 'La superficial compara contenido, la profunda compara referencias', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Igualdad superficial compara referencias (==), profunda compara el contenido real (Arrays.equals()).',
+                        incorrect: 'Incorrecto. La superficial verifica si apuntan a la misma dirección; la profunda verifica si tienen el mismo contenido.'
+                    }
+                },
+                {
+                    id: 'q3-3',
+                    question: '¿Cuál es el método correcto para clonar un arreglo en Java?',
+                    options: [
+                        { text: 'int[] copia = arreglo;', correct: false },
+                        { text: 'int[] copia = arreglo.clone();', correct: true },
+                        { text: 'int[] copia = new int(arreglo);', correct: false },
+                        { text: 'int[] copia = arreglo.copy();', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. El método .clone() crea una copia exacta del arreglo.',
+                        incorrect: 'Incorrecto. Usa el método .clone() o Arrays.copyOf() para copiar un arreglo.'
+                    }
+                },
+                {
+                    id: 'q3-4',
+                    question: '¿Cuál es la complejidad de fusionar dos arreglos de tamaño n y m?',
+                    options: [
+                        { text: 'O(1)', correct: false },
+                        { text: 'O(n + m)', correct: true },
+                        { text: 'O(n * m)', correct: false },
+                        { text: 'O(n²)', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. La complejidad es O(n + m) porque se deben procesar todos los elementos de ambos arreglos.',
+                        incorrect: 'Incorrecto. Fusionar dos arreglos tiene complejidad O(n + m), proporcional a la suma de sus tamaños.'
+                    }
+                }
+            ],
+            semana4: [
+                {
+                    id: 'q4-1',
+                    question: '¿Qué es una matriz bidimensional?',
+                    options: [
+                        { text: 'Un arreglo con una sola fila', correct: false },
+                        { text: 'Una estructura compuesta de filas y columnas', correct: true },
+                        { text: 'Un tipo de lista enlazada', correct: false },
+                        { text: 'Un arreglo que solo almacena números pares', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. Una matriz bidimensional tiene filas y columnas, permitiendo acceso mediante dos índices.',
+                        incorrect: 'Incorrecto. Una matriz bidimensional es una estructura de filas y columnas, accesible con dos índices [i][j].'
+                    }
+                },
+                {
+                    id: 'q4-2',
+                    question: '¿Cuál es la sintaxis para declarar una matriz 3x4 en Java?',
+                    options: [
+                        { text: 'int[3][4] matriz;', correct: false },
+                        { text: 'int[][] matriz = new int[3][4];', correct: true },
+                        { text: 'int matrix(3,4);', correct: false },
+                        { text: 'int[3,4] matriz = new int[];', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. La sintaxis es: tipo[][] nombre = new tipo[filas][columnas];',
+                        incorrect: 'Incorrecto. La sintaxis correcta es: int[][] matriz = new int[3][4];'
+                    }
+                },
+                {
+                    id: 'q4-3',
+                    question: '¿Cómo obtienes el número de filas de una matriz en Java?',
+                    options: [
+                        { text: 'matriz.filas', correct: false },
+                        { text: 'matriz.length', correct: true },
+                        { text: 'matriz.size()', correct: false },
+                        { text: 'matriz.rows', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. matriz.length devuelve el número de filas.',
+                        incorrect: 'Incorrecto. Usa matriz.length para obtener el número de filas.'
+                    }
+                },
+                {
+                    id: 'q4-4',
+                    question: '¿Cuál es la fórmula para obtener un índice lineal a partir de índices 2D (i,j)?',
+                    options: [
+                        { text: 'Indice = i * j', correct: false },
+                        { text: 'Indice = i + j', correct: false },
+                        { text: 'Indice = i * num_columnas + j', correct: true },
+                        { text: 'Indice = j / i', correct: false }
+                    ],
+                    feedback: {
+                        correct: '✓ Correcto. La fórmula es: Indice = i * num_columnas + j',
+                        incorrect: 'Incorrecto. La fórmula correcta es: Indice = i * número_de_columnas + j'
+                    }
+                }
+            ]
+        };
+
+        let currentFilter = 'all';
+
+        function generateQuiz() {
+            const content = document.getElementById('content');
+            let html = '';
+
+            Object.keys(quizData).forEach(semana => {
+                const semanaNum = semana.replace('semana', '');
+                const semanaId = `semana-${semanaNum}`;
+
+                html += `
+                    <div class="semana-section" data-semana="${semanaNum}">
+                        <h2 class="semana-title">Semana ${semanaNum}</h2>
+                `;
+
+                quizData[semana].forEach((q, index) => {
+                    html += `
+                        <div class="question-card">
+                            <div class="question-text">
+                                <span class="question-number">${index + 1}</span>
+                                <span>${q.question}</span>
+                            </div>
+                            <div class="options" id="options-${q.id}">
+                    `;
+
+                    q.options.forEach((option, optIndex) => {
+                        const optionId = `${q.id}-opt${optIndex}`;
+                        html += `
+                            <label class="option">
+                                <input type="radio" name="${q.id}" value="${optIndex}" onchange="checkAnswer('${q.id}')">
+                                <label for="${optionId}" style="margin: 0; cursor: pointer;">
+                                    <strong>${String.fromCharCode(65 + optIndex)})</strong> ${option.text}
+                                </label>
+                            </label>
+                        `;
+                    });
+
+                    const feedbackText = q.feedback.correct.split('<br>').join(' ');
+                    html += `
+                            </div>
+                            <div class="feedback" id="feedback-${q.id}"></div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            });
+
+            content.innerHTML = html;
+        }
+
+        function checkAnswer(questionId) {
+            const selectedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+            const feedback = document.getElementById(`feedback-${questionId}`);
+
+            if (!selectedOption) return;
+
+            let semana = 'semana' + questionId.split('-')[0].replace('q', '');
+            let questionIndex = parseInt(questionId.split('-')[1]) - 1;
+            const question = quizData[semana][questionIndex];
+            const isCorrect = question.options[selectedOption.value].correct;
+
+            feedback.classList.add('show');
+
+            if (isCorrect) {
+                feedback.classList.add('correct');
+                feedback.classList.remove('incorrect');
+                feedback.textContent = question.feedback.correct;
+            } else {
+                feedback.classList.add('incorrect');
+                feedback.classList.remove('correct');
+                feedback.textContent = question.feedback.incorrect;
+            }
+
+            updateScore();
+        }
+
+        function updateScore() {
+            let correct = 0;
+            let total = 0;
+
+            Object.keys(quizData).forEach(semana => {
+                quizData[semana].forEach(q => {
+                    const selectedOption = document.querySelector(`input[name="${q.id}"]:checked`);
+                    if (selectedOption) {
+                        total++;
+                        if (quizData[semana][quizData[semana].indexOf(q)].options[selectedOption.value].correct) {
+                            correct++;
+                        }
+                    }
+                });
+            });
+
+            const results = document.getElementById('results');
+            const finalScore = document.getElementById('finalScore');
+
+            if (total > 0) {
+                finalScore.textContent = `${correct}/${total}`;
+                results.classList.add('show');
+            }
+        }
+
+        function resetQuiz() {
+            if (confirm('¿Estás seguro de que deseas resetear todas las respuestas?')) {
+                document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                });
+                document.querySelectorAll('.feedback').forEach(fb => {
+                    fb.classList.remove('show', 'correct', 'incorrect');
+                    fb.textContent = '';
+                });
+                document.getElementById('results').classList.remove('show');
+            }
+        }
+
+        function filterSemana(semana) {
+            currentFilter = semana;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.semana-section').forEach(section => {
+                if (semana === 'all') {
+                    section.classList.remove('hidden');
+                } else {
+                    if (section.dataset.semana === semana) {
+                        section.classList.remove('hidden');
+                    } else {
+                        section.classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // Inicializar quiz
+        generateQuiz();
+    </script>
+</body>
+</html>

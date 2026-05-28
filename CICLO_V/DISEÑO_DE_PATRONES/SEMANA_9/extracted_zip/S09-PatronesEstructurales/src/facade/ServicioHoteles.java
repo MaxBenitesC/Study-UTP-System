@@ -1,0 +1,16 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package facade;
+
+/**
+ *
+ * @author c19255
+ */
+public class ServicioHoteles {
+    
+    public void reservaHotel(String ciudad){
+        System.out.println("Hotel reservado en :"+ciudad);
+    }
+}

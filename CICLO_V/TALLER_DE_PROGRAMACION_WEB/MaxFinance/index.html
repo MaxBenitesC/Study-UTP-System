@@ -1,0 +1,2377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MaxFinance</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --blue: #007AFF;
+            --green: #30D158;
+            --red: #FF453A;
+            --orange: #FF9F0A;
+            --purple: #BF5AF2;
+            --teal: #5AC8FA;
+            --bg: #000010;
+            --glass: rgba(255,255,255,0.06);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-hover: rgba(255,255,255,0.10);
+            --text: #FFFFFF;
+            --text2: rgba(255,255,255,0.60);
+            --text3: rgba(255,255,255,0.35);
+            --matrix: #00FF41;
+            --safe-top: env(safe-area-inset-top, 44px);
+            --safe-bottom: env(safe-area-inset-bottom, 34px);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+        html, body { width:100%; height:100%; overflow:hidden; background:var(--bg); color:var(--text); font-family:-apple-system,'SF Pro Display',BlinkMacSystemFont,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+
+        /* ── BACKGROUND ── */
+        #matrix-canvas { position:fixed; top:0; left:0; width:100%; height:100%; opacity:0.045; z-index:0; pointer-events:none; }
+        .bg-gradient { position:fixed; inset:0; background: radial-gradient(ellipse at 15% 15%, rgba(0,122,255,0.18) 0%,transparent 50%), radial-gradient(ellipse at 85% 85%, rgba(191,90,242,0.12) 0%,transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(0,255,65,0.04) 0%,transparent 70%), #000010; z-index:0; animation:bgShift 9s ease-in-out infinite alternate; }
+        @keyframes bgShift { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(18deg)} }
+
+        /* ── SHELL ── */
+        #app { position:fixed; inset:0; display:flex; flex-direction:column; z-index:1; max-width:430px; margin:0 auto; }
+
+        /* ── STATUS BAR ── */
+        .status-bar { height:calc(var(--safe-top)); min-height:48px; display:flex; align-items:flex-end; padding:0 20px 6px; justify-content:space-between; flex-shrink:0; }
+        .status-time { font-size:15px; font-weight:700; color:var(--text); }
+        .status-icons { display:flex; gap:6px; align-items:center; font-size:14px; }
+        .status-signal { font-family:'Courier New',monospace; font-size:10px; color:var(--matrix); letter-spacing:1px; }
+
+        /* ── PAGES ── */
+        .pages-wrapper { flex:1; overflow:hidden; position:relative; }
+        .page { position:absolute; inset:0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; padding:0 16px 100px; opacity:0; transform:translateX(28px); transition:all 0.38s cubic-bezier(0.25,0.46,0.45,0.94); pointer-events:none; }
+        .page.active { opacity:1; transform:translateX(0); pointer-events:all; }
+        .page::-webkit-scrollbar { display:none; }
+
+        /* ── TAB BAR ── */
+        .tab-bar { height:calc(var(--safe-bottom) + 58px); background:rgba(5,5,18,0.88); backdrop-filter:blur(32px) saturate(180%); -webkit-backdrop-filter:blur(32px) saturate(180%); border-top:1px solid var(--glass-border); display:flex; align-items:flex-start; padding-top:8px 8px 0; flex-shrink:0; }
+        .tab-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:4px 0; cursor:pointer; transition:all 0.2s ease; border-radius:12px; position:relative; }
+        .tab-item:active { transform:scale(0.88); }
+        .tab-icon { font-size:22px; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); filter:grayscale(1) opacity(0.45); }
+        .tab-label { font-size:10px; font-weight:500; color:var(--text3); transition:all 0.2s; }
+        .tab-item.active .tab-icon { filter:none; transform:scale(1.18) translateY(-2px); }
+        .tab-item.active .tab-label { color:var(--blue); font-weight:700; }
+        .tab-dot { position:absolute; top:2px; right:16px; width:7px; height:7px; background:var(--red); border-radius:50%; display:none; border:1.5px solid var(--bg); }
+        .tab-dot.show { display:block; }
+
+        /* ── GLASS CARD ── */
+        .glass-card { background:var(--glass); backdrop-filter:blur(24px) saturate(180%); -webkit-backdrop-filter:blur(24px) saturate(180%); border:1px solid var(--glass-border); border-radius:22px; padding:20px; margin-bottom:12px; position:relative; overflow:hidden; transition:transform 0.18s ease; }
+        .glass-card:active { transform:scale(0.986); }
+        .glass-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent); }
+
+        /* ── PAGE HEADER ── */
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin:14px 0 18px; }
+        .greeting-text { font-size:28px; font-weight:800; letter-spacing:-0.6px; }
+        .greeting-sub { font-size:13px; color:var(--text2); margin-top:3px; }
+        .avatar { width:46px; height:46px; border-radius:14px; background:linear-gradient(135deg,var(--blue),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; cursor:pointer; transition:transform 0.2s; flex-shrink:0; }
+        .avatar:active { transform:scale(0.90); }
+
+        /* ── BALANCE CARD ── */
+        .balance-card { background:linear-gradient(140deg, rgba(0,122,255,0.28) 0%, rgba(191,90,242,0.18) 55%, rgba(0,122,255,0.12) 100%); border:1px solid rgba(0,122,255,0.32); border-radius:28px; padding:28px 24px; margin-bottom:14px; position:relative; overflow:hidden; }
+        .balance-card::before { content:''; position:absolute; top:-60%; left:-50%; width:200%; height:220%; background:radial-gradient(ellipse at 28% 28%, rgba(255,255,255,0.07) 0%,transparent 55%); animation:shimmer 5s ease-in-out infinite; }
+        .balance-card::after { content:''; position:absolute; bottom:-30px; right:-30px; width:160px; height:160px; border-radius:50%; background:rgba(191,90,242,0.08); }
+        @keyframes shimmer { 0%,100%{transform:translate(0,0)} 50%{transform:translate(12px,8px)} }
+        .balance-label { font-size:11px; font-weight:700; color:rgba(255,255,255,0.55); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:10px; font-family:'Courier New',monospace; }
+        .balance-amount { font-size:54px; font-weight:900; letter-spacing:-2px; color:#fff; line-height:1; margin-bottom:4px; position:relative; z-index:1; }
+        .balance-amount .currency { font-size:26px; font-weight:600; vertical-align:top; margin-top:10px; display:inline-block; color:rgba(255,255,255,0.75); }
+        .balance-sub { font-size:12px; color:rgba(255,255,255,0.50); position:relative; z-index:1; }
+        .balance-meta { display:flex; gap:0; margin-top:20px; padding-top:16px; border-top:1px solid rgba(255,255,255,0.10); position:relative; z-index:1; }
+        .balance-meta-item { flex:1; }
+        .balance-meta-label { font-size:10px; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:5px; font-weight:600; }
+        .balance-meta-value { font-size:17px; font-weight:800; }
+
+        /* ── PROGRESS ── */
+        .days-progress { padding:14px 16px; }
+        .days-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+        .days-label { font-size:13px; color:var(--text2); font-weight:500; }
+        .days-value { font-size:13px; font-weight:700; color:var(--blue); }
+        .progress-track { height:7px; background:rgba(255,255,255,0.07); border-radius:4px; overflow:hidden; }
+        .progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--blue),var(--purple)); transition:width 1.2s cubic-bezier(0.25,0.46,0.45,0.94); position:relative; overflow:hidden; }
+        .progress-fill::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent); animation:pShine 2.5s ease-in-out infinite; }
+        @keyframes pShine { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+        .progress-labels { display:flex; justify-content:space-between; margin-top:7px; }
+        .progress-lbl { font-size:10px; color:var(--text3); }
+
+        /* ── QUICK STATS ── */
+        .quick-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+        .stat-card { background:var(--glass); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid var(--glass-border); border-radius:20px; padding:18px 16px; position:relative; overflow:hidden; transition:transform 0.15s; cursor:pointer; }
+        .stat-card:active { transform:scale(0.94); }
+        .stat-icon { font-size:26px; margin-bottom:8px; }
+        .stat-label { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:0.08em; font-weight:700; margin-bottom:5px; }
+        .stat-value { font-size:22px; font-weight:900; letter-spacing:-0.5px; }
+        .stat-sub { font-size:11px; color:var(--text3); margin-top:3px; }
+
+        /* ── SECTION HEADER ── */
+        .section-header { display:flex; justify-content:space-between; align-items:center; margin:18px 0 10px; }
+        .section-title { font-size:18px; font-weight:800; letter-spacing:-0.3px; }
+        .section-action { font-size:14px; color:var(--blue); font-weight:600; cursor:pointer; }
+
+        /* ── TRANSACTIONS ── */
+        .txn-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:18px; margin-bottom:8px; transition:all 0.15s ease; cursor:pointer; position:relative; overflow:hidden; }
+        .txn-item::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent); }
+        .txn-item:active { transform:scale(0.97); background:var(--glass-hover); }
+        .txn-icon { width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+        .txn-info { flex:1; min-width:0; }
+        .txn-name { font-size:15px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .txn-cat { font-size:12px; color:var(--text3); margin-top:2px; }
+        .txn-amount { font-size:16px; font-weight:800; flex-shrink:0; }
+
+        /* ── CATEGORY BG COLORS ── */
+        .bg-hijo    { background:rgba(0,122,255,0.20); }
+        .bg-hogar   { background:rgba(48,209,88,0.20); }
+        .bg-pandero { background:rgba(255,159,10,0.20); }
+        .bg-subs    { background:rgba(191,90,242,0.20); }
+        .bg-comida  { background:rgba(255,69,58,0.20); }
+        .bg-pasajes { background:rgba(90,200,250,0.20); }
+        .bg-gustos  { background:rgba(255,55,95,0.20); }
+        .bg-prestamos { background:rgba(172,142,104,0.20); }
+        .bg-ingreso { background:rgba(48,209,88,0.20); }
+
+        /* ── ALERTS ── */
+        .alert-card { border-radius:16px; padding:14px 16px; margin-bottom:12px; display:flex; align-items:center; gap:12px; animation:slideIn 0.4s ease; }
+        @keyframes slideIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+        .alert-danger  { background:rgba(255,69,58,0.14); border:1px solid rgba(255,69,58,0.35); }
+        .alert-warning { background:rgba(255,159,10,0.14); border:1px solid rgba(255,159,10,0.35); }
+        .alert-info    { background:rgba(0,122,255,0.14); border:1px solid rgba(0,122,255,0.35); }
+        .alert-icon { font-size:20px; }
+        .alert-text { flex:1; font-size:13px; font-weight:500; line-height:1.5; }
+
+        /* ── FAB ── */
+        .fab { position:fixed; bottom:calc(var(--safe-bottom) + 82px); right:calc(50% - 215px + 16px); width:58px; height:58px; border-radius:18px; background:linear-gradient(135deg,var(--blue),var(--purple)); display:flex; align-items:center; justify-content:center; font-size:28px; cursor:pointer; box-shadow:0 8px 28px rgba(0,122,255,0.50); transition:all 0.22s cubic-bezier(0.34,1.56,0.64,1); z-index:100; color:white; font-weight:300; }
+        .fab:active { transform:scale(0.86); box-shadow:0 4px 12px rgba(0,122,255,0.30); }
+
+        /* ── FILTER CHIPS ── */
+        .filter-chips { display:flex; gap:8px; overflow-x:auto; padding:4px 0 12px; scrollbar-width:none; }
+        .filter-chips::-webkit-scrollbar { display:none; }
+        .chip { flex-shrink:0; padding:7px 14px; border-radius:20px; font-size:13px; font-weight:600; background:var(--glass); border:1px solid var(--glass-border); color:var(--text2); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .chip.active { background:var(--blue); border-color:var(--blue); color:white; }
+        .chip:active { transform:scale(0.93); }
+
+        /* ── MODAL ── */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); z-index:200; display:flex; align-items:flex-end; opacity:0; pointer-events:none; transition:opacity 0.3s ease; max-width:430px; margin:0 auto; }
+        .modal-overlay.open { opacity:1; pointer-events:all; }
+        .modal-sheet { width:100%; background:#10101e; border-top-left-radius:30px; border-top-right-radius:30px; padding:12px 20px calc(var(--safe-bottom) + 24px); border-top:1px solid var(--glass-border); transform:translateY(100%); transition:transform 0.42s cubic-bezier(0.25,0.46,0.45,0.94); max-height:90vh; overflow-y:auto; }
+        .modal-overlay.open .modal-sheet { transform:translateY(0); }
+        .modal-handle { width:38px; height:5px; background:rgba(255,255,255,0.18); border-radius:3px; margin:0 auto 22px; }
+        .modal-title { font-size:22px; font-weight:800; margin-bottom:20px; letter-spacing:-0.4px; }
+
+        /* ── FORM ── */
+        .form-group { margin-bottom:14px; }
+        .form-label { font-size:11px; font-weight:800; color:var(--text2); text-transform:uppercase; letter-spacing:0.10em; margin-bottom:8px; display:block; }
+        .form-input { width:100%; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:14px 16px; font-size:16px; color:white; font-family:inherit; outline:none; transition:all 0.2s; -webkit-appearance:none; }
+        .form-input:focus { border-color:var(--blue); background:rgba(0,122,255,0.08); box-shadow:0 0 0 3px rgba(0,122,255,0.16); }
+        .form-input::placeholder { color:rgba(255,255,255,0.22); }
+        .amount-wrap { position:relative; }
+        .amount-prefix { position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:22px; font-weight:700; color:var(--text2); }
+        .amount-wrap .form-input { padding-left:36px; font-size:26px; font-weight:800; letter-spacing:-0.5px; }
+        .cat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .cat-opt { display:flex; flex-direction:column; align-items:center; gap:5px; padding:12px 6px; border-radius:14px; background:rgba(255,255,255,0.05); border:2px solid transparent; cursor:pointer; transition:all 0.2s; }
+        .cat-opt.selected { border-color:var(--blue); background:rgba(0,122,255,0.16); }
+        .cat-opt:active { transform:scale(0.92); }
+        .cat-emoji { font-size:24px; }
+        .cat-name { font-size:9px; font-weight:700; color:var(--text2); text-align:center; }
+        .type-tabs { display:flex; background:rgba(255,255,255,0.05); border-radius:14px; padding:3px; margin-bottom:18px; }
+        .type-tab { flex:1; padding:9px; text-align:center; font-size:14px; font-weight:700; border-radius:12px; cursor:pointer; transition:all 0.2s; color:var(--text2); }
+        .type-tab.active { background:rgba(255,255,255,0.10); color:white; }
+        .btn-primary { width:100%; padding:17px; border-radius:16px; background:linear-gradient(135deg,var(--blue),var(--purple)); border:none; color:white; font-size:17px; font-weight:800; font-family:inherit; cursor:pointer; transition:all 0.2s cubic-bezier(0.34,1.56,0.64,1); margin-top:10px; letter-spacing:-0.3px; }
+        .btn-primary:active { transform:scale(0.96); }
+        .btn-danger { width:100%; padding:15px; border-radius:16px; background:rgba(255,69,58,0.14); border:1px solid rgba(255,69,58,0.35); color:var(--red); font-size:16px; font-weight:700; font-family:inherit; cursor:pointer; transition:all 0.2s; margin-top:10px; }
+        select.form-input { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 16px center; -webkit-appearance:none; padding-right:40px; }
+
+        /* ── CHARTS ── */
+        .chart-container { position:relative; height:210px; margin:8px 0; }
+
+        /* ── ANALYSIS ── */
+        .analysis-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+        .analysis-row:last-child { border-bottom:none; }
+        .analysis-name { flex:1; font-size:14px; font-weight:600; }
+        .analysis-bar-wrap { width:70px; }
+        .analysis-bar { height:5px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+        .analysis-bar-inner { height:100%; border-radius:3px; transition:width 1.2s ease; }
+        .analysis-pct { font-size:10px; color:var(--text3); text-align:right; margin-top:3px; }
+        .analysis-amount { font-size:14px; font-weight:800; text-align:right; min-width:64px; }
+
+        /* ── LOANS ── */
+        .loan-card { display:flex; justify-content:space-between; align-items:center; padding:16px; background:var(--glass); border:1px solid var(--glass-border); border-radius:18px; margin-bottom:8px; transition:all 0.15s; cursor:pointer; }
+        .loan-card:active { transform:scale(0.97); }
+        .loan-person { font-size:16px; font-weight:700; }
+        .loan-note { font-size:12px; color:var(--text3); margin-top:2px; }
+        .loan-amount { font-size:22px; font-weight:900; }
+        .badge { display:inline-flex; align-items:center; padding:3px 8px; border-radius:8px; font-size:11px; font-weight:700; margin-top:5px; }
+        .badge-debo   { background:rgba(255,69,58,0.20); color:var(--red); }
+        .badge-meDeban { background:rgba(48,209,88,0.20); color:var(--green); }
+
+        /* ── PANDERO ── */
+        .pandero-center { text-align:center; padding:28px 0 20px; }
+        .pandero-emoji { font-size:60px; margin-bottom:12px; }
+        .pandero-title { font-size:36px; font-weight:900; letter-spacing:-1.5px; }
+        .pandero-sub { font-size:14px; color:var(--text2); margin-top:5px; }
+        .months-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0; }
+        .month-pill { padding:13px 8px; border-radius:16px; text-align:center; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); cursor:pointer; transition:all 0.2s; }
+        .month-pill:active { transform:scale(0.93); }
+        .month-pill.paid    { background:rgba(48,209,88,0.14); border-color:rgba(48,209,88,0.35); }
+        .month-pill.cobro   { background:rgba(255,159,10,0.18); border-color:rgba(255,159,10,0.40); }
+        .month-pill.current { background:rgba(0,122,255,0.20); border-color:rgba(0,122,255,0.55); box-shadow:0 0 14px rgba(0,122,255,0.28); }
+        .month-name { font-size:13px; font-weight:800; }
+        .month-status { font-size:10px; color:var(--text3); margin-top:3px; }
+
+        /* ── HACKER / TERMINAL ── */
+        .terminal { font-family:'Courier New',Courier,monospace; font-size:11px; color:var(--matrix); letter-spacing:0.06em; }
+        .glitch { position:relative; }
+        .glitch::before, .glitch::after { content:attr(data-text); position:absolute; top:0; left:0; width:100%; overflow:hidden; }
+        .glitch::before { text-shadow:-2px 0 var(--matrix); animation:glitch1 4s infinite linear; clip-path:polygon(0 0,100% 0,100% 33%,0 33%); }
+        .glitch::after  { text-shadow:2px 0 rgba(0,122,255,0.9); animation:glitch2 4s infinite linear; clip-path:polygon(0 66%,100% 66%,100% 100%,0 100%); }
+        @keyframes glitch1 { 0%,90%,100%{transform:translate(0);opacity:0} 92%{transform:translate(-2px,1px);opacity:.8} 94%{transform:translate(2px,-1px);opacity:.6} 96%{transform:translate(0);opacity:0} }
+        @keyframes glitch2 { 0%,86%,100%{transform:translate(0);opacity:0} 88%{transform:translate(2px,2px);opacity:.7} 90%{transform:translate(-2px,0);opacity:.5} 92%{transform:translate(0);opacity:0} }
+
+        /* ── EMPTY STATE ── */
+        .empty-state { text-align:center; padding:40px 20px; color:var(--text3); }
+        .empty-state-icon { font-size:52px; margin-bottom:14px; }
+        .empty-state-title { font-size:17px; font-weight:700; color:var(--text2); margin-bottom:6px; }
+        .empty-state-sub { font-size:14px; line-height:1.5; }
+
+        /* ── TOAST ── */
+        .toast { position:fixed; top:calc(var(--safe-top) + 56px); left:50%; transform:translateX(-50%) translateY(-20px); background:rgba(25,25,45,0.96); border:1px solid var(--glass-border); backdrop-filter:blur(24px); padding:13px 22px; border-radius:18px; font-size:14px; font-weight:700; z-index:400; opacity:0; transition:all 0.32s cubic-bezier(0.34,1.56,0.64,1); white-space:nowrap; max-width:320px; text-align:center; }
+        .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+        /* ── DATE DIVIDER ── */
+        .date-divider { font-size:11px; font-weight:800; color:var(--text3); text-transform:uppercase; letter-spacing:0.10em; padding:16px 0 8px; }
+
+        /* ── CONFIG ── */
+        .config-row { display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer; }
+        .config-row:last-child { border-bottom:none; }
+        .config-row-label { font-size:15px; font-weight:500; }
+        .config-row-value { font-size:15px; color:var(--blue); font-weight:700; }
+
+        /* ── UTILS ── */
+        .text-green  { color:var(--green) !important; }
+        .text-red    { color:var(--red) !important; }
+        .text-orange { color:var(--orange) !important; }
+        .text-blue   { color:var(--blue) !important; }
+        .text-purple { color:var(--purple) !important; }
+        .mt4 { margin-top:4px; }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix-canvas"></canvas>
+<div class="bg-gradient"></div>
+
+<div id="app">
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+        <span class="status-time" id="status-time">9:41</span>
+        <div class="status-icons">
+            <span class="status-signal" id="status-sig">▂▄▆█</span>
+            <span>📶</span>
+            <span>🔋</span>
+        </div>
+    </div>
+
+    <div class="pages-wrapper">
+
+        <!-- ══════════════ HOME ══════════════ -->
+        <div class="page active" id="page-home">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text" id="greeting">Hola, Max 👋</div>
+                    <div class="greeting-sub" id="greeting-sub">—</div>
+                </div>
+                <div class="avatar" onclick="showPage('config')">M</div>
+            </div>
+
+            <div id="alert-area"></div>
+
+            <div class="balance-card">
+                <div class="balance-label terminal">// SALDO DISPONIBLE</div>
+                <div class="balance-amount glitch" id="balance-display" data-text="">
+                    <span class="currency">S/</span><span id="balance-num">—</span>
+                </div>
+                <div class="balance-sub" id="balance-sub">calculando...</div>
+                <div class="balance-meta">
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Gastado</div>
+                        <div class="balance-meta-value text-red" id="spent-display">S/—</div>
+                    </div>
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Sueldo</div>
+                        <div class="balance-meta-value text-green">S/4,267</div>
+                    </div>
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Auto-debitado</div>
+                        <div class="balance-meta-value text-orange" id="fixed-display">S/—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card days-progress">
+                <div class="days-header">
+                    <span class="days-label">Días hasta el 15</span>
+                    <span class="days-value" id="days-until">—</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="days-bar" style="width:0%"></div>
+                </div>
+                <div class="progress-labels">
+                    <span class="progress-lbl" id="cycle-day">Día 0</span>
+                    <span class="progress-lbl">Día 15</span>
+                </div>
+            </div>
+
+            <div class="quick-stats">
+                <div class="stat-card" onclick="showPage('analisis')">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-label">Por día</div>
+                    <div class="stat-value text-blue" id="daily-budget">S/—</div>
+                    <div class="stat-sub">presupuesto diario</div>
+                </div>
+                <div class="stat-card" onclick="showPage('prestamos')">
+                    <div class="stat-icon">🤝</div>
+                    <div class="stat-label">Préstamos</div>
+                    <div class="stat-value text-red" id="loans-home">S/0</div>
+                    <div class="stat-sub" id="loans-sub">pendientes</div>
+                </div>
+            </div>
+
+            <!-- Próximos pagos del ciclo -->
+            <div id="upcoming-area"></div>
+
+            <div class="section-header">
+                <span class="section-title">Últimos movimientos</span>
+                <span class="section-action" onclick="showPage('gastos')">Ver todo →</span>
+            </div>
+            <div id="recent-txns"></div>
+        </div>
+
+        <!-- ══════════════ GASTOS ══════════════ -->
+        <div class="page" id="page-gastos">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text">Mis Gastos</div>
+                    <div class="greeting-sub" id="gastos-total-label">—</div>
+                </div>
+                <div class="avatar" style="background:linear-gradient(135deg,var(--green),var(--teal))">💸</div>
+            </div>
+            <div class="filter-chips" id="filter-chips">
+                <div class="chip active" data-cat="todos" onclick="filterTxns('todos')">Todos</div>
+                <div class="chip" data-cat="hijo"      onclick="filterTxns('hijo')">👶 Hijo</div>
+                <div class="chip" data-cat="hogar"     onclick="filterTxns('hogar')">🏠 Hogar</div>
+                <div class="chip" data-cat="pandero"   onclick="filterTxns('pandero')">💰 Pandero</div>
+                <div class="chip" data-cat="subs"      onclick="filterTxns('subs')">📱 Subs</div>
+                <div class="chip" data-cat="comida"    onclick="filterTxns('comida')">🍽️ Comida</div>
+                <div class="chip" data-cat="pasajes"   onclick="filterTxns('pasajes')">🚌 Pasajes</div>
+                <div class="chip" data-cat="gustos"    onclick="filterTxns('gustos')">✨ Gustos</div>
+                <div class="chip" data-cat="prestamos" onclick="filterTxns('prestamos')">🤝 Préstamos</div>
+            </div>
+            <div id="txns-list"></div>
+        </div>
+
+        <!-- ══════════════ ANÁLISIS ══════════════ -->
+        <div class="page" id="page-analisis">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text">Análisis</div>
+                    <div class="greeting-sub">¿dónde va tu plata?</div>
+                </div>
+                <div class="avatar" style="background:linear-gradient(135deg,var(--orange),var(--red))">📊</div>
+            </div>
+            <div class="glass-card">
+                <div class="section-title" style="margin-bottom:14px">Distribución</div>
+                <div class="chart-container"><canvas id="donut-chart"></canvas></div>
+            </div>
+            <div class="glass-card">
+                <div class="section-title" style="margin-bottom:4px">Desglose</div>
+                <div class="terminal" style="margin-bottom:14px">// gastos estimados vs sueldo</div>
+                <div id="analysis-breakdown"></div>
+            </div>
+            <div class="glass-card">
+                <div class="section-title" style="margin-bottom:14px">Quincenas</div>
+                <div class="chart-container"><canvas id="bar-chart"></canvas></div>
+            </div>
+            <div class="glass-card" style="border-color:rgba(0,122,255,0.22)">
+                <div class="terminal" style="margin-bottom:10px">// INSIGHT DE MAX</div>
+                <div style="font-size:15px;line-height:1.65;color:var(--text2)" id="insight-text">—</div>
+            </div>
+
+            <!-- FDS CON HIJO -->
+            <div class="glass-card" style="border-color:rgba(0,122,255,0.30)" id="fds-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                    <div class="terminal">// FDS CON MI HIJO</div>
+                    <span style="font-size:20px">👶</span>
+                </div>
+                <div id="fds-content">—</div>
+            </div>
+        </div>
+
+        <!-- ══════════════ PRÉSTAMOS ══════════════ -->
+        <div class="page" id="page-prestamos">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text">Préstamos</div>
+                    <div class="greeting-sub">lo que va y viene</div>
+                </div>
+                <div class="avatar" style="background:linear-gradient(135deg,#ac8e68,#d4a96a)">🤝</div>
+            </div>
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">😬</div>
+                    <div class="stat-label">Yo debo</div>
+                    <div class="stat-value text-red" id="total-debo">S/0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">😤</div>
+                    <div class="stat-label">Me deben</div>
+                    <div class="stat-value text-green" id="total-medeban">S/0</div>
+                </div>
+            </div>
+            <!-- Próximo débito automático -->
+            <div class="glass-card" id="loans-next-debit" style="display:none;border-color:rgba(255,159,10,0.25)">
+                <div class="terminal" style="margin-bottom:8px">// PRÓXIMO DÉBITO (día 15)</div>
+                <div style="font-size:22px;font-weight:900;color:var(--orange)" id="loans-next-amt">S/0</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px" id="loans-next-detail">—</div>
+            </div>
+
+            <div class="section-header"><span class="section-title">Lo que debo</span></div>
+            <div id="loans-debo-list"></div>
+            <div class="section-header"><span class="section-title">Me deben</span></div>
+            <div id="loans-medeban-list"></div>
+        </div>
+
+        <!-- ══════════════ PANDERO ══════════════ -->
+        <div class="page" id="page-pandero">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text">Pandero</div>
+                    <div class="greeting-sub">tu ahorro forzado</div>
+                </div>
+                <div class="avatar" style="background:linear-gradient(135deg,var(--orange),var(--purple))">🎯</div>
+            </div>
+            <div class="balance-card">
+                <div class="balance-label terminal">// PANDERO ACTIVO · 3 NÚMEROS</div>
+                <div class="pandero-center">
+                    <div class="pandero-emoji">🏦</div>
+                    <div class="pandero-title">S/2,400</div>
+                    <div class="pandero-sub">por número · S/600/mes</div>
+                </div>
+                <div class="balance-meta" style="border-top:1px solid rgba(255,255,255,0.10);padding-top:16px">
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Aportado</div>
+                        <div class="balance-meta-value text-orange" id="pandero-aportado">S/0</div>
+                    </div>
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Cobrado</div>
+                        <div class="balance-meta-value text-green" id="pandero-cobrado">S/0</div>
+                    </div>
+                    <div class="balance-meta-item">
+                        <div class="balance-meta-label">Balance</div>
+                        <div class="balance-meta-value text-blue" id="pandero-balance">S/0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-header">
+                <span class="section-title">Calendario 2025</span>
+                <span class="terminal" style="font-size:10px">// toca para marcar pagado</span>
+            </div>
+            <div class="months-grid" id="months-grid"></div>
+            <div class="glass-card" style="border-color:rgba(255,159,10,0.25)">
+                <div class="terminal" style="margin-bottom:8px">// PRÓXIMO COBRO</div>
+                <div style="font-size:26px;font-weight:900;color:var(--orange)" id="next-cobro">—</div>
+                <div style="font-size:13px;color:var(--text2);margin-top:5px" id="next-cobro-sub">—</div>
+            </div>
+        </div>
+
+        <!-- ══════════════ CONFIG ══════════════ -->
+        <div class="page" id="page-config">
+            <div class="page-header">
+                <div>
+                    <div class="greeting-text">Configuración</div>
+                    <div class="greeting-sub">tu perfil financiero</div>
+                </div>
+                <div class="avatar" style="background:linear-gradient(135deg,#636e72,#2d3436)">⚙️</div>
+            </div>
+            <div class="glass-card">
+                <div class="terminal" style="margin-bottom:12px">// PERFIL</div>
+                <div class="config-row"><span class="config-row-label">Nombre</span><span class="config-row-value">Max</span></div>
+                <div class="config-row"><span class="config-row-label">Sueldo neto</span><span class="config-row-value">S/4,267</span></div>
+                <div class="config-row"><span class="config-row-label">Día de cobro</span><span class="config-row-value">Cada 15</span></div>
+                <div class="config-row"><span class="config-row-label">Pandero</span><span class="config-row-value">3 números · S/600</span></div>
+            </div>
+            <div class="glass-card">
+                <div class="terminal" style="margin-bottom:12px">// GASTOS FIJOS MENSUALES</div>
+                <div id="fixed-expenses-list"></div>
+            </div>
+            <!-- SYNC CARD -->
+            <div class="glass-card" style="border-color:rgba(48,209,88,0.22)" id="sync-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                    <div class="terminal" style="color:var(--green)">☁️ // SYNC · GITHUB GIST</div>
+                    <div id="sync-badge" style="font-size:10px;padding:3px 9px;border-radius:8px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--text3)">sin configurar</div>
+                </div>
+                <div id="sync-status-row" style="font-size:12px;color:var(--text3);margin-bottom:14px;display:none">
+                    Último sync: <span id="sync-last-time">—</span>
+                </div>
+                <div id="sync-setup-area">
+                    <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">
+                        Guarda tu data en <strong>GitHub Gist</strong> (privado, gratis). Accede desde cualquier dispositivo con tu token.
+                    </div>
+                    <label class="form-label">GitHub Personal Access Token</label>
+                    <div style="display:flex;gap:8px;margin-bottom:10px">
+                        <input class="form-input" type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxx" style="flex:1;font-family:'Courier New',monospace;font-size:13px">
+                        <button onclick="toggleTokenVis()" style="padding:0 14px;background:rgba(255,255,255,0.07);border:1px solid var(--glass-border);border-radius:12px;color:var(--text2);cursor:pointer;font-size:16px" title="Ver/ocultar">👁</button>
+                    </div>
+                    <div style="font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.5">
+                        💡 github.com → Settings → Developer settings → Personal access tokens → Fine-grained → New token → solo permiso <strong style="color:var(--blue)">Gists (read+write)</strong>
+                    </div>
+                    <button class="btn-primary" onclick="setupGistSync()" style="background:linear-gradient(135deg,var(--green),var(--teal))">☁️ Conectar y sincronizar</button>
+                </div>
+                <div id="sync-connected-area" style="display:none">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                        <button onclick="syncToGist(true)" style="padding:12px;background:rgba(48,209,88,0.12);border:1px solid rgba(48,209,88,0.30);border-radius:12px;color:var(--green);font-size:13px;font-weight:700;cursor:pointer">⬆️ Guardar en nube</button>
+                        <button onclick="syncFromGist(true)" style="padding:12px;background:rgba(90,200,250,0.12);border:1px solid rgba(90,200,250,0.30);border-radius:12px;color:var(--teal);font-size:13px;font-weight:700;cursor:pointer">⬇️ Cargar desde nube</button>
+                    </div>
+                    <button onclick="disconnectGist()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.10);border-radius:12px;color:var(--text3);font-size:12px;cursor:pointer">Desconectar cuenta</button>
+                </div>
+            </div>
+
+            <!-- EXPORT / IMPORT CARD -->
+            <div class="glass-card">
+                <div class="terminal" style="margin-bottom:14px">📦 // MIS DATOS</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                    <button onclick="exportData()" style="padding:14px 10px;background:rgba(0,122,255,0.12);border:1px solid rgba(0,122,255,0.28);border-radius:14px;color:var(--blue);font-size:13px;font-weight:700;cursor:pointer;line-height:1.4">📋 Copiar<br><span style="font-size:11px;font-weight:400;opacity:0.8">JSON al portapapeles</span></button>
+                    <button onclick="showImportArea()" style="padding:14px 10px;background:rgba(191,90,242,0.12);border:1px solid rgba(191,90,242,0.28);border-radius:14px;color:var(--purple);font-size:13px;font-weight:700;cursor:pointer;line-height:1.4">📥 Importar<br><span style="font-size:11px;font-weight:400;opacity:0.8">Pegar JSON guardado</span></button>
+                </div>
+                <div id="import-area" style="display:none">
+                    <textarea id="import-json" style="width:100%;height:120px;background:rgba(0,0,0,0.35);border:1px solid var(--glass-border);border-radius:12px;color:var(--text2);font-size:12px;font-family:'Courier New',monospace;padding:10px;resize:none;margin-bottom:8px" placeholder='Pega aquí el JSON exportado {"transactions":[...],...}'></textarea>
+                    <div style="display:flex;gap:8px">
+                        <button onclick="importData()" style="flex:1;padding:12px;background:rgba(191,90,242,0.18);border:1px solid rgba(191,90,242,0.35);border-radius:12px;color:var(--purple);font-size:14px;font-weight:700;cursor:pointer">✅ Importar</button>
+                        <button onclick="document.getElementById('import-area').style.display='none'" style="padding:12px 16px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:12px;color:var(--text3);font-size:14px;cursor:pointer">✕</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="border-color:rgba(255,69,58,0.22)">
+                <div class="terminal" style="margin-bottom:12px;color:var(--red)">// DANGER ZONE</div>
+                <button class="btn-danger" onclick="confirmReset()">🗑️ Limpiar todos los datos</button>
+            </div>
+        </div>
+
+    </div><!-- /pages-wrapper -->
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+        <div class="tab-item active" id="tab-home"      onclick="showPage('home')">      <div class="tab-icon">🏠</div><div class="tab-label">Inicio</div></div>
+        <div class="tab-item"        id="tab-gastos"    onclick="showPage('gastos')">    <div class="tab-icon">💸</div><div class="tab-label">Gastos</div></div>
+        <div class="tab-item"        id="tab-analisis"  onclick="showPage('analisis')">  <div class="tab-icon">📊</div><div class="tab-label">Análisis</div></div>
+        <div class="tab-item"        id="tab-prestamos" onclick="showPage('prestamos')"> <div class="tab-icon">🤝</div><div class="tab-label">Préstamos</div><div class="tab-dot" id="dot-prestamos"></div></div>
+        <div class="tab-item"        id="tab-pandero"   onclick="showPage('pandero')">   <div class="tab-icon">🎯</div><div class="tab-label">Pandero</div></div>
+    </div>
+</div><!-- /app -->
+
+<!-- FAB -->
+<div class="fab" id="main-fab" onclick="openAddModal()">+</div>
+
+<!-- MODAL: ADD TRANSACTION -->
+<div class="modal-overlay" id="modal-add">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Nuevo movimiento</div>
+        <div class="type-tabs">
+            <div class="type-tab active" id="tipo-gasto"   onclick="setTipo('gasto')">💸 Gasto</div>
+            <div class="type-tab"        id="tipo-ingreso" onclick="setTipo('ingreso')">💵 Ingreso extra</div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Monto</label>
+            <div class="amount-wrap">
+                <span class="amount-prefix">S/</span>
+                <input class="form-input" type="number" id="input-monto" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+            </div>
+        </div>
+        <div class="form-group" id="cat-group">
+            <label class="form-label">Categoría</label>
+            <div class="cat-grid" id="cat-grid">
+                <div class="cat-opt selected" data-cat="comida"    onclick="selectCat('comida')">   <span class="cat-emoji">🍽️</span><span class="cat-name">Comida</span></div>
+                <div class="cat-opt"          data-cat="hijo"      onclick="selectCat('hijo')">     <span class="cat-emoji">👶</span> <span class="cat-name">Hijo</span></div>
+                <div class="cat-opt"          data-cat="hogar"     onclick="selectCat('hogar')">    <span class="cat-emoji">🏠</span> <span class="cat-name">Hogar</span></div>
+                <div class="cat-opt"          data-cat="pasajes"   onclick="selectCat('pasajes')">  <span class="cat-emoji">🚌</span> <span class="cat-name">Pasajes</span></div>
+                <div class="cat-opt"          data-cat="subs"      onclick="selectCat('subs')">     <span class="cat-emoji">📱</span> <span class="cat-name">Subs</span></div>
+                <div class="cat-opt"          data-cat="pandero"   onclick="selectCat('pandero')">  <span class="cat-emoji">💰</span> <span class="cat-name">Pandero</span></div>
+                <div class="cat-opt"          data-cat="gustos"    onclick="selectCat('gustos')">   <span class="cat-emoji">✨</span> <span class="cat-name">Gustos</span></div>
+                <div class="cat-opt"          data-cat="prestamos" onclick="selectCat('prestamos')"><span class="cat-emoji">🤝</span> <span class="cat-name">Préstamo</span></div>
+            </div>
+        </div>
+
+        <!-- Subcategorías dinámicas -->
+        <div class="form-group" id="subcat-group" style="display:none">
+            <label class="form-label" id="subcat-label">Tipo</label>
+            <div style="display:flex;flex-wrap:wrap;gap:7px" id="subcat-chips"></div>
+        </div>
+
+        <!-- Campos especiales para Pasajes -->
+        <div id="pasaje-fields" style="display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+                <div>
+                    <label class="form-label">De</label>
+                    <input class="form-input" type="text" id="pasaje-desde" placeholder="Origen">
+                </div>
+                <div>
+                    <label class="form-label">A</label>
+                    <input class="form-input" type="text" id="pasaje-hasta" placeholder="Destino">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Descripción <span style="color:var(--text3);font-weight:400;text-transform:none">(opcional si ya elegiste tipo)</span></label>
+            <input class="form-input" type="text" id="input-desc" placeholder="Detalle adicional...">
+        </div>
+
+        <!-- Tag fin de semana -->
+        <div class="form-group" id="tag-group">
+            <label class="form-label">Contexto</label>
+            <div style="display:flex;gap:7px;flex-wrap:wrap" id="tag-chips">
+                <div class="chip" data-tag=""        onclick="selectTag('')">Sin etiqueta</div>
+                <div class="chip" data-tag="fds_hijo" onclick="selectTag('fds_hijo')">👶 Fin de semana con hijo</div>
+                <div class="chip" data-tag="trabajo"  onclick="selectTag('trabajo')">💼 Trabajo</div>
+                <div class="chip" data-tag="pareja"   onclick="selectTag('pareja')">❤️ Con pareja</div>
+                <div class="chip" data-tag="emergencia" onclick="selectTag('emergencia')">🚨 Emergencia</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input class="form-input" type="date" id="input-fecha">
+        </div>
+        <button class="btn-primary" onclick="saveTransaction()">Guardar movimiento</button>
+    </div>
+</div>
+
+<!-- MODAL: ADD LOAN -->
+<div class="modal-overlay" id="modal-loan">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Nuevo préstamo</div>
+
+        <!-- Yo debo / Me deben -->
+        <div class="type-tabs">
+            <div class="type-tab active" id="lt-debo"    onclick="setLoanTipo('debo')">😬 Yo debo</div>
+            <div class="type-tab"        id="lt-medeban" onclick="setLoanTipo('meDeban')">😤 Me deben</div>
+        </div>
+
+        <!-- Tipo de persona -->
+        <div class="form-group">
+            <label class="form-label">Fuente</label>
+            <div class="type-tabs" style="margin-bottom:0">
+                <div class="type-tab active" id="lsrc-amigo" onclick="setLoanSrc('amigo')">👤 Amigo/familiar</div>
+                <div class="type-tab"        id="lsrc-banco" onclick="setLoanSrc('banco')">🏦 Banco/financiera</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Nombre</label>
+            <input class="form-input" type="text" id="loan-persona" placeholder="Nombre de la persona o banco">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Monto total</label>
+            <div class="amount-wrap">
+                <span class="amount-prefix">S/</span>
+                <input class="form-input" type="number" id="loan-monto" placeholder="0.00" step="0.01" min="0" inputmode="decimal" oninput="calcLoanCuota()">
+            </div>
+        </div>
+
+        <!-- Interés -->
+        <div class="form-group">
+            <label class="form-label">Interés <span style="color:var(--text3);font-weight:400;text-transform:none">(%  — deja 0 si no hay)</span></label>
+            <input class="form-input" type="number" id="loan-interes" placeholder="0" step="0.1" min="0" value="0" inputmode="decimal" oninput="calcLoanCuota()">
+        </div>
+
+        <!-- Cuotas -->
+        <div class="form-group">
+            <label class="form-label">Cuotas <span style="color:var(--text3);font-weight:400;text-transform:none">(1 = pago único al siguiente 15)</span></label>
+            <input class="form-input" type="number" id="loan-cuotas" placeholder="1" min="1" step="1" value="1" inputmode="numeric" oninput="calcLoanCuota()">
+        </div>
+
+        <!-- Preview cuota -->
+        <div id="loan-preview" style="background:rgba(0,122,255,0.10);border:1px solid rgba(0,122,255,0.25);border-radius:14px;padding:14px 16px;margin-bottom:14px;display:none">
+            <div style="font-size:11px;color:var(--blue);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;font-family:'Courier New',monospace">// CUOTA ESTIMADA</div>
+            <div style="font-size:26px;font-weight:900;color:white" id="preview-cuota">S/0</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px" id="preview-total">Total con interés: S/0</div>
+        </div>
+
+        <!-- Auto-débito -->
+        <div class="form-group" id="auto-debito-group">
+            <label class="form-label">Auto-débito cada 15</label>
+            <div class="type-tabs" style="margin-bottom:0">
+                <div class="type-tab active" id="lad-si"  onclick="setLoanAD(true)">✅ Sí, debitar automático</div>
+                <div class="type-tab"        id="lad-no"  onclick="setLoanAD(false)">✏️ Yo registro manual</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Fecha del préstamo</label>
+            <input class="form-input" type="date" id="loan-fecha">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Nota (opcional)</label>
+            <input class="form-input" type="text" id="loan-nota" placeholder="¿Para qué fue?">
+        </div>
+
+        <button class="btn-primary" onclick="saveLoan()">Guardar préstamo</button>
+    </div>
+</div>
+
+<!-- MODAL: CONFIRMAR PAGO DE CUOTA -->
+<div class="modal-overlay" id="modal-pay">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Confirmar pago</div>
+
+        <div style="background:rgba(48,209,88,0.10);border:1px solid rgba(48,209,88,0.25);border-radius:14px;padding:14px 16px;margin-bottom:18px">
+            <div style="font-size:11px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;font-family:'Courier New',monospace">// PAGO A REGISTRAR</div>
+            <div style="font-size:28px;font-weight:900;color:white" id="pay-monto-label">S/0</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:3px" id="pay-detalle-label">—</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Fecha en que pagaste</label>
+            <input class="form-input" type="date" id="pay-fecha">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Nota del pago (opcional)</label>
+            <input class="form-input" type="text" id="pay-nota" placeholder="Ej: transferencia, efectivo...">
+        </div>
+
+        <button class="btn-primary" onclick="confirmPayment()">✅ Confirmar pago</button>
+    </div>
+</div>
+
+<!-- MODAL: EDIT TRANSACTION -->
+<div class="modal-overlay" id="modal-edit">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-title">Editar movimiento</div>
+
+        <div class="form-group">
+            <label class="form-label">Monto</label>
+            <div class="amount-wrap">
+                <span class="amount-prefix">S/</span>
+                <input class="form-input" type="number" id="edit-monto" placeholder="0.00" step="0.01" min="0" inputmode="decimal">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Descripción</label>
+            <input class="form-input" type="text" id="edit-desc" placeholder="Descripción...">
+        </div>
+
+        <div class="form-group" id="edit-cat-group">
+            <label class="form-label">Categoría</label>
+            <div class="cat-grid" id="edit-cat-grid">
+                <div class="cat-opt" data-cat="comida"    onclick="editSelectCat('comida')">   <span class="cat-emoji">🍽️</span><span class="cat-name">Comida</span></div>
+                <div class="cat-opt" data-cat="hijo"      onclick="editSelectCat('hijo')">     <span class="cat-emoji">👶</span> <span class="cat-name">Hijo</span></div>
+                <div class="cat-opt" data-cat="hogar"     onclick="editSelectCat('hogar')">    <span class="cat-emoji">🏠</span> <span class="cat-name">Hogar</span></div>
+                <div class="cat-opt" data-cat="pasajes"   onclick="editSelectCat('pasajes')">  <span class="cat-emoji">🚌</span> <span class="cat-name">Pasajes</span></div>
+                <div class="cat-opt" data-cat="subs"      onclick="editSelectCat('subs')">     <span class="cat-emoji">📱</span> <span class="cat-name">Subs</span></div>
+                <div class="cat-opt" data-cat="pandero"   onclick="editSelectCat('pandero')">  <span class="cat-emoji">💰</span> <span class="cat-name">Pandero</span></div>
+                <div class="cat-opt" data-cat="gustos"    onclick="editSelectCat('gustos')">   <span class="cat-emoji">✨</span> <span class="cat-name">Gustos</span></div>
+                <div class="cat-opt" data-cat="prestamos" onclick="editSelectCat('prestamos')"><span class="cat-emoji">🤝</span> <span class="cat-name">Préstamo</span></div>
+            </div>
+        </div>
+
+        <div class="form-group" id="edit-subcat-group" style="display:none">
+            <label class="form-label">Tipo</label>
+            <div style="display:flex;flex-wrap:wrap;gap:7px" id="edit-subcat-chips"></div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Contexto</label>
+            <div style="display:flex;gap:7px;flex-wrap:wrap" id="edit-tag-chips">
+                <div class="chip" data-tag=""           onclick="editSelectTag('')">Sin etiqueta</div>
+                <div class="chip" data-tag="fds_hijo"   onclick="editSelectTag('fds_hijo')">👶 FDS con hijo</div>
+                <div class="chip" data-tag="trabajo"    onclick="editSelectTag('trabajo')">💼 Trabajo</div>
+                <div class="chip" data-tag="pareja"     onclick="editSelectTag('pareja')">❤️ Con pareja</div>
+                <div class="chip" data-tag="emergencia" onclick="editSelectTag('emergencia')">🚨 Emergencia</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input class="form-input" type="date" id="edit-fecha">
+        </div>
+
+        <button class="btn-primary" onclick="saveEditTxn()">💾 Guardar cambios</button>
+        <button onclick="deleteEditTxn()" style="width:100%;margin-top:10px;padding:15px;background:rgba(255,69,58,0.15);border:1px solid rgba(255,69,58,0.35);border-radius:14px;color:var(--red);font-size:16px;font-weight:700;cursor:pointer;transition:all 0.2s">🗑️ Eliminar movimiento</button>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const KEY = 'maxfinance_v3';
+const SUELDO = 4267;
+
+const CATS = {
+    comida:    { e:'🍽️', l:'Comida',      c:'#FF453A' },
+    hijo:      { e:'👶',  l:'Hijo',         c:'#007AFF' },
+    hogar:     { e:'🏠',  l:'Hogar',        c:'#30D158' },
+    pasajes:   { e:'🚌',  l:'Pasajes',      c:'#5AC8FA' },
+    subs:      { e:'📱',  l:'Subs',         c:'#BF5AF2' },
+    pandero:   { e:'💰',  l:'Pandero',      c:'#FF9F0A' },
+    gustos:    { e:'✨',  l:'Gustos',       c:'#FF375F' },
+    prestamos: { e:'🤝',  l:'Préstamos',    c:'#ac8e68' },
+    ingreso:   { e:'💵',  l:'Ingreso',      c:'#30D158' },
+};
+
+// dia = día del mes en que se debita dentro del ciclo (15→next 15)
+// dias >= 15: mismo mes del cobro | dias < 15: mes siguiente al cobro
+const FIXED = [
+    // ── DÍA 15 (al cobrar) ───────────────────────────────────
+    { id:'f02', n:'Colegio del hijo',       m:350,   c:'hijo',    dia:30 },
+    { id:'f10', n:'Pandero (3 números)',   m:600,   c:'pandero', dia:15 },
+    { id:'f09', n:'Servicios casa',        m:110,   c:'hogar',   dia:15 },
+    { id:'f11', n:'Celular Claro',         m:76.72, c:'subs',    dia:15 },
+    { id:'f08', n:'Internet + Deco Claro', m:160,   c:'hogar',   dia:15 },
+    { id:'f12', n:'Netflix',               m:52.90, c:'subs',    dia:15 },
+    // ── DÍA 15 (al cobrar) ───────────────────────────────────
+    { id:'f01', n:'Pensión hijo',          m:750,   c:'hijo',    dia:15 },
+    // ── DÍAS ESPECÍFICOS ──────────────────────────────────────
+    { id:'f14', n:'YouTube Premium',       m:20.02, c:'subs',    dia:26 },
+    { id:'f13', n:'Claude Pro',            m:75,    c:'subs',    dia:28 },
+    // ── MES SIGUIENTE AL COBRO ────────────────────────────────
+    { id:'f07', n:'Alquiler',              m:300,   c:'hogar',   dia:5  },
+    { id:'f15', n:'iCloud',                m:4.37,  c:'subs',    dia:1  },
+];
+
+const TOTAL_FIXED = FIXED.reduce((s,f) => s + f.m, 0);
+
+// Calcula la fecha de vencimiento de un gasto fijo dentro del ciclo actual.
+// dias >= 15 → mismo mes del cobro | dias < 15 → mes siguiente al cobro
+function dueInCycle(dia, cs) {
+    if (dia === 0) return null;
+    const m = cs.getMonth(), y = cs.getFullYear();
+    return dia >= 15
+        ? new Date(y, m, dia)         // mismo mes: día 15, 26, 28, 30
+        : new Date(y, m + 1, dia);    // mes siguiente: día 1, 5
+}
+
+// Devuelve todos los gastos fijos del ciclo, con su fecha y si ya pasaron
+function fixedSchedule() {
+    const now = new Date();
+    const cs  = cycleStart();
+    return FIXED.map(f => {
+        const due = dueInCycle(f.dia, cs);
+        return { ...f, due, charged: due ? due <= now : false };
+    }).filter(f => f.due !== null)
+      .sort((a, b) => a.due - b.due);
+}
+
+// Suma de los gastos fijos cuya fecha ya pasó en el ciclo actual
+function autoDeducted() {
+    const schedule = fixedSchedule();
+    const charged  = schedule.filter(f => f.charged);
+    return {
+        total: charged.reduce((s, f) => s + f.m, 0),
+        items: charged,
+    };
+}
+const MONTHS_ES   = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MONTHS_SH   = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const COBRO_MONTHS = [1, 5, 6]; // Feb, Jun, Jul
+
+function load()  { try { return JSON.parse(localStorage.getItem(KEY)) || base(); } catch { return base(); } }
+function base()  { return { transactions:[], loans:[], pandero:{} }; }
+function saveLocal() { localStorage.setItem(KEY, JSON.stringify(D)); }
+function save()      { saveLocal(); }
+
+let D = load();
+
+// ═══════════════════════════════════════════════
+//  ROUTING
+// ═══════════════════════════════════════════════
+let current = 'home';
+let donutCh = null, barCh = null;
+
+function showPage(name) {
+    ['home','gastos','analisis','prestamos','pandero','config'].forEach(p => {
+        const el  = document.getElementById('page-' + p);
+        const tab = document.getElementById('tab-'  + p);
+        if (p === name) { el.classList.add('active'); if(tab) tab.classList.add('active'); }
+        else             { el.classList.remove('active'); if(tab) tab.classList.remove('active'); }
+    });
+    const fab = document.getElementById('main-fab');
+    if (name === 'prestamos') { fab.style.display='flex'; fab.onclick=openLoanModal; fab.textContent='+'; }
+    else if (['home','gastos','analisis'].includes(name)) { fab.style.display='flex'; fab.onclick=openAddModal; fab.textContent='+'; }
+    else { fab.style.display='none'; }
+    current = name;
+    refresh();
+}
+
+function refresh() {
+    if (current==='home')      renderHome();
+    if (current==='gastos')    renderGastos();
+    if (current==='analisis')  renderAnalisis();
+    if (current==='prestamos') renderPrestamos();
+    if (current==='pandero')   renderPandero();
+    if (current==='config')    { renderConfig(); renderSyncUI(); }
+}
+
+// ═══════════════════════════════════════════════
+//  HOME
+// ═══════════════════════════════════════════════
+function renderHome() {
+    const now  = new Date();
+    const h    = now.getHours();
+    const greet = h<12 ? 'Buenos días' : h<19 ? 'Buenas tardes' : 'Buenas noches';
+    document.getElementById('greeting').textContent = greet + ', Max 👋';
+    document.getElementById('greeting-sub').textContent = fmtDate(now);
+
+    const { daysUntil, daysInCycle, daysElapsed } = getDays15();
+    document.getElementById('days-until').textContent =
+        daysUntil === 0 ? '¡HOY COBRAS! 🎉' : `${daysUntil} día${daysUntil!==1?'s':''}`;
+    const pct = daysInCycle > 0 ? Math.min((daysElapsed / daysInCycle) * 100, 100) : 0;
+    document.getElementById('days-bar').style.width = pct + '%';
+    document.getElementById('cycle-day').textContent = `Día ${daysElapsed}`;
+
+    const cs    = cycleStart();
+    const { total: autoAmt, items: autoItems } = autoDeducted();
+    const manualSpent = D.transactions
+        .filter(t => new Date(t.fecha+'T12:00:00') >= cs && t.tipo === 'gasto')
+        .reduce((s,t) => s + t.monto, 0);
+    const totalSpent = autoAmt + manualSpent;
+    const remaining  = SUELDO - totalSpent;
+
+    document.getElementById('balance-num').textContent = fmtN(Math.max(remaining, 0));
+    document.getElementById('balance-display').dataset.text = 'S/' + fmtN(Math.max(remaining, 0));
+    document.getElementById('spent-display').textContent = 'S/' + fmtN(totalSpent);
+    document.getElementById('fixed-display').textContent = 'S/' + fmtN(autoAmt);
+    document.getElementById('balance-sub').textContent   = `${autoItems.length} débitos auto · hasta el ` + nextPayday();
+
+    const dailyBudget = daysUntil > 0 ? Math.max(remaining, 0) / daysUntil : 0;
+    document.getElementById('daily-budget').textContent = 'S/' + fmtN(dailyBudget);
+
+    const totalDebo = D.loans.filter(l=>l.tipo==='debo'&&!l.pagado).reduce((s,l)=>s+l.monto,0);
+    const cntLoans  = D.loans.filter(l=>!l.pagado).length;
+    document.getElementById('loans-home').textContent = 'S/' + fmtN(totalDebo);
+    document.getElementById('loans-sub').textContent  = cntLoans + ' pendiente' + (cntLoans!==1?'s':'');
+    document.getElementById('dot-prestamos').classList.toggle('show', cntLoans > 0);
+
+    // alerts
+    const area = document.getElementById('alert-area');
+    let alerts = '';
+
+    // Cuotas de préstamos pendientes de confirmar este ciclo
+    const cuotasPend = (D.loans || []).filter(l => l.tipo==='debo' && !l.pagado && ((l.cuotas_total||1)-(l.cuotas_pagadas||0)) > 0);
+    if (cuotasPend.length > 0) {
+        const totalCuotas = cuotasPend.reduce((s,l) => s + l.monto_cuota, 0);
+        alerts += `<div class="alert-card alert-warning" onclick="showPage('prestamos')" style="cursor:pointer">
+            <span class="alert-icon">⚡</span>
+            <span class="alert-text">Tienes <strong>S/${fmtN(totalCuotas)}</strong> en cuotas pendientes de pagar. Toca para confirmar.</span>
+        </div>`;
+    }
+
+    if (remaining < 0)
+        alerts += `<div class="alert-card alert-danger"><span class="alert-icon">🚨</span><span class="alert-text">Tus gastos superan tu sueldo. Déficit de <strong>S/${fmtN(Math.abs(remaining))}</strong>.</span></div>`;
+    else if (remaining < 300)
+        alerts += `<div class="alert-card alert-warning"><span class="alert-icon">⚠️</span><span class="alert-text">Solo te quedan <strong>S/${fmtN(remaining)}</strong>. Ve con cuidado.</span></div>`;
+    else if (TOTAL_FIXED > SUELDO * 0.80)
+        alerts += `<div class="alert-card alert-info"><span class="alert-icon">📌</span><span class="alert-text">Tus gastos fijos son el <strong>${Math.round(TOTAL_FIXED/SUELDO*100)}%</strong> de tu sueldo (S/${fmtN(TOTAL_FIXED)}).</span></div>`;
+
+    // FDS con hijo warning
+    const fdsData = calcFdsConHijo();
+    if (fdsData.remaining.length > 0) {
+        const upcomingFixed2 = fixedSchedule().filter(f => !f.charged);
+        const pendFixed = upcomingFixed2.reduce((s,f) => s+f.m, 0);
+        const libreReal = remaining - pendFixed;
+        if (fdsData.avgPerFds > 0) {
+            const totalFdsNeed = fdsData.totalNeeded;
+            const sobraFds = libreReal - totalFdsNeed;
+            if (sobraFds < 0) {
+                alerts += `<div class="alert-card alert-danger" onclick="showPage('analisis')" style="cursor:pointer">
+                    <span class="alert-icon">👶</span>
+                    <span class="alert-text">Tienes <strong>${fdsData.remaining.length} FDS</strong> con tu hijo antes del 15 (~<strong>S/${fmtN(totalFdsNeed)}</strong>). Con lo que te queda libre (<strong>S/${fmtN(Math.max(libreReal,0))}</strong>) te faltarán <strong style="color:var(--red)">S/${fmtN(Math.abs(sobraFds))}</strong>. Toca para ver el plan.</span>
+                </div>`;
+            } else {
+                alerts += `<div class="alert-card alert-info" onclick="showPage('analisis')" style="cursor:pointer">
+                    <span class="alert-icon">👶</span>
+                    <span class="alert-text">Tienes <strong>${fdsData.remaining.length} FDS</strong> con tu hijo (~<strong>S/${fmtN(totalFdsNeed)}</strong>). Te sobrarían <strong style="color:var(--green)">S/${fmtN(sobraFds)}</strong> si mantienes el promedio.</span>
+                </div>`;
+            }
+        } else {
+            alerts += `<div class="alert-card alert-info" onclick="showPage('analisis')" style="cursor:pointer">
+                <span class="alert-icon">👶</span>
+                <span class="alert-text">Tienes <strong>${fdsData.remaining.length} FDS</strong> con tu hijo antes del 15. Registra gastos con <em>tag FDS</em> para ver proyección automática.</span>
+            </div>`;
+        }
+    }
+
+    area.innerHTML = alerts;
+
+    // Próximos pagos fijos (pendientes en los próximos 10 días)
+    const now2 = new Date();
+    const upcoming = fixedSchedule()
+        .filter(f => !f.charged)
+        .filter(f => (f.due - now2) / 86400000 <= 12); // solo los que vienen en ≤12 días
+
+    const upArea = document.getElementById('upcoming-area');
+    if (upcoming.length > 0) {
+        const totalUp = upcoming.reduce((s, f) => s + f.m, 0);
+        const rows = upcoming.map(f => {
+            const dias = Math.ceil((f.due - now2) / 86400000);
+            const cat  = CATS[f.c] || { e: '💸' };
+            const urgColor = dias <= 3 ? 'var(--red)' : dias <= 7 ? 'var(--orange)' : 'var(--text2)';
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+                <span style="font-size:14px">${cat.e} ${f.n}</span>
+                <span style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:11px;color:${urgColor};font-weight:700">en ${dias}d</span>
+                    <span style="font-size:14px;font-weight:800;color:var(--orange)">S/${fmtN(f.m)}</span>
+                </span>
+            </div>`;
+        }).join('');
+        upArea.innerHTML = `<div class="glass-card" style="border-color:rgba(255,159,10,0.28);margin-bottom:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+                <div class="terminal">// PRÓXIMOS PAGOS</div>
+                <span style="font-size:16px;font-weight:900;color:var(--orange)">S/${fmtN(totalUp)}</span>
+            </div>
+            ${rows}
+        </div>`;
+    } else {
+        upArea.innerHTML = '';
+    }
+
+    // recent
+    const recent = [...D.transactions].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,5);
+    const cont = document.getElementById('recent-txns');
+    cont.innerHTML = recent.length === 0
+        ? `<div class="empty-state"><div class="empty-state-icon">💸</div><div class="empty-state-title">Sin movimientos aún</div><div class="empty-state-sub">Toca el + para agregar tu primer gasto</div></div>`
+        : recent.map(t => txnHTML(t)).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  GASTOS
+// ═══════════════════════════════════════════════
+let activeFilter = 'todos';
+
+function filterTxns(cat) {
+    activeFilter = cat;
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.cat === cat));
+    renderGastos();
+}
+
+function renderGastos() {
+    // Transacciones manuales
+    let txns = [...D.transactions].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+    if (activeFilter !== 'todos') txns = txns.filter(t => t.categoria === activeFilter);
+
+    // Gastos fijos del ciclo como entradas virtuales
+    const schedule = fixedSchedule();
+    const virtualTxns = schedule
+        .filter(f => activeFilter === 'todos' || f.c === activeFilter)
+        .map(f => ({
+            id:          'fixed_' + f.id,
+            monto:       f.m,
+            descripcion: f.n,
+            fecha:       f.due.toISOString().split('T')[0],
+            categoria:   f.c,
+            tipo:        'gasto',
+            _fixed:      true,
+            _charged:    f.charged,
+        }));
+
+    // Combinar y ordenar por fecha desc
+    const all = [...txns, ...virtualTxns].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    const totalGastado = all
+        .filter(t => t.tipo === 'gasto' && t._charged !== false)
+        .reduce((s, t) => s + t.monto, 0);
+    document.getElementById('gastos-total-label').textContent = `Total gastado: S/${fmtN(totalGastado)}`;
+
+    const list = document.getElementById('txns-list');
+    if (all.length === 0) {
+        list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-title">Sin resultados</div><div class="empty-state-sub">No hay gastos en esta categoría</div></div>`;
+        return;
+    }
+
+    const groups = {};
+    all.forEach(t => {
+        const k = t.fecha.split('T')[0];
+        if (!groups[k]) groups[k] = [];
+        groups[k].push(t);
+    });
+
+    let html = '';
+    Object.keys(groups).sort((a,b) => b.localeCompare(a)).forEach(k => {
+        html += `<div class="date-divider">${fmtDateShort(new Date(k+'T12:00:00'))}</div>`;
+        groups[k].forEach(t => { html += txnHTML(t, !t._fixed); });
+    });
+    list.innerHTML = html;
+}
+
+function txnHTML(t, deletable=false) {
+    const cat    = CATS[t.categoria] || CATS.comida;
+    const ing    = t.tipo === 'ingreso';
+    const isPend = t._fixed && !t._charged;
+    const opacity= isPend ? 'opacity:0.52;' : '';
+
+    const badge = t._fixed
+        ? (isPend
+            ? `<span style="font-size:10px;background:rgba(255,159,10,0.20);color:var(--orange);padding:2px 7px;border-radius:6px;font-weight:700">⏳ pendiente</span>`
+            : `<span style="font-size:10px;background:rgba(0,122,255,0.18);color:var(--blue);padding:2px 7px;border-radius:6px;font-weight:700">⚡ auto</span>`)
+        : '';
+
+    const tagBadge = t.tag
+        ? `<span style="font-size:10px;background:rgba(255,255,255,0.08);color:var(--text2);padding:2px 7px;border-radius:6px;margin-left:4px">${
+            t.tag==='fds_hijo'?'👶 FDS hijo':t.tag==='trabajo'?'💼':t.tag==='pareja'?'❤️':t.tag==='emergencia'?'🚨':''
+          }</span>` : '';
+
+    const subs = SUBCATS[t.categoria] || [];
+    const sub  = subs.find(s => s.k === t.subcategoria);
+    const subLine = sub ? `<span style="font-size:11px;color:var(--text3)">${sub.e} ${sub.l}</span>` : '';
+
+    const clickable = deletable ? `onclick="openEditTxn('${t.id}')" style="${opacity}cursor:pointer"` : `style="${opacity}"`;
+    return `<div class="txn-item" ${clickable}>
+        <div class="txn-icon bg-${t.categoria}">${cat.e}</div>
+        <div class="txn-info">
+            <div class="txn-name" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">${t.descripcion}${badge}${tagBadge}</div>
+            <div class="txn-cat" style="display:flex;gap:6px;align-items:center">${cat.l} · ${fmtDateShort(new Date(t.fecha+'T12:00:00'))} ${subLine}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+            <div class="txn-amount ${ing?'text-green':isPend?'text-orange':'text-red'}">${ing?'+':'-'}S/${fmtN(t.monto)}</div>
+            ${deletable?`<div style="font-size:16px;opacity:0.35">✏️</div>`:''}
+        </div>
+    </div>`;
+}
+
+let editingTxnId = null;
+let editCatSel   = 'comida';
+let editTagSel   = '';
+let editSubSel   = '';
+
+function openEditTxn(id) {
+    const t = D.transactions.find(x => x.id === id);
+    if (!t) return;
+    editingTxnId = id;
+    editCatSel   = t.categoria || 'comida';
+    editTagSel   = t.tag || '';
+    editSubSel   = t.subcategoria || '';
+
+    document.getElementById('edit-monto').value = t.monto;
+    document.getElementById('edit-desc').value  = t.descripcion || '';
+    document.getElementById('edit-fecha').value = t.fecha;
+
+    // Seleccionar categoría
+    document.querySelectorAll('#edit-cat-grid .cat-opt').forEach(el => {
+        el.classList.toggle('selected', el.dataset.cat === editCatSel);
+    });
+    editRenderSubcats(editCatSel, editSubSel);
+
+    // Seleccionar tag
+    document.querySelectorAll('#edit-tag-chips .chip').forEach(el => {
+        el.classList.toggle('active', el.dataset.tag === editTagSel);
+    });
+
+    document.getElementById('modal-edit').classList.add('open');
+}
+
+function editSelectCat(cat) {
+    editCatSel = cat;
+    editSubSel = '';
+    document.querySelectorAll('#edit-cat-grid .cat-opt').forEach(el => {
+        el.classList.toggle('selected', el.dataset.cat === cat);
+    });
+    editRenderSubcats(cat, '');
+}
+
+function editRenderSubcats(cat, selected) {
+    const subs = SUBCATS[cat] || [];
+    const grp  = document.getElementById('edit-subcat-group');
+    const cont = document.getElementById('edit-subcat-chips');
+    if (subs.length === 0) { grp.style.display = 'none'; return; }
+    grp.style.display = 'block';
+    cont.innerHTML = subs.map(s =>
+        `<div class="chip ${s.k===selected?'active':''}" onclick="editSelectSub('${s.k}')">${s.e} ${s.l}</div>`
+    ).join('');
+}
+
+function editSelectSub(k) {
+    editSubSel = k;
+    document.querySelectorAll('#edit-subcat-chips .chip').forEach(el => {
+        el.classList.toggle('active', el.textContent.trim().includes(k) || el.getAttribute('onclick')===`editSelectSub('${k}')`);
+    });
+    editRenderSubcats(editCatSel, k);
+}
+
+function editSelectTag(tag) {
+    editTagSel = tag;
+    document.querySelectorAll('#edit-tag-chips .chip').forEach(el => {
+        el.classList.toggle('active', el.dataset.tag === tag);
+    });
+}
+
+function saveEditTxn() {
+    const monto = parseFloat(document.getElementById('edit-monto').value);
+    const desc  = document.getElementById('edit-desc').value.trim();
+    const fecha = document.getElementById('edit-fecha').value;
+    if (!monto || monto <= 0) { toast('⚠️ Ingresa un monto válido'); return; }
+    if (!fecha) { toast('⚠️ Selecciona la fecha'); return; }
+
+    const t = D.transactions.find(x => x.id === editingTxnId);
+    if (!t) return;
+    t.monto        = monto;
+    t.descripcion  = desc || (CATS[editCatSel]?.l || editCatSel);
+    t.categoria    = editCatSel;
+    t.subcategoria = editSubSel || undefined;
+    t.tag          = editTagSel || undefined;
+    t.fecha        = fecha;
+
+    save();
+    document.getElementById('modal-edit').classList.remove('open');
+    renderGastos(); renderHome();
+    toast('✅ Movimiento actualizado');
+}
+
+function deleteEditTxn() {
+    if (!confirm('¿Eliminar este movimiento?')) return;
+    D.transactions = D.transactions.filter(t => t.id !== editingTxnId);
+    save();
+    document.getElementById('modal-edit').classList.remove('open');
+    renderGastos(); renderHome();
+    toast('🗑️ Movimiento eliminado');
+}
+
+// ═══════════════════════════════════════════════
+//  ANÁLISIS
+// ═══════════════════════════════════════════════
+function renderAnalisis() {
+    const now = new Date();
+    const cs  = cycleStart();
+    const manualTxns = D.transactions.filter(t => t.tipo === 'gasto');
+    const cycleTxns  = manualTxns.filter(t => new Date(t.fecha+'T12:00:00') >= cs);
+
+    // ── Totales por categoría (fijos proyectados + manuales del ciclo) ──
+    const byCat = {};
+    FIXED.forEach(f => { if(f.dia>0) byCat[f.c] = (byCat[f.c]||0) + f.m; });
+    manualTxns.forEach(t => { byCat[t.categoria] = (byCat[t.categoria]||0) + t.monto; });
+    const totalG = Object.values(byCat).reduce((s,v)=>s+v,0);
+    const sorted = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+
+    // ── DIAGNÓSTICO FINANCIERO ──────────────────────────────────────────
+    const { total: autoAmt } = autoDeducted();
+    const manualSpent = cycleTxns.reduce((s,t)=>s+t.monto,0);
+    const saldoHoy    = SUELDO - autoAmt - manualSpent;
+    const upcoming    = fixedSchedule().filter(f=>!f.charged).reduce((s,f)=>s+f.m,0);
+    const { daysUntil } = getDays15();
+    const deficit     = saldoHoy - upcoming;
+    const diasRestantes = daysUntil;
+    const presupDiario  = diasRestantes > 0 ? Math.max(deficit, 0) / diasRestantes : 0;
+
+    // Análisis de fin de semana con hijo
+    const fdsTxns = cycleTxns.filter(t => t.tag === 'fds_hijo');
+    const fdsAmt  = fdsTxns.reduce((s,t)=>s+t.monto,0);
+    const fdsDays = [...new Set(fdsTxns.map(t=>t.fecha))].length;
+    const fdsAvg  = fdsDays > 0 ? fdsAmt / (fdsDays / 2) : 0; // ~2 días por FDS
+
+    // Gasto por día (solo transacciones manuales del ciclo)
+    const byDay = {};
+    cycleTxns.forEach(t => { byDay[t.fecha] = (byDay[t.fecha]||0) + t.monto; });
+    const dayEntries = Object.entries(byDay).sort((a,b)=>b[0].localeCompare(a[0]));
+    const avgDaily = dayEntries.length > 0 ? cycleTxns.reduce((s,t)=>s+t.monto,0) / dayEntries.length : 0;
+
+    // Top categoría de gasto variable (sin fijos)
+    const varCats = {};
+    cycleTxns.forEach(t => { varCats[t.categoria] = (varCats[t.categoria]||0) + t.monto; });
+    const topVar = Object.entries(varCats).sort((a,b)=>b[1]-a[1])[0];
+
+    // ── Subcategorías de comida ─────────────────────────────────────────
+    const comidaSubs = {};
+    cycleTxns.filter(t=>t.categoria==='comida').forEach(t => {
+        const k = t.subcategoria || 'sin_tipo';
+        comidaSubs[k] = (comidaSubs[k]||0) + t.monto;
+    });
+    const comidaSubHTML = Object.entries(comidaSubs).length > 0
+        ? Object.entries(comidaSubs).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{
+            const sub = (SUBCATS.comida||[]).find(s=>s.k===k) || {e:'🍽️',l:k};
+            return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0">
+                <span>${sub.e} ${sub.l}</span><span style="font-weight:700">S/${fmtN(v)}</span>
+            </div>`;
+          }).join('') : '<div style="font-size:12px;color:var(--text3)">Registra tus gastos de comida con tipo para ver el desglose</div>';
+
+    // ── Render diagnóstico ──────────────────────────────────────────────
+    const diagColor  = deficit < 0 ? 'var(--red)' : deficit < 300 ? 'var(--orange)' : 'var(--green)';
+    const diagBorder = deficit < 0 ? 'rgba(255,69,58,0.35)' : deficit < 300 ? 'rgba(255,159,10,0.35)' : 'rgba(48,209,88,0.25)';
+    const diagIcon   = deficit < 0 ? '🚨' : deficit < 300 ? '⚠️' : '✅';
+
+    // Recomendaciones personalizadas
+    const recos = [];
+    if (deficit < 0)
+        recos.push(`🚨 <strong>Déficit de S/${fmtN(Math.abs(deficit))}</strong> — tus pagos pendientes superan tu saldo. Necesitas reducir gastos variables YA.`);
+    if (fdsAmt > 0 && fdsAvg > 100)
+        recos.push(`👶 Gastas ~<strong>S/${fmtN(fdsAvg)}</strong> por fin de semana con tu hijo. Si lo reduces a S/80, ahorras S/${fmtN((fdsAvg-80)*2)} este ciclo.`);
+    if (comidaSubs['restaurant'] > 0 || comidaSubs['delivery'] > 0) {
+        const resto = (comidaSubs['restaurant']||0) + (comidaSubs['delivery']||0);
+        recos.push(`🍽️ Gastaste <strong>S/${fmtN(resto)}</strong> en restaurantes/delivery. Cocinar en casa puede darte S/50–100 más al mes.`);
+    }
+    if (presupDiario < 20 && diasRestantes > 5)
+        recos.push(`📉 Con lo que te queda después de pagos, solo puedes gastar <strong>S/${fmtN(presupDiario)}/día</strong> en comida y pasajes. Es muy ajustado.`);
+    if (topVar && topVar[1] > saldoHoy * 0.3)
+        recos.push(`📌 Tu mayor gasto variable es <strong>${(CATS[topVar[0]]||{}).l||topVar[0]}</strong> (S/${fmtN(topVar[1])}). ¿Puedes reducirlo?`);
+    if (recos.length === 0)
+        recos.push(`✅ Vas bien este ciclo. Sigue registrando para ver patrones con más precisión.`);
+
+    document.getElementById('insight-text').innerHTML = `
+        <div style="background:rgba(${deficit<0?'255,69,58':'255,159,10'},0.10);border:1px solid ${diagBorder};border-radius:14px;padding:14px 16px;margin-bottom:14px">
+            <div style="font-size:11px;color:${diagColor};font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;font-family:'Courier New',monospace">${diagIcon} DIAGNÓSTICO ACTUAL</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+                <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">SALDO HOY</div><div style="font-size:20px;font-weight:900;color:${saldoHoy<upcoming?'var(--red)':'var(--green)'}">S/${fmtN(saldoHoy)}</div></div>
+                <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">AÚN DEBES</div><div style="font-size:20px;font-weight:900;color:var(--orange)">S/${fmtN(upcoming)}</div></div>
+                <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">LIBRE PARA VIVIR</div><div style="font-size:20px;font-weight:900;color:${diagColor}">S/${fmtN(Math.max(deficit,0))}</div></div>
+                <div><div style="font-size:10px;color:var(--text3);margin-bottom:3px">DÍAS RESTANTES</div><div style="font-size:20px;font-weight:900;color:var(--blue)">${diasRestantes}d</div></div>
+            </div>
+            <div style="padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);font-size:13px;color:var(--text2)">
+                Presupuesto diario disponible: <strong style="color:${presupDiario<15?'var(--red)':presupDiario<30?'var(--orange)':'var(--green)'}">S/${fmtN(presupDiario)}/día</strong>
+            </div>
+        </div>
+        <div style="margin-bottom:6px;font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700">// RECOMENDACIONES</div>
+        ${recos.map(r=>`<div style="font-size:13px;line-height:1.6;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.04);border-radius:10px;border-left:3px solid var(--blue)">${r}</div>`).join('')}
+    `;
+
+    // ── Donut chart ─────────────────────────────────────────────────────
+    const labels = sorted.map(([k])=>CATS[k]?.l||k);
+    const values = sorted.map(([,v])=>v);
+    const colors = sorted.map(([k])=>CATS[k]?.c||'#666');
+    if (donutCh) donutCh.destroy();
+    donutCh = new Chart(document.getElementById('donut-chart').getContext('2d'), {
+        type: 'doughnut',
+        data: { labels, datasets:[{ data:values, backgroundColor:colors.map(c=>c+'BB'), borderColor:colors, borderWidth:2, hoverOffset:10 }] },
+        options: { responsive:true, maintainAspectRatio:false, cutout:'67%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:ctx=>` S/${fmtN(ctx.raw)} (${Math.round(ctx.raw/totalG*100)}%)` } } } }
+    });
+
+    // ── Desglose con subcategorías ───────────────────────────────────────
+    document.getElementById('analysis-breakdown').innerHTML = sorted.map(([cat,amt])=>{
+        const c   = CATS[cat]||{e:'❓',l:cat,c:'#666'};
+        const pct = totalG>0 ? Math.round(amt/totalG*100) : 0;
+        const pctS= Math.round(amt/SUELDO*100);
+        const isComida = cat === 'comida';
+        return `<div class="analysis-row" style="flex-direction:column;align-items:stretch;gap:6px">
+            <div style="display:flex;align-items:center;gap:12px">
+                <span style="font-size:20px">${c.e}</span>
+                <span class="analysis-name">${c.l}</span>
+                <div class="analysis-bar-wrap">
+                    <div class="analysis-bar"><div class="analysis-bar-inner" style="width:${pct}%;background:${c.c}"></div></div>
+                    <div class="analysis-pct">${pctS}% del sueldo</div>
+                </div>
+                <div class="analysis-amount" style="color:${c.c}">S/${fmtN(amt)}</div>
+            </div>
+            ${isComida && Object.keys(comidaSubs).length>0 ? `<div style="padding-left:32px;padding-top:4px">${comidaSubHTML}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    // ── Gasto por día del ciclo ──────────────────────────────────────────
+    const dayHTML = dayEntries.length === 0
+        ? '<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px">Sin gastos registrados este ciclo</div>'
+        : dayEntries.map(([fecha, amt]) => {
+            const d   = new Date(fecha+'T12:00:00');
+            const dow = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'][d.getDay()];
+            const isFds = d.getDay() === 0 || d.getDay() === 6;
+            const txDay = cycleTxns.filter(t=>t.fecha===fecha);
+            const subcats = [...new Set(txDay.map(t=>{
+                if(t.subcategoria){ const s=(SUBCATS[t.categoria]||[]).find(x=>x.k===t.subcategoria); return s?s.e+' '+s.l:null; }
+                return null;
+            }).filter(Boolean))].slice(0,3).join(' · ');
+            const hasFdsHijo = txDay.some(t=>t.tag==='fds_hijo');
+            const bar = Math.round((amt / Math.max(...dayEntries.map(([,v])=>v))) * 100);
+            return `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+                    <div>
+                        <span style="font-size:14px;font-weight:700;color:${isFds?'var(--orange)':'var(--text)'}">${dow} ${fmtDateShort(d)}</span>
+                        ${hasFdsHijo?'<span style="font-size:10px;background:rgba(0,122,255,0.18);color:var(--blue);padding:2px 7px;border-radius:6px;margin-left:6px">👶 con hijo</span>':''}
+                    </div>
+                    <span style="font-size:16px;font-weight:900;color:${amt>150?'var(--red)':amt>80?'var(--orange)':'var(--green)'}">S/${fmtN(amt)}</span>
+                </div>
+                <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;overflow:hidden;margin-bottom:4px">
+                    <div style="height:100%;width:${bar}%;background:${isFds?'var(--orange)':'var(--blue)'};border-radius:2px"></div>
+                </div>
+                ${subcats?`<div style="font-size:11px;color:var(--text3)">${subcats}</div>`:''}
+            </div>`;
+        }).join('');
+
+    // Reemplazar el card de bar chart con el gasto por día
+    if (barCh) barCh.destroy();
+    document.getElementById('bar-chart').parentElement.innerHTML =
+        `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700">// GASTO POR DÍA</div>
+            ${dayEntries.length>0?`<div style="font-size:11px;color:var(--text3)">${dayEntries.length} día${dayEntries.length!==1?'s':''}</div>`:''}
+        </div>
+        ${avgDaily>0?`<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Promedio diario: <strong style="color:var(--blue)">S/${fmtN(avgDaily)}</strong>${fdsAvg>0?' · FDS con hijo: <strong style="color:var(--orange)">S/'+fmtN(fdsAvg)+'</strong>':''}</div>`:''}
+        <div style="max-height:320px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent;padding-right:2px">
+        ${dayHTML}
+        </div>`;
+
+    // Card FDS con hijo
+    renderFdsCard(saldoHoy, upcoming, deficit);
+}
+
+function calcFdsConHijo() {
+    const now    = new Date();
+    const cs     = cycleStart();
+    const { daysUntil } = getDays15();
+    const next15 = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil);
+
+    // Fines de semana completos que quedan antes del 15 (sábado + domingo)
+    const remaining = [];
+    let d = new Date(now);
+    d.setDate(d.getDate() + 1);
+    while (d < next15) {
+        if (d.getDay() === 6) { // sábado
+            const sat = new Date(d);
+            const sun = new Date(d); sun.setDate(sun.getDate() + 1);
+            remaining.push({ sat, sun: sun < next15 ? sun : null });
+        }
+        d.setDate(d.getDate() + 1);
+    }
+
+    // Historial: transacciones etiquetadas 'fds_hijo'
+    const fdsTxns = D.transactions.filter(t => t.tag === 'fds_hijo' && t.tipo === 'gasto');
+
+    // Agrupar por fin de semana (clave = fecha del sábado)
+    const byWeekend = {};
+    fdsTxns.forEach(t => {
+        const td  = new Date(t.fecha + 'T12:00:00');
+        const sat = new Date(td);
+        if (td.getDay() === 0) sat.setDate(sat.getDate() - 1); // domingo → sábado anterior
+        const key = sat.toISOString().split('T')[0];
+        if (!byWeekend[key]) byWeekend[key] = { total: 0, items: [] };
+        byWeekend[key].total += t.monto;
+        byWeekend[key].items.push(t);
+    });
+
+    const weekendAmts = Object.values(byWeekend).map(w => w.total);
+    const avgPerFds   = weekendAmts.length > 0
+        ? weekendAmts.reduce((s,v) => s+v, 0) / weekendAmts.length : 0;
+
+    // Subcategorías más frecuentes en FDS
+    const subFreq = {};
+    fdsTxns.forEach(t => {
+        const k = t.subcategoria || t.categoria;
+        subFreq[k] = (subFreq[k]||0) + t.monto;
+    });
+
+    return {
+        remaining,          // próximos FDS antes del 15
+        byWeekend,          // historial agrupado
+        avgPerFds,          // promedio histórico por FDS
+        totalNeeded: remaining.length * avgPerFds,
+        weekendAmts,
+        subFreq,
+    };
+}
+
+function renderFdsCard(saldoHoy, upcomingFixed, deficit) {
+    const fds   = calcFdsConHijo();
+    const el    = document.getElementById('fds-content');
+    const now   = new Date();
+
+    // Si no hay datos históricos
+    if (fds.weekendAmts.length === 0) {
+        el.innerHTML = `
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">
+                Aún no tienes gastos registrados con la etiqueta <strong style="color:var(--blue)">👶 FDS con hijo</strong>.<br>
+                Cuando registres gastos del fin de semana con tu hijo, aquí verás el análisis y proyección automática.
+            </div>
+            <div style="background:rgba(0,122,255,0.10);border:1px solid rgba(0,122,255,0.22);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--text2)">
+                💡 Al agregar un gasto → Contexto → <strong>👶 Fin de semana con hijo</strong>
+            </div>
+            ${fds.remaining.length > 0 ? `
+            <div style="margin-top:14px">
+                <div style="font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700;margin-bottom:8px">// PRÓXIMOS FDS ANTES DEL 15</div>
+                ${fds.remaining.map(w => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                    <span style="font-size:13px">📅 Sáb ${fmtDateShort(w.sat)}${w.sun?' · Dom '+fmtDateShort(w.sun):' (solo sábado)'}</span>
+                    <span style="font-size:12px;color:var(--text3)">sin datos</span>
+                </div>`).join('')}
+            </div>` : ''}`;
+        return;
+    }
+
+    // Con datos históricos — proyección completa
+    const libre     = Math.max(deficit, 0); // saldo después de pagos fijos pendientes
+    const totalFds  = fds.totalNeeded;
+    const sobraFds  = libre - totalFds;
+    const colorFds  = sobraFds < 0 ? 'var(--red)' : sobraFds < 50 ? 'var(--orange)' : 'var(--green)';
+
+    // Top subcategorías en FDS
+    const topSubs = Object.entries(fds.subFreq)
+        .sort((a,b) => b[1]-a[1]).slice(0,4)
+        .map(([k,v]) => {
+            const cat  = SUBCATS.pasajes?.find(s=>s.k===k) ||
+                         SUBCATS.comida?.find(s=>s.k===k)  ||
+                         SUBCATS.hijo?.find(s=>s.k===k)    ||
+                         SUBCATS.gustos?.find(s=>s.k===k);
+            const catM = CATS[k];
+            const lbl  = cat ? `${cat.e} ${cat.l}` : catM ? `${catM.e} ${catM.l}` : k;
+            return `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding:2px 0">
+                <span>${lbl}</span><span style="font-weight:700">S/${fmtN(v)}</span>
+            </div>`;
+        }).join('');
+
+    // Historial de FDS pasados
+    const histHTML = Object.entries(fds.byWeekend)
+        .sort((a,b) => b[0].localeCompare(a[0])).slice(0,4)
+        .map(([satKey, w]) => {
+            const sd = new Date(satKey + 'T12:00:00');
+            return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                <span style="font-size:13px">📅 ${fmtDateShort(sd)}</span>
+                <span style="font-size:14px;font-weight:800;color:var(--orange)">S/${fmtN(w.total)}</span>
+            </div>`;
+        }).join('');
+
+    el.innerHTML = `
+        <!-- Resumen histórico -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div style="background:rgba(255,255,255,0.05);border-radius:14px;padding:12px">
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em">Promedio FDS</div>
+                <div style="font-size:22px;font-weight:900;color:var(--orange)">S/${fmtN(fds.avgPerFds)}</div>
+                <div style="font-size:11px;color:var(--text3)">${fds.weekendAmts.length} FDS registrado${fds.weekendAmts.length!==1?'s':''}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.05);border-radius:14px;padding:12px">
+                <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.06em">FDS que quedan</div>
+                <div style="font-size:22px;font-weight:900;color:var(--blue)">${fds.remaining.length}</div>
+                <div style="font-size:11px;color:var(--text3)">antes del 15 de mayo</div>
+            </div>
+        </div>
+
+        <!-- Proyección -->
+        <div style="background:rgba(${sobraFds<0?'255,69,58':sobraFds<50?'255,159,10':'48,209,88'},0.10);border:1px solid rgba(${sobraFds<0?'255,69,58':sobraFds<50?'255,159,10':'48,209,88'},0.28);border-radius:14px;padding:14px;margin-bottom:14px">
+            <div style="font-size:11px;color:${colorFds};font-weight:700;text-transform:uppercase;letter-spacing:0.08em;font-family:'Courier New',monospace;margin-bottom:10px">// PROYECCIÓN</div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px">
+                <span>Libre después de pagos fijos</span>
+                <span style="font-weight:700;color:var(--text)">S/${fmtN(Math.max(libre,0))}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px">
+                <span>${fds.remaining.length} FDS × S/${fmtN(fds.avgPerFds)}</span>
+                <span style="font-weight:700;color:var(--orange)">− S/${fmtN(totalFds)}</span>
+            </div>
+            <div style="height:1px;background:rgba(255,255,255,0.08);margin:8px 0"></div>
+            <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:900">
+                <span>${sobraFds < 0 ? '❌ Faltaría' : '✅ Sobraría'}</span>
+                <span style="color:${colorFds}">S/${fmtN(Math.abs(sobraFds))}</span>
+            </div>
+            ${sobraFds < 0 ? `<div style="margin-top:10px;font-size:12px;color:var(--red);line-height:1.5">
+                Para cubrir los FDS necesitas reducir S/${fmtN(Math.abs(sobraFds))} en otros gastos,
+                o limitar cada FDS a <strong>S/${fmtN(Math.max(libre/Math.max(fds.remaining.length,1),0))}</strong>.
+            </div>` : ''}
+        </div>
+
+        <!-- Próximos FDS -->
+        <div style="margin-bottom:14px">
+            <div style="font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700;margin-bottom:8px">// PRÓXIMOS FDS</div>
+            ${fds.remaining.length === 0
+                ? `<div style="font-size:13px;color:var(--text3)">No quedan fines de semana antes del 15.</div>`
+                : fds.remaining.map((w,i) => `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                    <span style="font-size:13px;font-weight:600">FDS ${i+1} · Sáb ${fmtDateShort(w.sat)}${w.sun?' – Dom '+fmtDateShort(w.sun):''}</span>
+                    <span style="font-size:14px;font-weight:800;color:var(--orange)">~S/${fmtN(fds.avgPerFds)}</span>
+                </div>`).join('')
+            }
+        </div>
+
+        <!-- Top gastos en FDS -->
+        ${topSubs ? `<div>
+            <div style="font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700;margin-bottom:8px">// EN QUÉ GASTAS LOS FDS</div>
+            ${topSubs}
+        </div>` : ''}
+
+        <!-- Historial FDS -->
+        ${histHTML ? `<div style="margin-top:14px">
+            <div style="font-size:11px;color:var(--matrix);font-family:'Courier New',monospace;font-weight:700;margin-bottom:8px">// HISTORIAL</div>
+            ${histHTML}
+        </div>` : ''}
+    `;
+}
+
+// ═══════════════════════════════════════════════
+//  PRÉSTAMOS
+// ═══════════════════════════════════════════════
+function loanPendingAmt(l) {
+    const pagadas = l.cuotas_pagadas || 0;
+    const total   = l.cuotas_total   || 1;
+    return l.monto_cuota * (total - pagadas);
+}
+
+function renderPrestamos() {
+    const debo   = D.loans.filter(l => l.tipo==='debo'    && !l.pagado);
+    const meDeban= D.loans.filter(l => l.tipo==='meDeban' && !l.pagado);
+
+    document.getElementById('total-debo').textContent    = 'S/' + fmtN(debo.reduce((s,l)=>s+loanPendingAmt(l),0));
+    document.getElementById('total-medeban').textContent = 'S/' + fmtN(meDeban.reduce((s,l)=>s+loanPendingAmt(l),0));
+    document.getElementById('loans-debo-list').innerHTML    = debo.length    ? debo.map(loanHTML).join('')    : emptySmall('😌','Sin deudas pendientes');
+    document.getElementById('loans-medeban-list').innerHTML = meDeban.length ? meDeban.map(loanHTML).join('') : emptySmall('👍','Nadie te debe');
+
+    // Card de próximo débito automático
+    const autoLoans = debo.filter(l => l.auto_debito);
+    const nextCard  = document.getElementById('loans-next-debit');
+    if (autoLoans.length > 0) {
+        const totalAuto = autoLoans.reduce((s,l) => s + l.monto_cuota, 0);
+        nextCard.style.display = 'block';
+        document.getElementById('loans-next-amt').textContent    = 'S/' + fmtN(totalAuto) + ' el próximo 15';
+        document.getElementById('loans-next-detail').textContent = autoLoans.map(l => `${l.persona}: S/${fmtN(l.monto_cuota)}`).join(' · ');
+    } else {
+        nextCard.style.display = 'none';
+    }
+}
+
+function loanHTML(l) {
+    const pagadas  = l.cuotas_pagadas || 0;
+    const total    = l.cuotas_total   || 1;
+    const pct      = Math.round((pagadas / total) * 100);
+    const srcIcon  = l.tipo_persona === 'banco' ? '🏦' : '👤';
+    const colAmt   = l.tipo === 'debo' ? 'text-red' : 'text-green';
+    const pending  = loanPendingAmt(l);
+    const interesTag = l.interes_pct > 0
+        ? `<span style="font-size:10px;color:var(--orange);margin-left:6px">${l.interes_pct}% interés</span>`
+        : '';
+    const autoTag = l.auto_debito
+        ? `<span style="font-size:10px;color:var(--blue);margin-left:4px">⚡ auto</span>`
+        : '';
+
+    return `<div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:18px;padding:16px;margin-bottom:10px;transition:transform 0.15s" onclick="showLoanActions('${l.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+                <div style="font-size:16px;font-weight:700">${srcIcon} ${l.persona}${interesTag}${autoTag}</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px">${l.nota||''} · ${fmtDateShort(new Date(l.fecha+'T12:00:00'))}</div>
+                <div class="badge badge-${l.tipo}" style="margin-top:5px">${l.tipo==='debo'?'😬 Yo debo':'😤 Me deben'}</div>
+            </div>
+            <div style="text-align:right">
+                <div style="font-size:21px;font-weight:900" class="${colAmt}">S/${fmtN(pending)}</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px">pendiente</div>
+                ${total > 1 ? `<div style="font-size:11px;color:var(--text2);margin-top:2px">S/${fmtN(l.monto_cuota)}/cuota</div>` : ''}
+            </div>
+        </div>
+        ${total > 1 ? `
+        <div style="margin-bottom:8px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:5px">
+                <span>Cuotas pagadas: ${pagadas}/${total}</span><span>${pct}%</span>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:${l.tipo==='debo'?'var(--red)':'var(--green)'};border-radius:3px;transition:width 0.8s ease"></div>
+            </div>
+        </div>` : ''}
+        ${(l.pagos||[]).length > 0 ? `
+        <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07)">
+            <div style="font-size:10px;color:var(--matrix);font-weight:700;letter-spacing:0.08em;margin-bottom:5px;font-family:'Courier New',monospace">// HISTORIAL DE PAGOS</div>
+            ${(l.pagos||[]).map(p => `
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text2);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+                <span>📅 ${fmtDateShort(new Date(p.fecha+'T12:00:00'))}${p.nota?' <span style="color:var(--text3)">· '+p.nota+'</span>':''}</span>
+                <span style="font-weight:800;color:var(--green)">S/${fmtN(p.monto)}</span>
+            </div>`).join('')}
+        </div>` : ''}
+        <div style="display:flex;gap:8px;margin-top:10px">
+            ${l.tipo==='debo' ? `<button onclick="event.stopPropagation();pagarCuota('${l.id}')" style="flex:1;padding:10px;border-radius:12px;background:rgba(48,209,88,0.15);border:1px solid rgba(48,209,88,0.35);color:var(--green);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+                ✅ ${total===1?'Registrar pago':'Cuota '+(pagadas+1)+'/'+total}
+            </button>` : ''}
+            <button onclick="event.stopPropagation();deleteLoan('${l.id}')" style="padding:10px 14px;border-radius:12px;background:rgba(255,69,58,0.10);border:1px solid rgba(255,69,58,0.25);color:var(--red);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">🗑️</button>
+        </div>
+    </div>`;
+}
+
+let payingLoanId = null;
+
+function pagarCuota(id) {
+    const l = D.loans.find(x => x.id === id);
+    if (!l) return;
+    const pagadas = l.cuotas_pagadas || 0;
+    const total   = l.cuotas_total   || 1;
+    const num     = pagadas + 1;
+
+    payingLoanId = id;
+
+    // Mostrar datos en el modal
+    document.getElementById('pay-monto-label').textContent =
+        'S/' + fmtN(l.monto_cuota);
+    document.getElementById('pay-detalle-label').textContent =
+        total === 1
+            ? `Pago único a ${l.persona} (prestado el ${fmtDateShort(new Date(l.fecha + 'T12:00:00'))})`
+            : `Cuota ${num}/${total} a ${l.persona} · S/${fmtN(l.monto_cuota)} c/u`;
+
+    // Fecha por defecto = hoy
+    document.getElementById('pay-fecha').value = new Date().toISOString().split('T')[0];
+    document.getElementById('pay-nota').value  = '';
+
+    document.getElementById('modal-pay').classList.add('open');
+}
+
+function closePayModal() {
+    document.getElementById('modal-pay').classList.remove('open');
+    payingLoanId = null;
+}
+
+function confirmPayment() {
+    if (!payingLoanId) return;
+    const l     = D.loans.find(x => x.id === payingLoanId);
+    if (!l) return;
+    const fecha = document.getElementById('pay-fecha').value;
+    const nota  = document.getElementById('pay-nota').value.trim();
+    if (!fecha) { toast('⚠️ Selecciona la fecha de pago'); return; }
+
+    const pagadas = l.cuotas_pagadas || 0;
+    const total   = l.cuotas_total   || 1;
+    const num     = pagadas + 1;
+    const desc    = total === 1
+        ? `Préstamo ${l.persona}${nota ? ' · ' + nota : ''}`
+        : `Préstamo ${l.persona} cuota ${num}/${total}${nota ? ' · ' + nota : ''}`;
+
+    // Transacción real con la fecha exacta del pago
+    D.transactions.push({
+        id:          Date.now() + '',
+        monto:       l.monto_cuota,
+        descripcion: desc,
+        fecha,
+        categoria:   'prestamos',
+        tipo:        'gasto',
+    });
+
+    // Guardar en historial de pagos del préstamo
+    if (!l.pagos) l.pagos = [];
+    l.pagos.push({ fecha, monto: l.monto_cuota, nota, cuota: num });
+
+    l.cuotas_pagadas = num;
+    if (l.cuotas_pagadas >= total) {
+        l.pagado = true;
+        toast(`🎉 Saldado con ${l.persona}. Registrado el ${fmtDateShort(new Date(fecha + 'T12:00:00'))}`);
+    } else {
+        toast(`✅ Cuota ${num}/${total} pagada el ${fmtDateShort(new Date(fecha + 'T12:00:00'))}`);
+    }
+
+    save(); closePayModal(); renderPrestamos(); renderHome();
+}
+
+function deleteLoan(id) {
+    if (confirm('¿Eliminar este préstamo?')) {
+        D.loans = D.loans.filter(x => x.id !== id);
+        save(); renderPrestamos(); toast('🗑️ Préstamo eliminado');
+    }
+}
+
+function showLoanActions(id) { /* botones en la card */ }
+
+// ═══════════════════════════════════════════════
+//  PANDERO
+// ═══════════════════════════════════════════════
+function renderPandero() {
+    const now = new Date();
+    const cm  = now.getMonth();
+    const grid = document.getElementById('months-grid');
+    grid.innerHTML = MONTHS_SH.map((m,i) => {
+        const paid   = !!(D.pandero && D.pandero[i]);
+        const cobro  = COBRO_MONTHS.includes(i);
+        const curr   = i === cm;
+        let cls = 'month-pill';
+        if (paid) cls += ' paid'; else if (cobro) cls += ' cobro';
+        if (curr) cls += ' current';
+        return `<div class="${cls}" onclick="togglePandero(${i})">
+            <div class="month-name">${m}</div>
+            <div class="month-status">${cobro ? '🏆 COBRO' : paid ? '✅ Pagado' : 'S/600'}</div>
+        </div>`;
+    }).join('');
+
+    const paidCnt   = Object.values(D.pandero||{}).filter(Boolean).length;
+    const cobrosCnt = COBRO_MONTHS.filter(m => D.pandero&&D.pandero[m]&&m<=cm).length;
+    document.getElementById('pandero-aportado').textContent= 'S/'+fmtN(paidCnt*600);
+    document.getElementById('pandero-cobrado').textContent = 'S/'+fmtN(cobrosCnt*2400);
+    document.getElementById('pandero-balance').textContent = 'S/'+fmtN(cobrosCnt*2400 - paidCnt*600);
+
+    const next = COBRO_MONTHS.find(m=>m>cm) ?? COBRO_MONTHS[0];
+    const yr   = next < cm ? now.getFullYear()+1 : now.getFullYear();
+    const daysN= Math.ceil((new Date(yr,next,1) - now)/86400000);
+    document.getElementById('next-cobro').textContent     = `${MONTHS_ES[next]} ${yr} — S/2,400`;
+    document.getElementById('next-cobro-sub').textContent = `Faltan ${daysN} días para tu próximo cobro 💪`;
+}
+
+function togglePandero(m) {
+    if (!D.pandero) D.pandero = {};
+    D.pandero[m] = !D.pandero[m];
+    save(); renderPandero();
+    toast(D.pandero[m] ? '✅ Mes marcado' : '↩️ Mes desmarcado');
+}
+
+// ═══════════════════════════════════════════════
+//  SYNC · GITHUB GIST
+// ═══════════════════════════════════════════════
+const SYNC_KEY = 'maxfinance_sync_cfg';
+let   _syncPending = false;
+
+function getSyncCfg() {
+    try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || {}; } catch { return {}; }
+}
+function saveSyncCfg(cfg) { localStorage.setItem(SYNC_KEY, JSON.stringify(cfg)); }
+
+function renderSyncUI() {
+    const cfg = getSyncCfg();
+    const badge      = document.getElementById('sync-badge');
+    const statusRow  = document.getElementById('sync-status-row');
+    const setupArea  = document.getElementById('sync-setup-area');
+    const connArea   = document.getElementById('sync-connected-area');
+    if (!badge) return;
+
+    if (cfg.token && cfg.gistId) {
+        badge.textContent = '✅ conectado';
+        badge.style.background = 'rgba(48,209,88,0.18)';
+        badge.style.color = 'var(--green)';
+        statusRow.style.display = 'block';
+        document.getElementById('sync-last-time').textContent =
+            cfg.lastSync ? new Date(cfg.lastSync).toLocaleString('es-PE') : 'nunca';
+        setupArea.style.display  = 'none';
+        connArea.style.display   = 'block';
+    } else if (cfg.token && !cfg.gistId) {
+        badge.textContent = '⏳ creando Gist...';
+        badge.style.background = 'rgba(255,159,10,0.18)';
+        badge.style.color = 'var(--orange)';
+    } else {
+        badge.textContent = 'sin configurar';
+        badge.style.background = 'rgba(255,255,255,0.07)';
+        badge.style.color = 'var(--text3)';
+        statusRow.style.display = 'none';
+        setupArea.style.display  = 'block';
+        connArea.style.display   = 'none';
+    }
+}
+
+function toggleTokenVis() {
+    const inp = document.getElementById('gh-token-input');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function setupGistSync() {
+    const token = document.getElementById('gh-token-input').value.trim();
+    if (!token) { toast('⚠️ Ingresa tu token'); return; }
+    toast('⏳ Conectando con GitHub...');
+    const cfg = { token };
+    saveSyncCfg(cfg);
+    await syncToGist(false, cfg);
+    renderSyncUI();
+}
+
+async function syncToGist(showToast=true, cfgOverride=null) {
+    const cfg = cfgOverride || getSyncCfg();
+    if (!cfg.token) { if(showToast) toast('⚠️ Configura tu token primero'); return; }
+
+    const content = JSON.stringify(D, null, 2);
+    const payload = {
+        description: 'MaxFinance — datos personales (privado)',
+        files: { 'maxfinance.json': { content } }
+    };
+
+    try {
+        let url = 'https://api.github.com/gists';
+        let method = 'POST';
+        if (cfg.gistId) { url += '/' + cfg.gistId; method = 'PATCH'; }
+        else payload.public = false;
+
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Authorization': 'token ' + cfg.token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/vnd.github+json',
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (res.status === 401) { toast('❌ Token inválido o expirado'); return; }
+        if (!res.ok) { toast('❌ Error ' + res.status + ' de GitHub'); return; }
+
+        const data = await res.json();
+        cfg.gistId  = data.id;
+        cfg.lastSync = new Date().toISOString();
+        saveSyncCfg(cfg);
+        renderSyncUI();
+        if (showToast) toast('☁️ Guardado en GitHub Gist ✅');
+    } catch(e) {
+        if (showToast) toast('❌ Sin conexión a internet');
+        console.error('syncToGist', e);
+    }
+}
+
+async function syncFromGist(showToast=true) {
+    const cfg = getSyncCfg();
+    if (!cfg.token || !cfg.gistId) { if(showToast) toast('⚠️ Sincronización no configurada'); return; }
+
+    try {
+        const res = await fetch('https://api.github.com/gists/' + cfg.gistId, {
+            headers: {
+                'Authorization': 'token ' + cfg.token,
+                'Accept': 'application/vnd.github+json',
+            }
+        });
+        if (!res.ok) { if(showToast) toast('❌ No se pudo leer el Gist'); return; }
+
+        const data = await res.json();
+        const content = data.files['maxfinance.json']?.content;
+        if (!content) { if(showToast) toast('⚠️ Gist vacío'); return; }
+
+        D = JSON.parse(content);
+        localStorage.setItem(KEY, JSON.stringify(D)); // guardar local sin re-sync
+        cfg.lastSync = new Date().toISOString();
+        saveSyncCfg(cfg);
+        renderSyncUI();
+        renderHome(); renderGastos();
+        if (showToast) toast('⬇️ Datos cargados desde la nube ✅');
+    } catch(e) {
+        if (showToast) toast('❌ Error al cargar desde Gist');
+        console.error('syncFromGist', e);
+    }
+}
+
+function disconnectGist() {
+    if (!confirm('¿Desconectar GitHub Gist? Tus datos locales no se borran.')) return;
+    localStorage.removeItem(SYNC_KEY);
+    renderSyncUI();
+    toast('↩️ Cuenta desconectada');
+}
+
+// Override save() para añadir auto-sync debounced (3s tras último cambio)
+let _syncTimer = null;
+save = function() {
+    saveLocal();
+    clearTimeout(_syncTimer);
+    _syncTimer = setTimeout(() => {
+        const cfg = getSyncCfg();
+        if (cfg.token && cfg.gistId) syncToGist(false);
+    }, 3000);
+};
+
+// ═══════════════════════════════════════════════
+//  EXPORT / IMPORT
+// ═══════════════════════════════════════════════
+function exportData() {
+    const json = JSON.stringify(D, null, 2);
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(json).then(() => toast('📋 JSON copiado al portapapeles ✅'));
+    } else {
+        // fallback para Safari/VSCode sin clipboard API
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+        document.body.appendChild(ta);
+        ta.select(); document.execCommand('copy');
+        document.body.removeChild(ta);
+        toast('📋 JSON copiado ✅');
+    }
+}
+
+function showImportArea() {
+    const area = document.getElementById('import-area');
+    area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    if (area.style.display === 'block') document.getElementById('import-json').focus();
+}
+
+function importData() {
+    const raw = document.getElementById('import-json').value.trim();
+    if (!raw) { toast('⚠️ Pega el JSON primero'); return; }
+    try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.transactions) { toast('❌ JSON inválido'); return; }
+        if (!confirm('¿Importar datos? Reemplazará todo lo actual.')) return;
+        D = parsed;
+        save();
+        document.getElementById('import-area').style.display = 'none';
+        document.getElementById('import-json').value = '';
+        renderHome(); renderGastos(); renderConfig();
+        toast('✅ Datos importados correctamente');
+    } catch(e) {
+        toast('❌ JSON inválido, verifica el formato');
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════
+function renderConfig() {
+    const autoLabel = { 15:'📅 día 15 (auto)', 26:'📅 día 26 (auto)', 28:'📅 fin de mes (auto)', 0:'✏️ ingreso manual' };
+    document.getElementById('fixed-expenses-list').innerHTML =
+        FIXED.map(f => {
+            const cat  = CATS[f.c]||{e:'💸'};
+            const lbl  = autoLabel[f.dia] || '✏️ manual';
+            const col  = f.dia > 0 ? 'var(--orange)' : 'var(--text3)';
+            return `<div class="analysis-row">
+                <span style="font-size:18px">${cat.e}</span>
+                <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600">${f.n}</div>
+                    <div style="font-size:10px;color:${col};margin-top:2px">${lbl}</div>
+                </div>
+                <span style="font-size:14px;font-weight:800;color:var(--orange)">S/${fmtN(f.m)}</span>
+            </div>`;
+        }).join('') +
+        `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <span style="font-size:13px;font-weight:800;color:var(--text2)">TOTAL FIJOS</span>
+                <span style="font-size:20px;font-weight:900;color:var(--red)">S/${fmtN(TOTAL_FIXED)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px">
+                <span style="font-size:12px;color:var(--text3)">Sueldo: S/${fmtN(SUELDO)}</span>
+                <span style="font-size:14px;font-weight:800;color:${TOTAL_FIXED>SUELDO*0.8?'var(--red)':'var(--orange)'}">
+                    ${Math.round(TOTAL_FIXED/SUELDO*100)}% del sueldo
+                </span>
+            </div>
+         </div>`;
+}
+
+function confirmReset() {
+    if (confirm('¿Borrar TODOS los datos? No se puede deshacer.')) {
+        localStorage.removeItem(KEY); D = base(); toast('🗑️ Datos borrados'); showPage('home');
+    }
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL: ADD TRANSACTION
+// ═══════════════════════════════════════════════
+let currTipo = 'gasto', currCat = 'comida';
+
+function openAddModal() {
+    document.getElementById('input-monto').value  = '';
+    document.getElementById('input-desc').value   = '';
+    document.getElementById('input-fecha').value  = new Date().toISOString().split('T')[0];
+    document.getElementById('pasaje-desde').value = '';
+    document.getElementById('pasaje-hasta').value = '';
+    currSubcat = ''; currTag = '';
+    document.querySelectorAll('#tag-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.tag === ''));
+    setTipo('gasto'); selectCat('comida');
+    document.getElementById('modal-add').classList.add('open');
+    setTimeout(() => document.getElementById('input-monto').focus(), 400);
+}
+function closeAddModal() { document.getElementById('modal-add').classList.remove('open'); }
+
+function setTipo(t) {
+    currTipo = t;
+    document.getElementById('tipo-gasto').classList.toggle('active',   t==='gasto');
+    document.getElementById('tipo-ingreso').classList.toggle('active', t==='ingreso');
+    document.getElementById('cat-group').style.display = t==='gasto' ? 'block' : 'none';
+    if (t==='ingreso') currCat='ingreso';
+}
+const SUBCATS = {
+    comida:  [
+        { k:'mercado',   e:'🛒', l:'Mercado/Super' },
+        { k:'restaurant',e:'🍽️', l:'Restaurante'   },
+        { k:'delivery',  e:'🛵', l:'Delivery'      },
+        { k:'lonchera',  e:'🍱', l:'Lonchera'      },
+        { k:'cafe',      e:'☕', l:'Café/snack'    },
+    ],
+    pasajes: [
+        { k:'trabajo',   e:'💼', l:'Al trabajo'    },
+        { k:'hijo',      e:'👶', l:'Ver a mi hijo' },
+        { k:'pareja',    e:'❤️', l:'Con pareja'    },
+        { k:'estudio',   e:'🎓', l:'Estudios'      },
+        { k:'otro',      e:'🌍', l:'Otro'          },
+    ],
+    gustos:  [
+        { k:'ropa',      e:'👕', l:'Ropa'          },
+        { k:'entrete',   e:'🎮', l:'Entretenimiento'},
+        { k:'salida',    e:'🍺', l:'Salida social' },
+        { k:'tech',      e:'📱', l:'Tech/gadget'   },
+        { k:'cuidado',   e:'💇', l:'Cuidado pers.' },
+        { k:'capricho',  e:'🤩', l:'Capricho'      },
+    ],
+    hijo:    [
+        { k:'colegio',   e:'📚', l:'Colegio'       },
+        { k:'salud',     e:'🏥', l:'Salud/terapia' },
+        { k:'ropa_hijo', e:'👕', l:'Ropa'          },
+        { k:'paseo',     e:'🎡', l:'Paseo/actividad'},
+        { k:'comida_hijo',e:'🍔',l:'Comida'        },
+        { k:'otro_hijo', e:'❤️', l:'Otro'          },
+    ],
+    hogar:   [
+        { k:'limpieza',  e:'🧹', l:'Limpieza'      },
+        { k:'manten',    e:'🔧', l:'Mantenimiento' },
+        { k:'decoracion',e:'🛋️', l:'Decoración'    },
+        { k:'otros_hogar',e:'🏠',l:'Otros'         },
+    ],
+};
+
+let currSubcat = '';
+let currTag    = '';
+
+function selectCat(cat) {
+    currCat    = cat;
+    currSubcat = '';
+    document.querySelectorAll('.cat-opt').forEach(el => el.classList.toggle('selected', el.dataset.cat === cat));
+
+    // Subcategorías
+    const subs     = SUBCATS[cat];
+    const subcatGrp= document.getElementById('subcat-group');
+    const subcatLbl= document.getElementById('subcat-label');
+    const chips    = document.getElementById('subcat-chips');
+    if (subs) {
+        subcatLbl.textContent = cat === 'comida' ? 'Tipo de comida' :
+                                cat === 'pasajes' ? 'Motivo del viaje' :
+                                cat === 'gustos'  ? 'Tipo de gusto' :
+                                cat === 'hijo'    ? 'Gasto del hijo' :
+                                cat === 'hogar'   ? 'Tipo de gasto hogar' : 'Tipo';
+        chips.innerHTML = subs.map(s =>
+            `<div class="chip" data-sub="${s.k}" onclick="selectSubcat('${s.k}')">${s.e} ${s.l}</div>`
+        ).join('');
+        subcatGrp.style.display = 'block';
+    } else {
+        subcatGrp.style.display = 'none';
+    }
+
+    // Campos pasaje
+    document.getElementById('pasaje-fields').style.display = cat === 'pasajes' ? 'block' : 'none';
+}
+
+function selectSubcat(k) {
+    currSubcat = k;
+    document.querySelectorAll('#subcat-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.sub === k));
+    // Auto-rellenar descripción si está vacía
+    const subs = SUBCATS[currCat] || [];
+    const sub  = subs.find(s => s.k === k);
+    const descEl = document.getElementById('input-desc');
+    if (sub && !descEl.value) descEl.value = sub.l;
+}
+
+function selectTag(tag) {
+    currTag = tag;
+    document.querySelectorAll('#tag-chips .chip').forEach(c => c.classList.toggle('active', c.dataset.tag === tag));
+}
+
+function saveTransaction() {
+    const monto  = parseFloat(document.getElementById('input-monto').value);
+    const fecha  = document.getElementById('input-fecha').value;
+    const desde  = document.getElementById('pasaje-desde').value.trim();
+    const hasta  = document.getElementById('pasaje-hasta').value.trim();
+
+    // Construir descripción automática
+    let desc = document.getElementById('input-desc').value.trim();
+    if (!desc) {
+        const subs = SUBCATS[currCat] || [];
+        const sub  = subs.find(s => s.k === currSubcat);
+        if (currCat === 'pasajes' && desde && hasta) desc = `${desde} → ${hasta}`;
+        else if (sub) desc = sub.l;
+        else desc = (CATS[currCat]||{}).l || currCat;
+    }
+    if (currCat === 'pasajes' && desde && hasta) desc = `${desde} → ${hasta}`;
+
+    if (!monto || monto <= 0) { toast('⚠️ Ingresa un monto válido'); return; }
+
+    D.transactions.push({
+        id:          Date.now() + '',
+        monto,
+        descripcion: desc,
+        fecha,
+        categoria:   currTipo === 'ingreso' ? 'ingreso' : currCat,
+        subcategoria:currSubcat || null,
+        tag:         currTag    || null,
+        tipo:        currTipo,
+    });
+    save(); closeAddModal(); toast('✅ Guardado'); refresh();
+}
+
+// ═══════════════════════════════════════════════
+//  MODAL: LOANS
+// ═══════════════════════════════════════════════
+let currLoanTipo = 'debo';
+let currLoanSrc  = 'amigo';
+let currLoanAD   = true;
+
+function openLoanModal() {
+    document.getElementById('loan-persona').value = '';
+    document.getElementById('loan-monto').value   = '';
+    document.getElementById('loan-interes').value = '0';
+    document.getElementById('loan-cuotas').value  = '1';
+    document.getElementById('loan-fecha').value   = new Date().toISOString().split('T')[0];
+    document.getElementById('loan-nota').value    = '';
+    document.getElementById('loan-preview').style.display = 'none';
+    setLoanTipo('debo'); setLoanSrc('amigo'); setLoanAD(true);
+    document.getElementById('modal-loan').classList.add('open');
+    setTimeout(() => document.getElementById('loan-persona').focus(), 400);
+}
+function closeLoanModal() { document.getElementById('modal-loan').classList.remove('open'); }
+
+function setLoanTipo(t) {
+    currLoanTipo = t;
+    document.getElementById('lt-debo').classList.toggle('active',    t==='debo');
+    document.getElementById('lt-medeban').classList.toggle('active', t==='meDeban');
+    // ocultar auto-débito si es "me deben" (no tiene sentido)
+    document.getElementById('auto-debito-group').style.display = t==='debo' ? 'block' : 'none';
+}
+function setLoanSrc(s) {
+    currLoanSrc = s;
+    document.getElementById('lsrc-amigo').classList.toggle('active', s==='amigo');
+    document.getElementById('lsrc-banco').classList.toggle('active', s==='banco');
+}
+function setLoanAD(v) {
+    currLoanAD = v;
+    document.getElementById('lad-si').classList.toggle('active',  v===true);
+    document.getElementById('lad-no').classList.toggle('active',  v===false);
+}
+
+function calcLoanCuota() {
+    const monto   = parseFloat(document.getElementById('loan-monto').value)   || 0;
+    const interes = parseFloat(document.getElementById('loan-interes').value) || 0;
+    const cuotas  = parseInt(document.getElementById('loan-cuotas').value)    || 1;
+    const preview = document.getElementById('loan-preview');
+    if (monto <= 0) { preview.style.display = 'none'; return; }
+    const totalConInteres = monto * (1 + interes / 100);
+    const cuota = totalConInteres / cuotas;
+    preview.style.display = 'block';
+    document.getElementById('preview-cuota').textContent = 'S/' + fmtN(cuota) + (cuotas > 1 ? ` × ${cuotas}` : '');
+    document.getElementById('preview-total').textContent = interes > 0
+        ? `Total con ${interes}% interés: S/${fmtN(totalConInteres)}`
+        : `Sin interés · pago único de S/${fmtN(cuota)}`;
+}
+
+function saveLoan() {
+    const persona = document.getElementById('loan-persona').value.trim();
+    const monto   = parseFloat(document.getElementById('loan-monto').value);
+    const interes = parseFloat(document.getElementById('loan-interes').value) || 0;
+    const cuotas  = parseInt(document.getElementById('loan-cuotas').value)    || 1;
+    const nota    = document.getElementById('loan-nota').value.trim();
+    if (!persona)         { toast('⚠️ Ingresa el nombre'); return; }
+    if (!monto||monto<=0) { toast('⚠️ Ingresa un monto');  return; }
+    const totalConInteres = monto * (1 + interes / 100);
+    const monto_cuota     = totalConInteres / cuotas;
+    const fecha = document.getElementById('loan-fecha').value || new Date().toISOString().split('T')[0];
+    D.loans.push({
+        id:             Date.now() + '',
+        persona,
+        tipo_persona:   currLoanSrc,
+        tipo:           currLoanTipo,
+        monto_original: monto,
+        interes_pct:    interes,
+        monto_total:    totalConInteres,
+        cuotas_total:   cuotas,
+        monto_cuota,
+        cuotas_pagadas: 0,
+        auto_debito:    currLoanTipo === 'debo' ? currLoanAD : false,
+        nota,
+        fecha,
+        pagos:          [], // historial de pagos con fecha
+        pagado:         false,
+    });
+    save(); closeLoanModal();
+    toast(`✅ Préstamo registrado${currLoanAD && currLoanTipo==='debo' ? ' · se debitará el 15' : ''}`);
+    renderPrestamos();
+}
+
+// ═══════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════
+function fmtN(n) {
+    const num = Number(n||0);
+    const hasCents = num % 1 !== 0;
+    return num.toLocaleString('es-PE', { minimumFractionDigits: hasCents?2:0, maximumFractionDigits: hasCents?2:0 });
+}
+function fmtDate(d) {
+    const ds=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const ms=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    return `${ds[d.getDay()]}, ${d.getDate()} de ${ms[d.getMonth()]}`;
+}
+function fmtDateShort(d) { return `${d.getDate()} ${MONTHS_SH[d.getMonth()]}`; }
+
+function cycleStart() {
+    const now = new Date(), day = now.getDate();
+    return day >= 15 ? new Date(now.getFullYear(), now.getMonth(), 15)
+                     : new Date(now.getFullYear(), now.getMonth()-1, 15);
+}
+function getDays15() {
+    const now = new Date(), day = now.getDate();
+    let next15;
+    if (day < 15)       next15 = new Date(now.getFullYear(), now.getMonth(), 15);
+    else if (day === 15) return { daysUntil:0, daysInCycle:30, daysElapsed:0 };
+    else                next15 = new Date(now.getFullYear(), now.getMonth()+1, 15);
+    const cs        = cycleStart();
+    const daysUntil = Math.ceil((next15 - now) / 86400000);
+    const daysInC   = Math.ceil((next15 - cs)  / 86400000);
+    const daysEl    = Math.floor((now - cs)     / 86400000);
+    return { daysUntil, daysInCycle:daysInC, daysElapsed:daysEl };
+}
+function nextPayday() {
+    const now = new Date(), day = now.getDate();
+    const ms=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+    if (day <= 15) return `15 de ${ms[now.getMonth()]}`;
+    const nm = now.getMonth()+1 > 11 ? 0 : now.getMonth()+1;
+    return `15 de ${ms[nm]}`;
+}
+function emptySmall(icon,text) {
+    return `<div class="empty-state" style="padding:18px 20px"><div style="font-size:32px;margin-bottom:8px">${icon}</div><div class="empty-state-sub">${text}</div></div>`;
+}
+function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ═══════════════════════════════════════════════
+//  CLOCK
+// ═══════════════════════════════════════════════
+function tick() {
+    const n = new Date();
+    document.getElementById('status-time').textContent =
+        n.getHours().toString().padStart(2,'0') + ':' + n.getMinutes().toString().padStart(2,'0');
+}
+tick(); setInterval(tick, 1000);
+
+// ═══════════════════════════════════════════════
+//  MATRIX RAIN
+// ═══════════════════════════════════════════════
+(function() {
+    const cv  = document.getElementById('matrix-canvas');
+    const ctx = cv.getContext('2d');
+    let cols, drops;
+    const ch  = '01アイウエカキクケコ$€¥∑∆∏⊕⊗░▓█'.split('');
+
+    function resize() {
+        cv.width  = window.innerWidth;
+        cv.height = window.innerHeight;
+        cols  = Math.floor(cv.width / 17);
+        drops = new Array(cols).fill(1);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    setInterval(function() {
+        ctx.fillStyle = 'rgba(0,0,16,0.05)';
+        ctx.fillRect(0,0,cv.width,cv.height);
+        ctx.fillStyle = '#00FF41';
+        ctx.font = '12px Courier New';
+        drops.forEach((y,i) => {
+            ctx.fillText(ch[Math.floor(Math.random()*ch.length)], i*17, y*17);
+            if (y*17 > cv.height && Math.random() > 0.974) drops[i] = 0;
+            drops[i]++;
+        });
+    }, 55);
+})();
+
+// ═══════════════════════════════════════════════
+//  CLOSE MODALS ON OVERLAY CLICK
+// ═══════════════════════════════════════════════
+document.getElementById('modal-add').addEventListener('click',  e => { if(e.target===document.getElementById('modal-add'))  closeAddModal(); });
+document.getElementById('modal-loan').addEventListener('click', e => { if(e.target===document.getElementById('modal-loan')) closeLoanModal(); });
+document.getElementById('modal-pay').addEventListener('click',  e => { if(e.target===document.getElementById('modal-pay'))  closePayModal(); });
+document.getElementById('modal-edit').addEventListener('click', e => { if(e.target===document.getElementById('modal-edit')) document.getElementById('modal-edit').classList.remove('open'); });
+
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+renderHome();
+
+// Auto-sync desde Gist al abrir la app (silencioso, solo si ya está configurado)
+(async () => {
+    const cfg = getSyncCfg();
+    if (cfg.token && cfg.gistId) {
+        await syncFromGist(false);
+        renderHome(); renderGastos();
+    }
+})();
+</script>
+</body>
+</html>
