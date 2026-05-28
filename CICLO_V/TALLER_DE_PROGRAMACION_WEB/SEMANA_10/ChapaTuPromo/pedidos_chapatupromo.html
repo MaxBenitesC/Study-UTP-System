@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChapaTuPromo | Mis Pedidos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos_chapatupromo.css">
+  <link rel="icon" href="logo/chapatupromo.png" type="image/png">
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <img src="logo/chapatupromo.png" alt="Logo ChapaTuPromo">
+      <div class="header-texto">
+        <h1>ChapaTuPromo</h1>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu_chapatupromo.html">Ver Menu</a> |
+      <a href="formulario_chapatupromo.html">Nuevo Pedido</a> |
+      <a href="ofertas_chapatupromo.html">Ofertas del Dia</a> |
+      <a href="login_chapatupromo.html">Ingresar</a> |
+      <a href="registrar_chapatupromo.html">Registrarme</a>
+    </nav>
+  </header>
+  <hr>
+  <section>
+    <h2>Pedidos Realizados</h2>
+    <p>Aqui puedes ver el estado de todos tus pedidos. Te avisamos por correo cuando tu pedido este listo para recoger o en camino.</p>
+
+    <div class="pedidos-stats">
+      <div class="stat-card stat-total">
+        <h3>6</h3>
+        <p>Total de pedidos</p>
+      </div>
+      <div class="stat-card stat-entregados">
+        <h3>3</h3>
+        <p>Entregados</p>
+      </div>
+      <div class="stat-card stat-proceso">
+        <h3>3</h3>
+        <p>En proceso</p>
+      </div>
+    </div>
+
+    <table>
+      <tr>
+        <th class="celda-ini">Num. Pedido</th>
+        <th>Fecha</th>
+        <th>Cliente</th>
+        <th>Productos</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+        <th>Tipo de entrega</th>
+        <th>Pago</th>
+        <th class="celda-fin">Estado</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>17 abr 2026</td>
+        <td>Maria Flores Quispe</td>
+        <td>Torta de Chocolate San Antonio, Yogurt Gloria Fresa 1L</td>
+        <td>2</td>
+        <td>S/. 27.60</td>
+        <td>Recojo - Tienda Surco</td>
+        <td>Yape</td>
+        <td><strong>Listo para recojo</strong></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>17 abr 2026</td>
+        <td>Carlos Quispe Mamani</td>
+        <td>Pollo Entero Refrigerado, Jamon del Pais Suiza</td>
+        <td>2</td>
+        <td>S/. 21.60</td>
+        <td>Delivery - Jr. Los Pinos 234, SJL</td>
+        <td>Yape</td>
+        <td><strong>En camino</strong></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>17 abr 2026</td>
+        <td>Rosa Huaman Ccoa</td>
+        <td>Torta Tres Leches, Queso Fresco La Preferida, Crema de Leche Laive</td>
+        <td>3</td>
+        <td>S/. 32.60</td>
+        <td>Recojo - Tienda La Molina</td>
+        <td>Plin</td>
+        <td><strong>Preparando</strong></td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>16 abr 2026</td>
+        <td>Jose Condori Vargas</td>
+        <td>Pan de Molde Bimbo Integral, Salchicha estilo Huacho Suiza</td>
+        <td>3</td>
+        <td>S/. 50.40</td>
+        <td>Delivery - Av. Los Heroes 890, Chorrillos</td>
+        <td>Tarjeta Visa</td>
+        <td><strong>Entregado</strong></td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>16 abr 2026</td>
+        <td>Ana Ccahuana Torres</td>
+        <td>Ensalada Rusa Bells, Causa Rellena de Atun</td>
+        <td>2</td>
+        <td>S/. 10.95</td>
+        <td>Recojo - Tienda San Miguel</td>
+        <td>Yape</td>
+        <td><strong>Entregado</strong></td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>16 abr 2026</td>
+        <td>Luis Mamani Apaza</td>
+        <td>Filete de Perico Refrigerado, Queso Fresco La Preferida</td>
+        <td>2</td>
+        <td>S/. 15.30</td>
+        <td>Recojo - Tienda San Borja</td>
+        <td>Yape</td>
+        <td><strong>Entregado</strong></td>
+      </tr>
+      <tr>
+        <td colspan="9">Total de pedidos: 6</td>
+      </tr>
+    </table>
+
+    <br>
+    <p><a href="formulario_chapatupromo.html">Hacer un nuevo pedido</a></p>
+  </section>
+  <hr>
+  <footer>
+    <p class="footer-siguenos">Siguenos en nuestras redes</p>
+    <div class="footer-redes">
+      <a href="https://instagram.com/ChapaTuPromo" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="https://facebook.com/ChapaTuPromo" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      <a href="https://tiktok.com/@ChapaTuPromo" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+    </div>
+    <p class="footer-copy">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
+  </footer>
+
+</body>
+</html>
