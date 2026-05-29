@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Balotario Dinámico - AED Semanas 6 a 9</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+         background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); min-height:100vh; padding:16px; }
+  .container { max-width:900px; margin:0 auto; background:#fff; border-radius:12px;
+               box-shadow:0 10px 40px rgba(0,0,0,.3); overflow:hidden; }
+  header { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:26px; text-align:center; }
+  header h1 { font-size:1.8em; margin-bottom:6px; }
+  header p { opacity:.9; font-size:.95em; }
+  .bar { background:#f8f9fa; padding:14px 16px; display:flex; gap:10px; flex-wrap:wrap;
+         align-items:center; justify-content:space-between; border-bottom:1px solid #eee; }
+  .filters { display:flex; gap:8px; flex-wrap:wrap; }
+  .filters button, .actions button { border:none; cursor:pointer; padding:9px 14px; border-radius:20px;
+         font-size:.85em; font-weight:600; background:#e9ecef; color:#444; transition:.15s; }
+  .filters button.active { background:#764ba2; color:#fff; }
+  .filters button:hover, .actions button:hover { filter:brightness(.95); transform:translateY(-1px); }
+  .actions button { background:#667eea; color:#fff; }
+  .score { font-weight:700; color:#764ba2; font-size:.95em; white-space:nowrap; }
+  .content { padding:18px 16px 28px; }
+  .q { border:1px solid #e6e6ef; border-radius:10px; padding:16px; margin-bottom:18px; background:#fff; }
+  .q .tag { display:inline-block; font-size:.7em; font-weight:700; text-transform:uppercase;
+            letter-spacing:.5px; color:#fff; background:#764ba2; padding:3px 9px; border-radius:10px; margin-bottom:10px; }
+  .q .tag.gen { background:#e67e22; }
+  .q h3 { font-size:1.05em; color:#2c3e50; margin-bottom:10px; line-height:1.45; }
+  .q code { background:#f3f0fa; color:#5b3da8; padding:1px 6px; border-radius:5px; font-size:.95em; }
+  .diagram { overflow-x:auto; background:#fafaff; border:1px dashed #cfc8ec; border-radius:8px;
+             padding:12px; margin:10px 0; text-align:center; }
+  .opts { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+  .opt { text-align:left; border:1.5px solid #dfe1ea; background:#fff; border-radius:8px; padding:11px 13px;
+         cursor:pointer; font-size:.95em; transition:.12s; }
+  .opt:hover { border-color:#764ba2; background:#f8f6fd; }
+  .opt.correct { border-color:#27ae60; background:#eafaf0; color:#1e8449; font-weight:600; }
+  .opt.wrong { border-color:#e74c3c; background:#fdecea; color:#c0392b; }
+  .opt:disabled { cursor:default; }
+  .explain { margin-top:10px; padding:11px 13px; border-radius:8px; background:#f4f1fb;
+             border-left:4px solid #764ba2; font-size:.9em; color:#3a3a4a; display:none; line-height:1.5; }
+  .explain.show { display:block; }
+  .footer { text-align:center; color:#888; font-size:.8em; padding:16px; }
+  svg text { font-family:'Segoe UI',sans-serif; }
+  @media(max-width:600px){ header h1{font-size:1.4em} .q h3{font-size:1em} }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🧩 Balotario Dinámico — AED</h1>
+    <p>Semanas 6 a 9 · TAD · Punteros &amp; Nodos · Listas Enlazadas · Búsqueda · Circulares</p>
+  </header>
+
+  <div class="bar">
+    <div class="filters" id="filters"></div>
+    <div class="actions">
+      <button onclick="nuevaDinamica()">🎲 Pregunta dinámica</button>
+      <button onclick="render()">🔄 Reiniciar</button>
+    </div>
+    <div class="score" id="score">Aciertos: 0 / 0</div>
+  </div>
+
+  <div class="content" id="content"></div>
+  <div class="footer">
+    Generado para Max Benites · Estilo de diagramas basado en las diapositivas de clase.<br>
+    El botón <b>🎲 Pregunta dinámica</b> crea recorridos de punteros nuevos cada vez (como en el examen).
+  </div>
+</div>
+
+<script>
+/* ---------- Render de cadena de nodos en SVG (estilo slides) ---------- */
+function chainSVG(labels, opts={}){
+  const {circular=false, nullEnd=true, inicio=true, highlight=-1, doble=false} = opts;
+  const NW=78, NH=40, GAP=46, padX=30, topY=46;
+  const n=labels.length;
+  const W = padX*2 + n*NW + (n-1)*GAP + 30;
+  const H = circular ? 150 : 118;
+  let s=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  const y=topY;
+  const cx=i=> padX + i*(NW+GAP);
+  // inicio pointer
+  if(inicio){
+    const sx=cx(0)+12;
+    s+=`<text x="${sx-6}" y="${y-18}" font-size="13" font-style="italic">inicio</text>`;
+    s+=`<circle cx="${sx}" cy="${y-12}" r="3.5"/>`;
+    s+=`<line x1="${sx}" y1="${y-12}" x2="${cx(0)+18}" y2="${y}" stroke="#000" stroke-width="2" marker-end="url(#a)"/>`;
+  }
+  for(let i=0;i<n;i++){
+    const x=cx(i);
+    s+=`<rect x="${x}" y="${y}" width="${NW}" height="${NH}" fill="#ffe600" stroke="#000"/>`;
+    s+=`<line x1="${x+NW-22}" y1="${y}" x2="${x+NW-22}" y2="${y+NH}" stroke="#000"/>`;
+    s+=`<text x="${x+(NW-22)/2}" y="${y+NH/2+4}" font-size="12" text-anchor="middle">${labels[i]}</text>`;
+    const dotx=x+NW-11, doty=y+NH/2;
+    s+=`<circle cx="${dotx}" cy="${doty}" r="3.5"/>`;
+    const linkColor = (highlight===i)?"#e2231a":"#000";
+    const lw = (highlight===i)?3:2;
+    if(i<n-1){
+      s+=`<line x1="${dotx}" y1="${doty}" x2="${cx(i+1)-4}" y2="${doty}" stroke="${linkColor}" stroke-width="${lw}" marker-end="url(#a${highlight===i?'r':''})"/>`;
+    } else {
+      if(circular){
+        // arco de regreso al primer nodo por debajo
+        const startX=dotx, startY=y+NH, endX=cx(0)+10, endY=y+NH;
+        const by=H-12;
+        s+=`<path d="M ${startX} ${doty} V ${by-14} Q ${startX} ${by} ${startX-14} ${by} H ${endX} Q ${endX-12} ${by} ${endX} ${by-14} V ${endY}" fill="none" stroke="#000" stroke-width="2" marker-end="url(#a)"/>`;
+      } else if(nullEnd){
+        s+=`<line x1="${dotx}" y1="${doty}" x2="${dotx+34}" y2="${doty}" stroke="${linkColor}" stroke-width="${lw}" marker-end="url(#a${highlight===i?'r':''})"/>`;
+        s+=`<text x="${dotx+38}" y="${doty+4}" font-size="12" font-style="italic">nil</text>`;
+      }
+    }
+    if(doble && i>0){
+      // flecha de retroceso (ant)
+      const px=cx(i-1)+NW-11;
+      s+=`<line x1="${x+4}" y1="${doty+9}" x2="${px+10}" y2="${doty+9}" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>`;
+    }
+  }
+  s+=`<defs>
+    <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z"/></marker>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#e2231a"/></marker>
+  </defs></svg>`;
+  return s;
+}
+
+/* ---------- Banco de preguntas curadas ---------- */
+const BANK = [
+ {tema:"TAD", q:"Según las diapositivas, ¿cuál es la ecuación que define un Tipo Abstracto de Datos (TAD)?",
+  opts:["TAD = Representación (datos) + Operaciones (funciones y procedimientos)",
+        "TAD = Clase + Objetos",
+        "TAD = Memoria + Punteros",
+        "TAD = Especificación − Implementación"],
+  correct:0, ex:"El TAD se define como <code>Representación (datos) + Operaciones</code>. Define el QUÉ (interfaz) sin el CÓMO (implementación)."},
+
+ {tema:"TAD", q:"En la implementación de un TAD, ¿qué corresponde a la <b>vista pública</b> que ve el módulo cliente?",
+  opts:["La interfaz (definida en la especificación)",
+        "Las estructuras de datos internas",
+        "Los algoritmos privados",
+        "La gestión de memoria"],
+  correct:0, ex:"El cliente solo ve la <b>interfaz</b> (vista pública). Los algoritmos + estructuras de datos son la vista privada, oculta."},
+
+ {tema:"Punteros", q:"¿Qué almacena realmente un puntero (p. ej. <code>sgte</code>)?",
+  opts:["Una dirección de memoria","El valor/dato del nodo","El nombre del nodo","Una copia del nodo completo"],
+  correct:0, ex:"\"El puntero es una variable cuyo valor es una posición de memoria\". Guarda la <b>dirección</b>, no el dato."},
+
+ {tema:"Punteros", q:"Tienes <code>p → NodoA</code> y <code>q → NodoB</code>. Ejecutas <code>q = p</code>. ¿Qué ocurre con NodoB?",
+  opts:["Queda sin apuntador y no puede ser accesado (se pierde)",
+        "Se copia dentro de NodoA",
+        "q sigue apuntando a NodoB y también a NodoA",
+        "Se enlaza automáticamente al final"],
+  correct:0, ex:"Tras <code>q = p</code>, ambos punteros apuntan a NodoA. NodoB \"se queda sin apuntador y no puede ser accesado\" → fuga de memoria."},
+
+ {tema:"Listas", q:"Para <b>insertar al inicio</b>, ¿cuál es el orden correcto de instrucciones?",
+  opts:["1) nuevo.sgte = inicio  2) inicio = nuevo",
+        "1) inicio = nuevo  2) nuevo.sgte = inicio",
+        "1) inicio = nuevo.sgte  2) nuevo = inicio",
+        "Da igual el orden"],
+  correct:0, ex:"Primero enlazas el nuevo al antiguo primero (<code>nuevo.sgte = inicio</code>) y recién mueves la cabeza (<code>inicio = nuevo</code>). Si inviertes, pierdes el resto de la lista."},
+
+ {tema:"Listas", q:"Para <b>insertar en medio</b> después del nodo <code>aux</code>, el orden correcto es:",
+  opts:["1) nuevo.sgte = aux.sgte  2) aux.sgte = nuevo",
+        "1) aux.sgte = nuevo  2) nuevo.sgte = aux.sgte",
+        "1) aux = nuevo  2) nuevo.sgte = aux",
+        "1) aux.sgte = nuevo.sgte  2) nuevo = aux"],
+  correct:0, ex:"Si haces <code>aux.sgte = nuevo</code> primero, pierdes la dirección del resto. Por eso: primero <code>nuevo.sgte = aux.sgte</code>, luego <code>aux.sgte = nuevo</code>."},
+
+ {tema:"Listas", q:"¿Qué instrucción <b>elimina el nodo central</b> que sigue a <code>aux</code>?",
+  opts:["aux.sgte = aux.sgte.sgte","aux = aux.sgte","aux.sgte = aux","inicio = aux.sgte"],
+  correct:0, ex:"<code>aux.sgte = aux.sgte.sgte</code> hace que aux salte por encima del nodo a eliminar, dejándolo desenlazado."},
+
+ {tema:"Búsqueda", q:"Al recorrer una lista para buscar un valor, ¿por qué se usa un puntero auxiliar <code>p</code> y no <code>inicio</code>?",
+  opts:["Porque si mueves <code>inicio</code> pierdes la cabeza de la lista",
+        "Porque <code>inicio</code> es de solo lectura",
+        "Porque <code>p</code> es más rápido",
+        "Porque inicio apunta al final"],
+  correct:0, ex:"Se inicializa <code>p = inicio</code> y se avanza <code>p = p.sgte</code>. Si movieras <code>inicio</code>, perderías el acceso a toda la lista."},
+
+ {tema:"Circulares", q:"¿Qué caracteriza a una lista enlazada <b>circular</b>?",
+  opts:["El último nodo apunta al primero; no existe un nodo que apunte a null",
+        "Todos los nodos apuntan a null",
+        "Tiene dos cabezas (inicio y fin)",
+        "Solo puede tener un nodo"],
+  correct:0, ex:"\"El último nodo está enlazado al primer nodo\" y \"no existe algún elemento que apunte a vacío\". Estructura tipo anillo."},
+
+ {tema:"Circulares", q:"¿Por qué es fácil caer en un <b>bucle infinito</b> al recorrer una lista circular?",
+  opts:["Porque la condición <code>p != null</code> nunca se cumple como falsa",
+        "Porque los nodos no tienen datos",
+        "Porque inicio es null",
+        "Porque no se puede usar while"],
+  correct:0, ex:"En una circular ningún nodo apunta a null, así que <code>while(p != null)</code> nunca termina. Hay que parar al volver al nodo inicio."},
+];
+
+/* ---------- Preguntas con diagrama (estáticas) ---------- */
+function diagQuestions(){
+ return [
+ {tema:"Listas", _diag:chainSVG(["A","B","C","D"],{nullEnd:true}),
+  q:"Sobre esta lista, ¿a qué nodo apunta <code>inicio.sgte.sgte</code> ?",
+  opts:["C","B","D","null"], correct:0,
+  ex:"inicio = A (0 saltos). .sgte → B (1). .sgte → C (2). Respuesta: <b>C</b>."},
+
+ {tema:"Listas", _diag:chainSVG(["A","B","C","D"],{nullEnd:true}),
+  q:"En esta lista de 4 nodos terminada en nil, ¿a qué apunta <code>inicio.sgte.sgte.sgte.sgte</code> (4 saltos)?",
+  opts:["null (nil)","D","A","Error"], correct:0,
+  ex:"A(0)→B(1)→C(2)→D(3)→ el sgte de D es <b>null</b> (4 saltos). El último nodo apunta a nil."},
+
+ {tema:"Listas", _diag:chainSVG(["A","B","C","D"],{nullEnd:true}),
+  q:"Misma lista de 4 nodos (nil al final). ¿Qué pasa con <code>inicio.sgte.sgte.sgte.sgte.sgte</code> (5 saltos)?",
+  opts:["Lanza error: NullPointerException","Apunta a A (vuelve al inicio)","Apunta a D","Apunta a null sin error"],
+  correct:0, ex:"Tras 4 saltos llegas a null. El 5º salto hace <code>null.sgte</code> → <b>NullPointerException</b>. No es circular: no vuelve al inicio."},
+
+ {tema:"Circulares", _diag:chainSVG(["A","B","C","D"],{circular:true,nullEnd:false}),
+  q:"Esta lista es <b>circular</b> (D apunta a A). ¿A qué nodo apunta <code>inicio.sgte.sgte.sgte.sgte.sgte</code> (5 saltos)?",
+  opts:["B","A","D","null"], correct:0,
+  ex:"En circular el resultado es nodo número (saltos mód N). N=4, 5 mód 4 = 1 → segundo nodo = <b>B</b>. Nunca da null ni error."},
+
+ {tema:"Punteros", _diag:chainSVG(["Dato 1"],{nullEnd:false,inicio:true,doble:true}),
+  q:"Este nodo de una lista <b>doblemente enlazada</b> tiene dos punteros. ¿Cómo se llaman típicamente?",
+  opts:["ant (anterior) y sig (siguiente)","top y bottom","head y tail","push y pop"],
+  correct:0, ex:"Un nodo doble guarda <code>ant</code> (referencia al anterior) y <code>sig</code> (al siguiente), permitiendo recorrer en ambos sentidos."},
+ ];
+}
+
+/* ---------- Generador dinámico (estilo examen) ---------- */
+function nuevaDinamica(){
+  const labelsPool=["A","B","C","D","E","F","G"];
+  const N = 3 + Math.floor(Math.random()*4);        // 3..6 nodos
+  const labels = labelsPool.slice(0,N);
+  const circular = Math.random()<0.5;
+  const k = 1 + Math.floor(Math.random()*(N+2));    // 1..N+2 saltos
+  // calcular respuesta
+  let ans;
+  if(circular){ ans = labels[k % N]; }
+  else { if(k<=N-1) ans=labels[k]; else if(k===N) ans="null (nil)"; else ans="Error (NullPointerException)"; }
+  // opciones
+  let opts = new Set([ans]);
+  opts.add(labels[Math.floor(Math.random()*N)]);
+  opts.add("null (nil)");
+  opts.add("Error (NullPointerException)");
+  if(circular) opts.add(labels[0]);
+  let arr=[...opts]; while(arr.length<4){ arr.push(labels[arr.length%N]); arr=[...new Set(arr)]; }
+  arr = arr.slice(0,4).sort(()=>Math.random()-0.5);
+  const expr = "inicio" + ".sgte".repeat(k);
+  const tipo = circular ? "lista CIRCULAR (el último apunta al primero)" : "lista terminada en nil";
+  const q = {
+    tema:"_gen",
+    _diag: chainSVG(labels,{circular:circular, nullEnd:!circular}),
+    q:`Dada esta ${tipo} de ${N} nodos, ¿a qué apunta <code>${expr}</code> (${k} salto${k>1?'s':''})?`,
+    opts:arr, correct:arr.indexOf(ans),
+    ex: circular
+        ? `Circular: resultado = nodo (saltos mód N) = ${k} mód ${N} = ${k%N} → <b>${ans}</b>. Nunca da null ni error.`
+        : (k<=N-1 ? `A=0 saltos. Tras ${k} saltos llegas al nodo índice ${k} → <b>${ans}</b>.`
+           : k===N ? `Tras ${N-1} saltos llegas al último nodo; el salto ${N} cae en <b>null</b> (el último apunta a nil).`
+           : `Tras ${N} saltos estás en null; el salto ${k} hace null.sgte → <b>Error (NullPointerException)</b>.`)
+  };
+  // insertar al inicio del contenido
+  document.getElementById('content').insertAdjacentHTML('afterbegin', renderQ(q, 'gen-'+Date.now(), true));
+}
+
+/* ---------- Estado y render ---------- */
+let aciertos=0, respondidas=0, filtro="Todas";
+const TEMAS=["Todas","TAD","Punteros","Listas","Búsqueda","Circulares"];
+
+function allQuestions(){ return [...BANK, ...diagQuestions()]; }
+
+function renderQ(item, id, isGen=false){
+  const tag = isGen ? `<span class="tag gen">🎲 Dinámica</span>` : `<span class="tag">${item.tema}</span>`;
+  let html = `<div class="q" id="${id}">${tag}`;
+  if(item._diag) html += `<div class="diagram">${item._diag}</div>`;
+  html += `<h3>${item.q}</h3><div class="opts">`;
+  item.opts.forEach((o,i)=>{ html += `<button class="opt" onclick="answer('${id}',${i},${item.correct})">${o}</button>`; });
+  html += `</div><div class="explain" id="ex-${id}">💡 ${item.ex}</div></div>`;
+  return html;
+}
+
+function answer(id, i, correct){
+  const box=document.getElementById(id);
+  if(box.dataset.done) return;
+  box.dataset.done="1";
+  const btns=box.querySelectorAll('.opt');
+  btns.forEach((b,idx)=>{ b.disabled=true;
+    if(idx===correct) b.classList.add('correct');
+    if(idx===i && i!==correct) b.classList.add('wrong'); });
+  document.getElementById('ex-'+id).classList.add('show');
+  respondidas++; if(i===correct) aciertos++;
+  updateScore();
+}
+function updateScore(){ document.getElementById('score').textContent=`Aciertos: ${aciertos} / ${respondidas}`; }
+
+function render(){
+  aciertos=0; respondidas=0; updateScore();
+  // filtros
+  const fc=document.getElementById('filters'); fc.innerHTML='';
+  TEMAS.forEach(t=>{ const b=document.createElement('button'); b.textContent=t;
+    if(t===filtro) b.classList.add('active');
+    b.onclick=()=>{ filtro=t; render(); }; fc.appendChild(b); });
+  // preguntas
+  const list = allQuestions().filter(x=> filtro==="Todas" || x.tema===filtro)
+                              .sort(()=>Math.random()-0.5);
+  const c=document.getElementById('content'); c.innerHTML='';
+  list.forEach((item,idx)=> c.insertAdjacentHTML('beforeend', renderQ(item,'q'+idx)));
+}
+render();
+</script>
+</body>
+</html>

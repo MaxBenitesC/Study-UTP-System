@@ -17,7 +17,11 @@
       "Bash(dpkg -l flameshot scrot maim)",
       "WebSearch",
       "Bash(javac AlgoritmoBanquero.java)",
-      "Bash(java AlgoritmoBanquero)"
+      "Bash(java AlgoritmoBanquero)",
+      "Bash(cp /tmp/backup_PROYECTO_CLAUDE.md \"CICLO_V/REDES_Y_COMUNICACION_DE_DATOS/PROYECTO/CLAUDE.md\")",
+      "Bash(cp /tmp/backup_WEB_GEMINI.md \"CICLO_V/TALLER_DE_PROGRAMACION_WEB/GEMINI.md\")",
+      "Bash(git push *)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }
