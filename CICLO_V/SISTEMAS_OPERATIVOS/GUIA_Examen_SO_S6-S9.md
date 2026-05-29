@@ -232,6 +232,67 @@ public class AlgoritmosReemplazo {
 ```
 **Cómo correrlo:** `javac AlgoritmosReemplazo.java` y luego `java AlgoritmosReemplazo`.
 
+### 👁️ Modo visual (sin código) — simulación paso a paso
+Misma lógica, pero "dibujada" como en el examen. Cadena corta: **`7, 0, 1, 2, 0, 3, 0, 4`** con **3 marcos**. (`✗` = fallo de página, `✓` = acierto). Así es como debes resolverlo a mano.
+
+**FIFO** — sale siempre la **más antigua** (marcos en orden antiguo→nuevo):
+| Paso | Pide | M1 | M2 | M3 | ¿? | Sale |
+|---|---|---|---|---|---|---|
+| 1 | 7 | 7 | · | · | ✗ | — |
+| 2 | 0 | 7 | 0 | · | ✗ | — |
+| 3 | 1 | 7 | 0 | 1 | ✗ | — |
+| 4 | 2 | 0 | 1 | 2 | ✗ | 7 |
+| 5 | 0 | 0 | 1 | 2 | ✓ | — |
+| 6 | 3 | 1 | 2 | 3 | ✗ | 0 |
+| 7 | 0 | 2 | 3 | 0 | ✗ | 1 |
+| 8 | 4 | 3 | 0 | 4 | ✗ | 2 |
+
+➡️ **FIFO = 7 fallos**
+
+**LRU** — sale la que **lleva más tiempo sin usarse** (marcos en orden menos→más reciente):
+| Paso | Pide | M1 | M2 | M3 | ¿? | Sale |
+|---|---|---|---|---|---|---|
+| 1 | 7 | 7 | · | · | ✗ | — |
+| 2 | 0 | 7 | 0 | · | ✗ | — |
+| 3 | 1 | 7 | 0 | 1 | ✗ | — |
+| 4 | 2 | 0 | 1 | 2 | ✗ | 7 |
+| 5 | 0 | 1 | 2 | 0 | ✓ | — (0 pasa a "más reciente") |
+| 6 | 3 | 2 | 0 | 3 | ✗ | 1 |
+| 7 | 0 | 2 | 3 | 0 | ✓ | — |
+| 8 | 4 | 3 | 0 | 4 | ✗ | 2 |
+
+➡️ **LRU = 6 fallos**
+
+**ÓPTIMO** — sale la que se usará **más tarde en el futuro** (o que ya no se usa):
+| Paso | Pide | M1 | M2 | M3 | ¿? | Sale (razón) |
+|---|---|---|---|---|---|---|
+| 1 | 7 | 7 | · | · | ✗ | — |
+| 2 | 0 | 7 | 0 | · | ✗ | — |
+| 3 | 1 | 7 | 0 | 1 | ✗ | — |
+| 4 | 2 | 0 | 1 | 2 | ✗ | 7 (no se usa más) |
+| 5 | 0 | 0 | 1 | 2 | ✓ | — |
+| 6 | 3 | 0 | 2 | 3 | ✗ | 1 (no se usa más) |
+| 7 | 0 | 0 | 2 | 3 | ✓ | — |
+| 8 | 4 | 2 | 3 | 4 | ✗ | 0 (ya no se usa después) |
+
+➡️ **Óptimo = 6 fallos** (siempre es el mínimo posible)
+
+**CLOCK (Segunda Oportunidad)** — bit de referencia; si bit=1 da otra oportunidad (lo baja a 0) y avanza el puntero; si bit=0 reemplaza. Formato `página[bit]`:
+| Paso | Pide | M1 | M2 | M3 | ¿? |
+|---|---|---|---|---|---|
+| 1 | 7 | 7[1] | · | · | ✗ |
+| 2 | 0 | 7[1] | 0[1] | · | ✗ |
+| 3 | 1 | 7[1] | 0[1] | 1[1] | ✗ |
+| 4 | 2 | 2[1] | 0[0] | 1[0] | ✗ (baja bits y reemplaza 7) |
+| 5 | 0 | 2[1] | 0[1] | 1[0] | ✓ (0 reactiva su bit) |
+| 6 | 3 | 2[1] | 0[0] | 3[1] | ✗ (reemplaza 1) |
+| 7 | 0 | 2[1] | 0[1] | 3[1] | ✓ |
+| 8 | 4 | 4[1] | 0[0] | 3[0] | ✗ (reemplaza 2) |
+
+➡️ **Clock = 6 fallos**
+
+📊 **Resumen del ejemplo:** FIFO **7** · LRU **6** · Óptimo **6** · Clock **6** → menos fallos = mejor. El Óptimo es la cota ideal (imposible en la práctica); LRU y Clock se le acercan.
+
 ---
 
 # CLASE 4 — Segmentación y Gestión de Usuarios Linux (Semana 9)
