@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VoIP Call Center Multisede — UTP</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css" id="theme">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    :root{
+      --rojo-utp:#E0303F;       /* acento institucional */
+      --neon:#22d3ee;           /* cian neón */
+      --neon2:#34d399;          /* verde neón */
+      --bg0:#070b16;
+      --bg1:#0d1426;
+      --txt:#e8eef9;
+      --muted:#8aa0c2;
+    }
+
+    /* ===== Fondo de red animada ===== */
+    #net-bg{
+      position:fixed; inset:0; z-index:0;
+      background:
+        radial-gradient(1200px 700px at 80% -10%, rgba(34,211,238,.10), transparent 60%),
+        radial-gradient(900px 600px at 10% 110%, rgba(224,48,63,.12), transparent 60%),
+        linear-gradient(160deg, var(--bg0), var(--bg1));
+    }
+    #net-canvas{position:fixed; inset:0; z-index:1; opacity:.55;}
+    .reveal-viewport{background:transparent;}
+    .reveal{font-family:"DejaVu Sans","Segoe UI",system-ui,sans-serif; color:var(--txt);}
+    .reveal .slides{z-index:3;}
+
+    /* ===== Tipografía ===== */
+    .reveal h1,.reveal h2,.reveal h3{
+      font-weight:800; letter-spacing:.3px; text-transform:none; color:#fff;
+      text-shadow:0 2px 24px rgba(34,211,238,.18);
+    }
+    .reveal h1{font-size:2.1em; line-height:1.05;}
+    .reveal h2{font-size:1.35em; margin-bottom:.2em;}
+    .reveal h3{font-size:1.05em; color:var(--neon);}
+    .reveal p,.reveal li{color:var(--txt);}
+    .accent{color:var(--rojo-utp);}
+    .neon{color:var(--neon);}
+    .muted{color:var(--muted);}
+
+    /* línea de acento bajo títulos de sección */
+    .kicker{
+      display:inline-block; font-size:.5em; letter-spacing:3px; text-transform:uppercase;
+      color:var(--neon); border:1px solid rgba(34,211,238,.4);
+      padding:4px 14px; border-radius:999px; margin-bottom:18px;
+      background:rgba(34,211,238,.06);
+    }
+
+    /* ===== Tarjetas / grid ===== */
+    .grid{display:grid; gap:14px; margin-top:8px;}
+    .g2{grid-template-columns:repeat(2,1fr);}
+    .g3{grid-template-columns:repeat(3,1fr);}
+    .g4{grid-template-columns:repeat(4,1fr);}
+    .card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px; padding:16px 16px; text-align:left;
+      backdrop-filter:blur(4px);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .card .ico{font-size:1.5em; color:var(--neon); margin-bottom:8px; display:block;}
+    .card.red .ico{color:var(--rojo-utp);}
+    .card h3{margin:0 0 6px;}
+    .card p{font-size:.62em; color:var(--muted); margin:0; line-height:1.4;}
+
+    /* métricas grandes */
+    .metric{font-size:2em; font-weight:800; color:#fff; line-height:1;}
+    .metric small{display:block; font-size:.3em; color:var(--muted); font-weight:500; margin-top:8px; letter-spacing:1px;}
+    .metric .u{color:var(--neon); font-size:.6em;}
+
+    /* lista limpia con bullets neón */
+    .reveal ul{list-style:none; margin-left:0;}
+    .reveal ul li{position:relative; padding-left:30px; margin:14px 0; font-size:.92em;}
+    .reveal ul li::before{
+      content:"\f0c8"; font-family:"Font Awesome 6 Free"; font-weight:900;
+      position:absolute; left:0; top:.15em; color:var(--neon); font-size:.7em;
+    }
+
+    /* pills / chips */
+    .chip{display:inline-block; font-size:.5em; padding:6px 14px; border-radius:999px;
+      background:rgba(52,211,153,.12); color:var(--neon2); border:1px solid rgba(52,211,153,.35);
+      margin:4px;}
+    .chip.red{background:rgba(224,48,63,.12); color:#ff6b78; border-color:rgba(224,48,63,.4);}
+
+    /* portada */
+    .cover{display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%;}
+    .cover .logo{height:64px; margin-bottom:26px; filter:drop-shadow(0 6px 20px rgba(224,48,63,.4));}
+    .team{display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:24px;}
+    .team .m{font-size:.5em; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      padding:8px 14px; border-radius:10px; color:var(--txt);}
+    .team .m b{color:var(--neon);}
+
+    /* topología simple */
+    .topo{display:flex; align-items:center; justify-content:center; gap:34px; margin-top:30px;}
+    .node{width:120px; height:120px; border-radius:18px; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:6px; border:1px solid rgba(34,211,238,.4);
+      background:rgba(34,211,238,.06); font-size:.5em;}
+    .node i{font-size:1.6em; color:var(--neon);}
+    .node.hub{border-color:var(--rojo-utp); background:rgba(224,48,63,.1); transform:scale(1.15);}
+    .node.hub i{color:var(--rojo-utp);}
+    .spokes{display:flex; flex-direction:column; gap:14px;}
+
+    /* timeline */
+    .tl{display:flex; justify-content:space-between; margin-top:20px; position:relative;}
+    .tl::before{content:""; position:absolute; top:22px; left:5%; right:5%; height:2px;
+      background:linear-gradient(90deg,var(--neon),var(--rojo-utp));}
+    .tl .step{position:relative; text-align:center; width:23%;}
+    .tl .dot{width:44px; height:44px; border-radius:50%; margin:0 auto 12px; display:flex;
+      align-items:center; justify-content:center; background:var(--bg1); border:2px solid var(--neon);
+      color:var(--neon); font-weight:800; font-size:.7em; position:relative; z-index:2;}
+    .tl .step small{font-size:.46em; color:var(--muted); display:block; line-height:1.3;}
+    .tl .step b{font-size:.55em; color:#fff; display:block; margin-bottom:4px;}
+
+    .footer-tag{position:fixed; bottom:14px; left:20px; font-size:13px; color:var(--muted); z-index:5;}
+    .reveal .slide-number{background:transparent; color:var(--muted);}
+    .big-q{font-size:1.4em; line-height:1.3; max-width:90%; margin:0 auto;}
+  </style>
+</head>
+<body>
+<div id="net-bg"></div>
+<canvas id="net-canvas"></canvas>
+<div class="footer-tag">Redes y Comunicación de Datos I · UTP</div>
+
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · PORTADA -->
+    <section data-transition="fade">
+      <div class="cover">
+        <img class="logo" src="Utplogonuevo.svg.png" alt="UTP" onerror="this.style.display='none'">
+        <span class="kicker">Proyecto final · Ciclo V</span>
+        <h1>Arquitectura de red <span class="neon">IPv4 convergente</span><br>para infraestructura <span class="accent">VoIP</span></h1>
+        <p class="muted" style="margin-top:14px;">Optimización en un call center multisede</p>
+        <div class="team fragment fade-up">
+          <span class="m">Vega Jáuregui <b>Diego J.</b></span>
+          <span class="m">Benites Corazón <b>Max A.</b></span>
+          <span class="m">Quispe Arias <b>Kevin A.</b></span>
+          <span class="m">Tasayco Magallanes <b>Giordano M.</b></span>
+        </div>
+        <p class="muted fragment fade-up" style="margin-top:22px; font-size:.55em;">
+          Docente: Ing. Gerald Paul Medina Pérez · Mayo 2026
+        </p>
+      </div>
+    </section>
+
+    <!-- 2 · EL PROBLEMA -->
+    <section data-transition="slide">
+      <span class="kicker">El problema</span>
+      <h2>Un call center que <span class="accent">pierde llamadas</span></h2>
+      <div class="grid g4" style="margin-top:30px;">
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-building"></i></span><div class="metric">4<small>SEDES EN LIMA</small></div></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-headset"></i></span><div class="metric">100–140<small>AGENTES SIMULTÁNEOS</small></div></div>
+        <div class="card red fragment fade-up"><span class="ico"><i class="fa-solid fa-triangle-exclamation"></i></span><div class="metric">2–4<small>INCIDENCIAS / SEMANA</small></div></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-volume-high"></i></span><div class="metric">Audio<small>DEGRADADO / CAÍDAS</small></div></div>
+      </div>
+      <p class="fragment fade-up muted" style="margin-top:30px; font-size:.8em;">
+        Sin relación con horas pico → <span class="neon">no es saturación de ancho de banda</span>, es configuración.
+      </p>
+    </section>
+
+    <!-- 3 · DIAGNÓSTICO -->
+    <section data-transition="slide">
+      <span class="kicker">Diagnóstico · Levantamiento Bellavista</span>
+      <h2>Lo que encontramos <span class="accent">in situ</span></h2>
+      <div class="grid g2" style="margin-top:24px;">
+        <div class="card red fragment fade-right"><span class="ico"><i class="fa-solid fa-network-wired"></i></span><h3>Red plana</h3><p>Todo en <code>192.168.88.0/24</code>, sin segmentación ni prioridad de voz.</p></div>
+        <div class="card red fragment fade-left"><span class="ico"><i class="fa-solid fa-sliders"></i></span><h3>QoS no configurado</h3><p>RTP compite con datos → jitter y cortes de audio.</p></div>
+        <div class="card red fragment fade-right"><span class="ico"><i class="fa-solid fa-globe"></i></span><h3>Servidor expuesto</h3><p><code>asterisk2</code> con IP pública directa → riesgo de fraude SIP.</p></div>
+        <div class="card red fragment fade-left"><span class="ico"><i class="fa-solid fa-shield-halved"></i></span><h3>VPN informal</h3><p>ZeroTier de nube sin gestión del router corporativo.</p></div>
+      </div>
+      <p class="fragment fade-up muted" style="margin-top:22px; font-size:.7em;">
+        Ping a 8.8.8.8: 36–38 ms, 0 % pérdida → <span class="neon">el ISP no es el cuello de botella</span>.
+      </p>
+    </section>
+
+    <!-- 4 · OBJETIVO + PROPUESTA -->
+    <section data-transition="zoom">
+      <span class="kicker">Nuestra propuesta</span>
+      <h2>Una arquitectura, <span class="neon">6 componentes</span></h2>
+      <div class="grid g3" style="margin-top:24px;">
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-key"></i></span><h3>VPN WireGuard</h3><p>Túneles cifrados entre sedes.</p></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-gauge-high"></i></span><h3>QoS DSCP 46</h3><p>Prioridad a la voz (RTP/SIP).</p></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-arrows-split-up-and-left"></i></span><h3>Failover dual-ISP</h3><p>Conmutación automática.</p></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-server"></i></span><h3>HA ViciDial</h3><p>Maestro–réplica ≥ 99.5 %.</p></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-chart-line"></i></span><h3>Monitoreo Zabbix</h3><p>SNMP + alertas activas.</p></div>
+        <div class="card fragment fade-up"><span class="ico"><i class="fa-solid fa-clipboard-list"></i></span><h3>SOP N1–N4</h3><p>Procesos de respuesta.</p></div>
+      </div>
+      <p class="fragment fade-up muted" style="margin-top:20px; font-size:.62em;">
+        <i class="fa-solid fa-circle-info neon"></i> VLAN 802.1Q → recomendación de <b>fase 2</b> (los switches actuales no son gestionables).
+      </p>
+    </section>
+
+    <!-- 5 · COMPONENTES 1-2 -->
+    <section data-transition="slide">
+      <span class="kicker">Conectividad y voz</span>
+      <h2><span class="neon">VPN</span> segura + <span class="neon">QoS</span> para el audio</h2>
+      <div class="grid g2" style="margin-top:26px;">
+        <div class="card fragment fade-right">
+          <span class="ico"><i class="fa-solid fa-key"></i></span>
+          <h3>WireGuard hub-and-spoke</h3>
+          <p style="font-size:.7em; margin-top:8px;">Bellavista como hub, las 3 sedes como spokes. Túneles cifrados sobre el MikroTik RB3011 — reemplaza al ZeroTier informal.</p>
+        </div>
+        <div class="card fragment fade-left">
+          <span class="ico"><i class="fa-solid fa-gauge-high"></i></span>
+          <h3>QoS EF · DSCP 46</h3>
+          <p style="font-size:.7em; margin-top:8px;">La voz (RTP/SIP) viaja en cola de máxima prioridad. Resuelve la causa raíz del audio degradado <b>sin comprar hardware</b>.</p>
+        </div>
+      </div>
+      <div style="margin-top:24px;" class="fragment fade-up">
+        <span class="chip"><i class="fa-solid fa-lock"></i> Cifrado moderno</span>
+        <span class="chip"><i class="fa-solid fa-bolt"></i> Bajo overhead</span>
+        <span class="chip red"><i class="fa-solid fa-phone-volume"></i> Voz priorizada</span>
+      </div>
+    </section>
+
+    <!-- 6 · COMPONENTES 3-4 -->
+    <section data-transition="slide">
+      <span class="kicker">Disponibilidad</span>
+      <h2>Que <span class="accent">no se caiga</span> la operación</h2>
+      <div class="grid g2" style="margin-top:26px;">
+        <div class="card fragment fade-right">
+          <span class="ico"><i class="fa-solid fa-arrows-split-up-and-left"></i></span>
+          <h3>Failover dual-ISP</h3>
+          <p style="font-size:.7em; margin-top:8px;">Bellavista: 75 Mbps empresarial + 600 Mbps Claro. Check Gateway + Netwatch conmutan automáticamente al caer un enlace.</p>
+        </div>
+        <div class="card fragment fade-left">
+          <span class="ico"><i class="fa-solid fa-server"></i></span>
+          <h3>ViciDial maestro–réplica</h3>
+          <p style="font-size:.7em; margin-top:8px;">Alta disponibilidad sobre ViciBox 12.0.2. Si el maestro falla, la réplica sostiene las llamadas (≥ 99.5 %).</p>
+        </div>
+      </div>
+      <div style="margin-top:22px;" class="fragment fade-up">
+        <span class="chip"><i class="fa-solid fa-wifi"></i> ISP 1 · 75 Mbps</span>
+        <span class="chip red"><i class="fa-solid fa-arrow-right-arrow-left"></i> Conmutación &lt;10 s</span>
+        <span class="chip"><i class="fa-solid fa-wifi"></i> ISP 2 · 600 Mbps</span>
+      </div>
+    </section>
+
+    <!-- 7 · MONITOREO + SOP -->
+    <section data-transition="slide">
+      <span class="kicker">Operación y gobierno</span>
+      <h2>Ver para <span class="neon">anticipar</span>, responder con <span class="accent">orden</span></h2>
+      <div class="grid g2" style="margin-top:18px;">
+        <div class="card fragment fade-right">
+          <span class="ico"><i class="fa-solid fa-chart-line"></i></span>
+          <h3>Zabbix vía SNMP</h3>
+          <p style="font-size:.7em;">Dashboards de latencia, jitter y enlaces. Alertas antes de que el agente reporte el problema.</p>
+        </div>
+        <div class="card fragment fade-left">
+          <span class="ico"><i class="fa-solid fa-clipboard-list"></i></span>
+          <h3>SOP de 4 niveles</h3>
+          <p style="font-size:.7em;">N1 a N4 con responsabilidades claras y tiempos comprometidos por incidencia.</p>
+        </div>
+      </div>
+      <div class="tl fragment fade-up">
+        <div class="step"><div class="dot">T+0</div><b>Detección</b><small>Alerta Zabbix / agente</small></div>
+        <div class="step"><div class="dot">T+1h</div><b>N1–N2</b><small>Diagnóstico inicial</small></div>
+        <div class="step"><div class="dot">T+4h</div><b>N3</b><small>Escalamiento técnico</small></div>
+        <div class="step"><div class="dot">T+24h</div><b>N4</b><small>Cierre y mejora</small></div>
+      </div>
+    </section>
+
+    <!-- 8 · DISEÑO DE RED -->
+    <section data-transition="slide">
+      <span class="kicker">Diseño de red</span>
+      <h2>Topología <span class="neon">hub-and-spoke</span></h2>
+      <div class="topo fragment fade-up">
+        <div class="spokes">
+          <div class="node fragment fade-right"><i class="fa-solid fa-building"></i>Magdalena</div>
+          <div class="node fragment fade-right"><i class="fa-solid fa-building"></i>Los Olivos</div>
+          <div class="node fragment fade-right"><i class="fa-solid fa-building"></i>Independencia</div>
+        </div>
+        <i class="fa-solid fa-link neon fragment fade-in" style="font-size:1.6em;"></i>
+        <div class="node hub fragment grow"><i class="fa-solid fa-building-shield"></i>Bellavista<br>HUB</div>
+      </div>
+      <p class="fragment fade-up muted" style="margin-top:28px; font-size:.7em;">
+        Todo el tráfico pasa por Bellavista → coherente con el patrón <span class="neon">maestro–réplica</span> de ViciDial. 3 túneles WireGuard.
+      </p>
+    </section>
+
+    <!-- 9 · RESULTADOS ESPERADOS -->
+    <section data-transition="zoom">
+      <span class="kicker">Resultados esperados · metas del piloto</span>
+      <h2>Lo que vamos a <span class="neon">demostrar</span></h2>
+      <div class="grid g4" style="margin-top:34px;">
+        <div class="card fragment grow"><div class="metric">&lt;150<span class="u"> ms</span><small>LATENCIA</small></div></div>
+        <div class="card fragment grow"><div class="metric">&lt;30<span class="u"> ms</span><small>JITTER</small></div></div>
+        <div class="card fragment grow"><div class="metric">&lt;10<span class="u"> s</span><small>FAILOVER</small></div></div>
+        <div class="card fragment grow"><div class="metric">≥99.5<span class="u"> %</span><small>DISPONIBILIDAD</small></div></div>
+      </div>
+      <p class="fragment fade-up muted" style="margin-top:30px; font-size:.62em;">
+        Umbrales según <span class="neon">ITU-T G.114</span>, Thangam et al. (2024) y Simanjuntak (2023) — validados en piloto + acta firmada por la gerencia.
+      </p>
+    </section>
+
+    <!-- 10 · GRACIAS -->
+    <section data-transition="fade" data-background-color="#070b16">
+      <div class="cover">
+        <span class="kicker">Equipo 4 · Redes y Comunicación de Datos I</span>
+        <h1 style="font-size:3em;">Gracias <span class="accent">.</span></h1>
+        <p class="big-q muted fragment fade-up" style="margin-top:20px;">
+          ¿Preguntas?
+        </p>
+        <div class="team fragment fade-up" style="margin-top:30px;">
+          <span class="m">Vega · <b>Diego</b></span>
+          <span class="m">Benites · <b>Max</b></span>
+          <span class="m">Quispe · <b>Kevin</b></span>
+          <span class="m">Tasayco · <b>Giordano</b></span>
+        </div>
+        <p class="muted fragment fade-up" style="margin-top:26px; font-size:.5em;">UTP · Ingeniería de Sistemas e Informática · 2026</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+<script>
+  Reveal.initialize({
+    width:1280, height:720, margin:0.04, minScale:0.2, maxScale:2.0,
+    hash:true, slideNumber:'c/t', transition:'slide', transitionSpeed:'default',
+    backgroundTransition:'fade', controls:true, progress:true, center:true
+  });
+
+  /* ===== Fondo de red de nodos animada ===== */
+  const cv = document.getElementById('net-canvas');
+  const ctx = cv.getContext('2d');
+  let W,H,pts;
+  function resize(){
+    W = cv.width = window.innerWidth; H = cv.height = window.innerHeight;
+    const n = Math.min(90, Math.floor(W*H/16000));
+    pts = Array.from({length:n}, () => ({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++){
+      const p=pts[i];
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+      for(let j=i+1;j<pts.length;j++){
+        const q=pts[j], dx=p.x-q.x, dy=p.y-q.y, d=Math.hypot(dx,dy);
+        if(d<140){
+          ctx.strokeStyle='rgba(34,211,238,'+(1-d/140)*.35+')';
+          ctx.lineWidth=.6;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle='rgba(120,200,255,.75)';
+      ctx.beginPath(); ctx.arc(p.x,p.y,1.6,0,Math.PI*2); ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize);
+  resize(); draw();
+</script>
+</body>
+</html>

@@ -2,7 +2,12 @@
 % LaTeX header - Articulo Universitario UTP
 % Aplica: colores UTP, callouts EV-XX como cajas, tablas compactas,
 %         saltos de pagina por seccion, fonts con fallback
+% Control de lineas huerfanas/viudas
 % =================================================================
+
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
 
 % --- Colores institucionales UTP ---
 \usepackage{xcolor}
@@ -11,6 +16,8 @@
 \definecolor{calloutbg}{HTML}{FFF8E1}
 \definecolor{calloutborder}{HTML}{F9A825}
 \definecolor{callouttext}{HTML}{5D4037}
+% --- Paquetes matemáticos ---
+\usepackage{amsmath}
 
 % --- Titulos coloreados en rojo UTP ---
 \usepackage{titlesec}

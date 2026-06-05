@@ -39,7 +39,13 @@
       "Bash(sed -n '606p' Articulo_Universitario_claude.md)",
       "Bash(grep -c \"^\\\\`\\\\`\\\\`\" /home/ilkay/Documentos/UTP/CICLO_V/transcribir_PDF_to_MD.md)",
       "Bash(pandoc Articulo_Universitario_claude.md --from=markdown --pdf-engine=xelatex --top-level-division=section --include-in-header=latex_header.tex --lua-filter=fit-tables.lua --variable geometry:margin=2.5cm --variable geometry:a4paper --variable mainfont=\"DejaVu Serif\" --variable sansfont=\"DejaVu Sans\" --variable monofont=\"DejaVu Sans Mono\" --variable fontsize=11pt --variable lang=es --variable linestretch=1.15 --variable secnumdepth=0 --output Articulo_Universitario_avance_mayo_2026.pdf)",
-      "Bash(pdfinfo Articulo_Universitario_avance_mayo_2026.pdf)"
+      "Bash(pdfinfo Articulo_Universitario_avance_mayo_2026.pdf)",
+      "Bash(command -v chromium chromium-browser google-chrome google-chrome-stable brave-browser)",
+      "Bash(command -v decktape npx)",
+      "Bash(timeout 120 chromium --headless --disable-gpu --no-sandbox --virtual-time-budget=8000 --run-all-compositor-stages-before-draw --no-pdf-header-footer --print-to-pdf=Presentacion_VoIP.pdf \"file://$\\(pwd\\)/Presentacion_VoIP.html?print-pdf\")",
+      "Bash(echo \"exit:$?\")",
+      "Bash(pdfinfo Presentacion_VoIP.pdf)",
+      "Bash(command -v pdftoppm)"
     ]
   }
 }
