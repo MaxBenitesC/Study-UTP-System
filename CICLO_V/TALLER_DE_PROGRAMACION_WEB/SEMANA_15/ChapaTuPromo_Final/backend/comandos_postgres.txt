@@ -1,0 +1,75 @@
+COMANDOS POSTGRES PARA LA DEMOSTRACION
+
+1. Entrar a la carpeta del backend
+Este comando es para ubicarnos en la carpeta donde estan el backend, el schema.sql y el seed.sql.
+
+cd /home/ilkay/Documentos/UTP/CICLO_V/TALLER_DE_PROGRAMACION_WEB/SEMANA_15/ChapaTuPromo_Final/backend
+
+
+2. Vaciar los datos de la base de datos
+Este comando es para dejar la base de datos limpia antes de la demostracion.
+Borra usuarios, pedidos, detalle de pedidos y productos, y hace que los ID vuelvan a empezar desde 1.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "TRUNCATE TABLE detalle_pedido, pedidos, usuarios, productos RESTART IDENTITY CASCADE;"
+
+
+3. Cargar los productos iniciales
+Este comando vuelve a insertar los productos base del proyecto.
+Se usa despues de vaciar la base de datos.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -f seed.sql
+
+
+4. Ver todas las tablas creadas
+Este comando es para mostrar que la base de datos tiene tablas.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "\dt"
+
+
+5. Ver los productos cargados
+Este comando es para mostrar los productos que salen en el menu y en ofertas.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "SELECT id, nombre, categoria, precio_original, stock, estado FROM productos ORDER BY id;"
+
+
+6. Ver los usuarios registrados
+Este comando es para mostrar los usuarios que se registraron desde la pagina web.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "SELECT id, nombre, correo, telefono, fecha_registro FROM usuarios ORDER BY id DESC;"
+
+
+7. Ver los pedidos realizados
+Este comando es para mostrar los pedidos que se hicieron desde el formulario de la pagina.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "SELECT id, nombre_cliente, tipo_entrega, tienda, metodo_pago, total, estado, fecha_pedido FROM pedidos ORDER BY id DESC;"
+
+
+8. Ver el detalle de cada pedido
+Este comando es para ver que productos compro el cliente, la cantidad, el precio y el subtotal.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "SELECT dp.pedido_id, p.nombre, dp.cantidad, dp.precio_unitario, dp.subtotal FROM detalle_pedido dp JOIN productos p ON p.id = dp.producto_id ORDER BY dp.pedido_id DESC;"
+
+
+9. Ver el stock de productos
+Este comando es para demostrar que cuando se hace una compra, el stock baja automaticamente.
+
+psql postgresql://chapatupromo_user:chapatupromo123@localhost:5432/chapatupromo -c "SELECT id, nombre, stock FROM productos ORDER BY id;"
+
+
+10. Probar que el backend se conecta con la base de datos
+Este comando consulta la ruta de prueba del backend.
+Sirve para mostrar que Node.js esta conectado con PostgreSQL.
+
+curl http://localhost:3000/api/prueba-bd
+
+
+11. Levantar el backend
+Este comando inicia el servidor para poder abrir la pagina con http://localhost:3000.
+
+npm start
+
+
+12. Abrir la pagina principal
+Este link se abre en el navegador para mostrar el proyecto funcionando.
+
+http://localhost:3000/index.html

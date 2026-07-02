@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 require("dotenv").config();
 
 const db = require("./database");
@@ -9,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 app.get("/", (req, res) => {
   res.json({
@@ -131,6 +134,7 @@ app.get("/api/ofertas", async (req, res) => {
 app.post("/api/usuarios", async (req, res) => {
   try {
     const { nombre, correo, password, telefono, direccion } = req.body;
+
     if (!nombre || !correo || !password) {
       return res.status(400).json({
         mensaje: "Nombre, correo y password son obligatorios"

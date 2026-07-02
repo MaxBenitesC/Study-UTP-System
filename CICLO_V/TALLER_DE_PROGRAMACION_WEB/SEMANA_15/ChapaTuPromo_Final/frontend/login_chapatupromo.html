@@ -33,11 +33,13 @@
   <section class="caja-login">
     <h2>Ingresa a tu cuenta</h2>
 
-    <form action="menu_chapatupromo.html" method="post">
+    <div id="mensaje-login" class="mensaje-formulario"></div>
+
+    <form id="formulario-login">
 
       <p>
         <label for="usuario">Correo electronico:</label><br>
-        <input type="text" id="usuario" name="usuario" placeholder="tucorreo@gmail.com" required>
+        <input type="email" id="usuario" name="usuario" placeholder="tucorreo@gmail.com" required>
       </p>
 
       <p>
@@ -64,6 +66,8 @@
     </div>
     <p class="derechos-autor">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
   </footer>
+  <script src="js/config.js"></script>
+  <script src="js/login.js"></script>
 
 </body>
 </html>
