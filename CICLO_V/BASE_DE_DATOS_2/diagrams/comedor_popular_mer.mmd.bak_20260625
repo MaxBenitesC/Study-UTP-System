@@ -1,0 +1,52 @@
+erDiagram
+    CATEGORIAS ||--o{ PRODUCTOS : clasifica
+    PROVEEDORES ||--o{ INGRESO : realiza
+    INGRESO ||--o{ DETALLE_INGRESO : contiene
+    PRODUCTOS ||--o{ DETALLE_INGRESO : ingresa
+    CONSUMO ||--o{ DETALLE_CONSUMO : contiene
+    PRODUCTOS ||--o{ DETALLE_CONSUMO : se_consume
+
+    CATEGORIAS {
+        int id_categoria PK
+        varchar nombre_categoria
+    }
+
+    PRODUCTOS {
+        int id_producto PK
+        int id_categoria FK
+        varchar nombre_producto
+        int stock
+        date fecha_vencimiento
+    }
+
+    PROVEEDORES {
+        int id_proveedor PK
+        varchar nombre_proveedor
+        varchar telefono_proveedor
+        varchar direccion_proveedor
+    }
+
+    INGRESO {
+        int id_ingreso PK
+        date fecha_ingreso
+        int id_proveedor FK
+    }
+
+    DETALLE_INGRESO {
+        int id_detalle_ingreso PK
+        int id_ingreso FK
+        int id_producto FK
+        int cantidad
+    }
+
+    CONSUMO {
+        int id_consumo PK
+        date fecha_consumo
+    }
+
+    DETALLE_CONSUMO {
+        int id_detalle_consumo PK
+        int id_consumo FK
+        int id_producto FK
+        int cantidad
+    }

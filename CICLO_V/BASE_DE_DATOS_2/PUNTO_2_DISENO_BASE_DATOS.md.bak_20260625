@@ -1,0 +1,246 @@
+# Punto 2: Diseno de la Base de Datos
+
+## 2.1 Problematica
+
+El comedor popular necesita controlar los productos que recibe, almacena y consume diariamente. Actualmente esta informacion puede registrarse en cuadernos, lo que dificulta saber con rapidez que productos hay disponibles, que productos ingresaron, de que proveedor llegaron, que productos se consumieron y cuanto stock queda.
+
+El problema principal no es desarrollar una aplicacion, sino transformar esta necesidad real en una base de datos organizada. Para ello se identifica la informacion importante del proceso y se convierte en tablas relacionadas.
+
+## 2.2 Analisis del proceso real
+
+El proceso observado se puede resumir asi:
+
+1. El comedor maneja productos como arroz, papa, aceite, verduras, pollo, pescado, gas u otros insumos.
+2. Cada producto pertenece a una categoria para poder ordenarlo mejor.
+3. Los productos ingresan al comedor por medio de proveedores o instituciones.
+4. Un ingreso puede incluir varios productos.
+5. Cada producto ingresado tiene una cantidad.
+6. Los productos tambien se consumen cuando se usan en la preparacion de alimentos.
+7. Un consumo puede incluir varios productos.
+8. Cada producto consumido tiene una cantidad.
+
+Con este analisis se concluye que no basta con una sola tabla de productos. Tambien se necesita guardar el historial de ingresos y consumos.
+
+## 2.3 Identificacion de entidades
+
+Al inicio del diseno se pensaron 5 tablas principales:
+
+- `categorias`
+- `productos`
+- `proveedores`
+- `ingreso`
+- `consumo`
+
+Estas tablas representan la informacion principal del comedor. Sin embargo, al revisar mejor el proceso se encontro que `ingreso` y `consumo` no se relacionan con `productos` de forma simple, porque un ingreso puede tener varios productos y un producto puede aparecer en varios ingresos. Lo mismo ocurre con los consumos.
+
+Por ese motivo, el diseno correcto agrega tablas detalle. Estas tablas funcionan como tablas intermedias para resolver relaciones de muchos a muchos y, ademas, permiten guardar el dato de la cantidad.
+
+Con ese ajuste, de la problematica se identificaron las siguientes entidades:
+
+| Entidad | Justificacion |
+|---------|---------------|
+| categorias | Permite clasificar los productos por tipo, como viveres, verduras, carnes o combustible. |
+| productos | Representa los insumos que el comedor necesita controlar. |
+| proveedores | Representa a quienes entregan o venden productos al comedor. |
+| ingreso | Representa el registro general de una entrada de productos, como la fecha y el proveedor. |
+| detalle_ingreso | Representa los productos y cantidades incluidos en cada ingreso. |
+| consumo | Representa el registro general de una salida o uso de productos, como la fecha del consumo. |
+| detalle_consumo | Representa los productos y cantidades incluidos en cada consumo. |
+
+## 2.4 Definicion de atributos
+
+Cada tabla se definio con los datos necesarios para resolver el problema:
+
+| Tabla | Atributos principales |
+|-------|----------------------|
+| categorias | id_categoria, nombre_categoria |
+| productos | id_producto, id_categoria, nombre_producto, stock, fecha_vencimiento |
+| proveedores | id_proveedor, nombre_proveedor, telefono_proveedor, direccion_proveedor |
+| ingreso | id_ingreso, fecha_ingreso, id_proveedor |
+| detalle_ingreso | id_detalle_ingreso, id_ingreso, id_producto, cantidad |
+| consumo | id_consumo, fecha_consumo |
+| detalle_consumo | id_detalle_consumo, id_consumo, id_producto, cantidad |
+
+## 2.5 Relaciones entre tablas
+
+Las relaciones se definieron de acuerdo con las reglas del negocio:
+
+| Relacion | Tipo | Explicacion |
+|----------|------|-------------|
+| categorias - productos | 1:N | Una categoria puede tener varios productos, pero cada producto pertenece a una categoria. |
+| proveedores - ingreso | 1:N | Un proveedor puede registrar varios ingresos, pero cada ingreso pertenece a un proveedor. |
+| ingreso - detalle_ingreso | 1:N | Un ingreso puede incluir varios productos. |
+| productos - detalle_ingreso | 1:N | Un producto puede aparecer en varios ingresos. |
+| consumo - detalle_consumo | 1:N | Un consumo puede incluir varios productos usados. |
+| productos - detalle_consumo | 1:N | Un producto puede aparecer en varios consumos. |
+
+## 2.6 Por que se usan tablas detalle
+
+Las tablas `detalle_ingreso` y `detalle_consumo` son necesarias porque durante el analisis aparecen relaciones de muchos a muchos.
+
+Inicialmente se podria pensar que bastan 5 tablas:
+
+```text
+categorias
+productos
+proveedores
+ingreso
+consumo
+```
+
+Pero al aplicar las reglas del negocio se observa lo siguiente:
+
+- Un `ingreso` puede incluir muchos `productos`.
+- Un `producto` puede aparecer en muchos `ingresos`.
+- Un `consumo` puede incluir muchos `productos`.
+- Un `producto` puede aparecer en muchos `consumos`.
+
+Cuando dos tablas se relacionan de muchos a muchos, no es correcto guardar todos los datos en una sola tabla ni poner varios productos en una misma columna. Lo correcto es crear una tabla intermedia o tabla detalle.
+
+Por eso la relacion directa:
+
+```text
+ingreso (N) -------- (N) productos
+```
+
+se transforma en:
+
+```text
+ingreso (1) -------- (N) detalle_ingreso
+productos (1) ------ (N) detalle_ingreso
+```
+
+De esa forma, cada fila de `detalle_ingreso` representa un producto especifico dentro de un ingreso especifico.
+
+Ejemplo de ingreso:
+
+| Ingreso | Producto | Cantidad |
+|---------|----------|----------|
+| Ingreso 1 | Arroz | 50 |
+| Ingreso 1 | Aceite | 10 |
+| Ingreso 1 | Frejoles | 20 |
+
+Si se guardaran todos esos productos directamente en la tabla `ingreso`, se repetirian columnas o se mezclaria informacion. Por eso se separa:
+
+- `ingreso` guarda la fecha y proveedor.
+- `detalle_ingreso` guarda los productos y cantidades de ese ingreso.
+
+El mismo criterio se aplica para `consumo` y `detalle_consumo`:
+
+```text
+consumo (N) -------- (N) productos
+```
+
+se transforma en:
+
+```text
+consumo (1) -------- (N) detalle_consumo
+productos (1) ------ (N) detalle_consumo
+```
+
+Por eso el proceso correcto no termina en las 5 tablas iniciales. Primero se identifican las entidades principales y luego, al detectar relaciones de muchos a muchos, se agregan las tablas detalle necesarias. En este caso el resultado final queda con 7 tablas.
+
+## 2.7 Correccion de tipos de datos
+
+En PostgreSQL, `SERIAL` se usa para crear identificadores automaticos, normalmente en claves primarias. Las claves foraneas no deben ser `SERIAL`, porque no generan un nuevo dato; solo guardan el identificador de un registro que ya existe en otra tabla.
+
+Por eso se corrigio asi:
+
+| Campo | Tipo correcto | Motivo |
+|-------|---------------|--------|
+| productos.id_categoria | INT | Guarda el id de una categoria existente. |
+| ingreso.id_proveedor | INT | Guarda el id de un proveedor existente. |
+| detalle_ingreso.id_ingreso | INT | Guarda el id de un ingreso existente. |
+| detalle_ingreso.id_producto | INT | Guarda el id de un producto existente. |
+| detalle_consumo.id_consumo | INT | Guarda el id de un consumo existente. |
+| detalle_consumo.id_producto | INT | Guarda el id de un producto existente. |
+
+Tambien se corrigio `fecha_vencimiento`, porque una fecha no debe guardarse como `INTEGER`, sino como `DATE`.
+
+## 2.8 Modelo relacional resultante
+
+```text
+categorias (1) -------- (N) productos
+
+proveedores (1) ------- (N) ingreso
+ingreso (1) ----------- (N) detalle_ingreso
+productos (1) --------- (N) detalle_ingreso
+
+consumo (1) ----------- (N) detalle_consumo
+productos (1) --------- (N) detalle_consumo
+```
+
+## 2.9 Codigo SQL corregido
+
+```sql
+CREATE TABLE categorias (
+    id_categoria SERIAL PRIMARY KEY,
+    nombre_categoria VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE productos (
+    id_producto SERIAL PRIMARY KEY,
+    id_categoria INT NOT NULL,
+    nombre_producto VARCHAR(50) NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    fecha_vencimiento DATE,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+);
+
+CREATE TABLE proveedores (
+    id_proveedor SERIAL PRIMARY KEY,
+    nombre_proveedor VARCHAR(50) NOT NULL,
+    telefono_proveedor VARCHAR(20) NOT NULL,
+    direccion_proveedor VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE ingreso (
+    id_ingreso SERIAL PRIMARY KEY,
+    fecha_ingreso DATE NOT NULL,
+    id_proveedor INT NOT NULL,
+    FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+);
+
+CREATE TABLE detalle_ingreso (
+    id_detalle_ingreso SERIAL PRIMARY KEY,
+    id_ingreso INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    FOREIGN KEY (id_ingreso) REFERENCES ingreso(id_ingreso),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+
+CREATE TABLE consumo (
+    id_consumo SERIAL PRIMARY KEY,
+    fecha_consumo DATE NOT NULL
+);
+
+CREATE TABLE detalle_consumo (
+    id_detalle_consumo SERIAL PRIMARY KEY,
+    id_consumo INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    FOREIGN KEY (id_consumo) REFERENCES consumo(id_consumo),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+```
+
+## 2.10 Archivo XML para Draw.io
+
+El XML editable para Draw.io se encuentra en:
+
+```text
+diagrams/comedor_popular_mer.drawio
+```
+
+Tambien se dejo una version textual del diagrama en:
+
+```text
+diagrams/comedor_popular_mer.mmd
+```
+
+## 2.11 Conclusion del diseno
+
+El diseno final permite resolver el problema planteado porque organiza la informacion del inventario en tablas relacionadas. Con este modelo se puede registrar productos, clasificarlos por categoria, conocer sus proveedores, controlar los ingresos de productos y registrar los consumos diarios.
+
+La base de datos resultante no depende de una aplicacion web ni de un equipo especifico. Es una propuesta de organizacion de datos que transforma una problematica real del comedor en un modelo relacional implementable en PostgreSQL.

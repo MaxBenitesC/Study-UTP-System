@@ -1,0 +1,59 @@
+# Proyecto de Base de Datos: Comedor Popular
+
+## Enfoque del trabajo
+
+El proyecto se enfoca en un solo problema: convertir el control manual de productos de un comedor popular en una base de datos relacional.
+
+No se considera desarrollo de aplicacion web, costos, instalacion en una computadora ni diseno de interfaces. El objetivo es demostrar como una problematica real se analiza y se transforma en tablas, campos, claves primarias, claves foraneas y relaciones.
+
+## Punto 2: Diseno de la Base de Datos
+
+El desarrollo completo del punto 2 se encuentra en:
+
+```text
+PUNTO_2_DISENO_BASE_DATOS.md
+```
+
+## Archivos del modelo
+
+| Archivo | Contenido |
+|---------|-----------|
+| sql/01_schema.sql | Script de creacion de tablas corregido para PostgreSQL |
+| sql/02_data.sql | Datos de prueba para categorias, productos, proveedores, ingresos y consumos |
+| sql/03_queries.sql | Consultas de ejemplo para revisar inventario |
+| diagrams/comedor_popular_mer.drawio | XML editable para abrir en Draw.io |
+| diagrams/comedor_popular_mer.mmd | Diagrama textual en formato Mermaid |
+| PUNTO_2_DISENO_BASE_DATOS.md | Explicacion desde la problematica hasta el modelo relacional |
+
+## Tablas finales
+
+El modelo final contiene 7 tablas:
+
+1. categorias
+2. productos
+3. proveedores
+4. ingreso
+5. detalle_ingreso
+6. consumo
+7. detalle_consumo
+
+## Relaciones principales
+
+```text
+categorias (1) -------- (N) productos
+
+proveedores (1) ------- (N) ingreso
+ingreso (1) ----------- (N) detalle_ingreso
+productos (1) --------- (N) detalle_ingreso
+
+consumo (1) ----------- (N) detalle_consumo
+productos (1) --------- (N) detalle_consumo
+```
+
+## Correcciones aplicadas
+
+Las claves foraneas fueron corregidas para usar `INT` en lugar de `SERIAL`.
+
+`SERIAL` se mantiene solo en las claves primarias, porque sirve para generar identificadores automaticamente. En cambio, una clave foranea solo almacena el identificador de un registro que ya existe en otra tabla.
+
+Tambien se corrigio `fecha_vencimiento`, que debe usar tipo `DATE` porque representa una fecha.

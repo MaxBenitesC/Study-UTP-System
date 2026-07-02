@@ -1,0 +1,19 @@
+{
+  "name": "chapatupromo-backend",
+  "version": "1.0.0",
+  "description": "Backend para conectar mi primera pagina web con base de datos postgresql usando Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "Max Anderson Benites Corazon",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.22.0"
+  }
+}

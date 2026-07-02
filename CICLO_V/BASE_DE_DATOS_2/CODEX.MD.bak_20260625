@@ -1,0 +1,140 @@
+# Avance del Proyecto - Base de Datos II
+
+## Contexto acordado
+
+El proyecto se enfocara en un solo problema: pasar el control manual de productos e inventario de un comedor popular a una base de datos relacional.
+
+No se debe enfocar en aplicacion web, costos, instalacion en una PC, diseno de interfaces, clientes, pedidos, empleados ni ventas, porque el modelo actual no incluye esas tablas. El profesor quiere ver como una problematica se analiza y se convierte en una base de datos.
+
+## Tablas finales acordadas
+
+```sql
+CREATE TABLE categorias (
+    id_categoria SERIAL PRIMARY KEY,
+    nombre_categoria VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE productos (
+    id_producto SERIAL PRIMARY KEY,
+    id_categoria INT NOT NULL,
+    nombre_producto VARCHAR(50) NOT NULL,
+    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    fecha_vencimiento DATE,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+);
+
+CREATE TABLE proveedores (
+    id_proveedor SERIAL PRIMARY KEY,
+    nombre_proveedor VARCHAR(50) NOT NULL,
+    telefono_proveedor VARCHAR(20) NOT NULL,
+    direccion_proveedor VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE ingreso (
+    id_ingreso SERIAL PRIMARY KEY,
+    fecha_ingreso DATE NOT NULL,
+    id_proveedor INT NOT NULL,
+    FOREIGN KEY (id_proveedor) REFERENCES proveedores(id_proveedor)
+);
+
+CREATE TABLE detalle_ingreso (
+    id_detalle_ingreso SERIAL PRIMARY KEY,
+    id_ingreso INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    FOREIGN KEY (id_ingreso) REFERENCES ingreso(id_ingreso),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+
+CREATE TABLE consumo (
+    id_consumo SERIAL PRIMARY KEY,
+    fecha_consumo DATE NOT NULL
+);
+
+CREATE TABLE detalle_consumo (
+    id_detalle_consumo SERIAL PRIMARY KEY,
+    id_consumo INT NOT NULL,
+    id_producto INT NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    FOREIGN KEY (id_consumo) REFERENCES consumo(id_consumo),
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+```
+
+## Correcciones importantes
+
+- Las claves primarias usan `SERIAL` porque generan identificadores automaticos.
+- Las claves foraneas deben usar `INT`, no `SERIAL`, porque guardan identificadores que ya existen en otra tabla.
+- `fecha_vencimiento` debe ser `DATE`, no `INTEGER`, porque representa una fecha.
+- Se agrego `CHECK (cantidad > 0)` para evitar cantidades invalidas.
+- Se agrego `CHECK (stock >= 0)` para evitar stock negativo.
+
+## Relaciones del modelo
+
+```text
+categorias (1) -------- (N) productos
+
+proveedores (1) ------- (N) ingreso
+ingreso (1) ----------- (N) detalle_ingreso
+productos (1) --------- (N) detalle_ingreso
+
+consumo (1) ----------- (N) detalle_consumo
+productos (1) --------- (N) detalle_consumo
+```
+
+## Texto recomendado para 2.1 Descripcion del problema o caso de estudio
+
+Un comedor popular necesita gestionar de manera ordenada la informacion relacionada con el control de sus productos e insumos. En sus operaciones diarias recibe productos de proveedores, mercados o instituciones, almacena dichos productos y luego los consume durante la preparacion de alimentos.
+
+Cuando este control se realiza de forma manual o mediante registros desorganizados, pueden generarse problemas como perdida de informacion, errores al registrar cantidades, dificultad para conocer el stock disponible, falta de control sobre los productos proximos a vencer y poca claridad sobre que productos ingresaron o fueron consumidos en una fecha determinada.
+
+La ausencia de una base de datos centralizada dificulta la consulta rapida de la informacion. Por ejemplo, no se puede saber con facilidad que productos necesitan reposicion, que proveedor entrego determinados insumos, cuanto producto ingreso al almacen o que cantidad fue utilizada en la preparacion diaria.
+
+Por ello, surge la necesidad de disenar una base de datos que permita registrar, organizar y relacionar la informacion principal del inventario del comedor. Esta base de datos permitira controlar categorias, productos, proveedores, ingresos de productos y consumos, facilitando una administracion mas ordenada del stock disponible.
+
+## Texto para 2.2 Modelo UML
+
+### 2.2.1 Explicacion del modelo
+
+El modelo propuesto representa el control de inventario de productos del comedor popular. La base de datos permite registrar los productos que se utilizan en el comedor, clasificarlos por categorias, identificar a los proveedores que entregan los productos, registrar los ingresos de insumos y controlar los consumos realizados durante la preparacion de alimentos.
+
+La tabla `categorias` permite agrupar los productos segun su tipo, por ejemplo, viveres, verduras, carnes, abarrotes o combustible. La tabla `productos` almacena los insumos disponibles, su stock y fecha de vencimiento.
+
+La tabla `proveedores` registra a las instituciones, mercados o personas que entregan productos al comedor. Cada registro en la tabla `ingreso` representa una entrada de productos y se relaciona con un proveedor. Como un ingreso puede contener varios productos, se utiliza la tabla `detalle_ingreso`, donde se especifica que producto ingreso y en que cantidad.
+
+De la misma manera, la tabla `consumo` registra las salidas o usos de productos en una fecha determinada. Como en un consumo pueden utilizarse varios productos, se emplea la tabla `detalle_consumo`, donde se indica que producto fue consumido y en que cantidad.
+
+Este modelo permite pasar el control manual del inventario a una base de datos organizada, evitando duplicidad de informacion y permitiendo consultar que productos ingresaron, que productos se consumieron y cuanto stock queda disponible.
+
+### 2.2.2 Imagen del diagrama UML
+
+En esta seccion va la imagen generada en Draw.io.
+
+El archivo editable del diagrama esta en:
+
+```text
+diagrams/comedor_popular_mer.drawio
+```
+
+Tambien existe una version textual del modelo en:
+
+```text
+diagrams/comedor_popular_mer.mmd
+```
+
+## Archivos creados o actualizados
+
+| Archivo | Contenido |
+|---------|-----------|
+| `PUNTO_2_DISENO_BASE_DATOS.md` | Desarrollo del punto 2 desde la problematica hasta el modelo relacional. |
+| `estructura_wor_proyecto_comedor_popular.md` | Resumen del enfoque actual del proyecto. |
+| `sql/01_schema.sql` | Script SQL corregido con las 7 tablas finales. |
+| `sql/02_data.sql` | Datos de prueba para el modelo de inventario. |
+| `sql/03_queries.sql` | Consultas basicas para revisar inventario. |
+| `diagrams/comedor_popular_mer.drawio` | XML editable para Draw.io. |
+| `diagrams/comedor_popular_mer.mmd` | Diagrama textual en Mermaid. |
+
+## Pendiente
+
+- Pegar la imagen del UML generada desde Draw.io en el apartado 2.2.2 del informe.
+- Revisar que el informe final no mencione tablas que no existen en el modelo, como clientes, pedidos, empleados o ventas.

@@ -1,0 +1,142 @@
+erDiagram
+    COMEDORES ||--o{ TRABAJADORES : tiene
+    CARGOS ||--o{ TRABAJADORES : asigna
+
+    COMEDORES ||--o{ INGRESOS : recibe
+    PROVEEDORES ||--o{ INGRESOS : entrega
+    TRABAJADORES ||--o{ INGRESOS : registra
+    INGRESOS ||--o{ DETALLE_INGRESO : contiene
+    PRODUCTOS ||--o{ DETALLE_INGRESO : ingresa
+    CATEGORIAS ||--o{ PRODUCTOS : clasifica
+
+    TIPOS_BENEFICIARIO ||--o{ BENEFICIARIOS : clasifica
+    FAMILIAS ||--o{ BENEFICIARIOS : agrupa
+    BENEFICIARIOS ||--o{ CONSUMOS : realiza
+
+    COMEDORES ||--o{ MENUS : prepara
+    TIPOS_MENU ||--o{ MENUS : clasifica
+    TRABAJADORES ||--o{ MENUS : registra
+    MENUS ||--o{ DETALLE_MENU : usa
+    PRODUCTOS ||--o{ DETALLE_MENU : se_utiliza
+
+    MENUS ||--o{ CONSUMOS : se_entrega
+    TRABAJADORES ||--o{ CONSUMOS : atiende
+
+    COMEDORES {
+        int id_comedor PK
+        varchar nombre
+        varchar direccion
+        varchar distrito
+    }
+
+    CARGOS {
+        int id_cargo PK
+        varchar nombre
+    }
+
+    TRABAJADORES {
+        int id_trabajador PK
+        int id_comedor FK
+        int id_cargo FK
+        varchar nombres
+        varchar apellidos
+        varchar dni
+        varchar telefono
+        boolean activo
+    }
+
+    PROVEEDORES {
+        int id_proveedor PK
+        varchar ruc
+        varchar nombre
+        varchar telefono
+        varchar direccion
+        boolean activo
+    }
+
+    CATEGORIAS {
+        int id_categoria PK
+        varchar nombre
+    }
+
+    PRODUCTOS {
+        int id_producto PK
+        int id_categoria FK
+        varchar nombre
+        varchar unidad_medida
+        numeric stock_minimo
+        boolean activo
+    }
+
+    INGRESOS {
+        int id_ingreso PK
+        int id_comedor FK
+        int id_proveedor FK
+        int id_trabajador FK
+        timestamp fecha_ingreso
+        varchar documento
+    }
+
+    DETALLE_INGRESO {
+        int id_detalle_ingreso PK
+        int id_ingreso FK
+        int id_producto FK
+        numeric cantidad
+        date fecha_vencimiento
+        numeric costo_unitario
+    }
+
+    TIPOS_BENEFICIARIO {
+        int id_tipo_beneficiario PK
+        varchar nombre
+    }
+
+    FAMILIAS {
+        int id_familia PK
+        varchar codigo_padron
+        varchar direccion
+        varchar distrito
+    }
+
+    BENEFICIARIOS {
+        int id_beneficiario PK
+        int id_tipo_beneficiario FK
+        int id_familia FK
+        varchar nombres
+        varchar apellidos
+        varchar dni
+        boolean activo
+    }
+
+    TIPOS_MENU {
+        int id_tipo_menu PK
+        varchar nombre
+    }
+
+    MENUS {
+        int id_menu PK
+        int id_comedor FK
+        int id_tipo_menu FK
+        int id_trabajador FK
+        date fecha
+        varchar nombre
+        int cantidad_menus
+        numeric precio_base
+    }
+
+    DETALLE_MENU {
+        int id_detalle_menu PK
+        int id_menu FK
+        int id_producto FK
+        numeric cantidad_usada
+    }
+
+    CONSUMOS {
+        int id_consumo PK
+        int id_beneficiario FK
+        int id_menu FK
+        int id_trabajador FK
+        timestamp fecha_hora
+        numeric precio_cobrado
+        numeric monto_pagado
+    }
