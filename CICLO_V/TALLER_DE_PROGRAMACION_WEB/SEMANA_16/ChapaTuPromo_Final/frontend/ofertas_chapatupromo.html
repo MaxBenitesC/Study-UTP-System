@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChapaTuPromo | Ofertas del Dia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos_chapatupromo.css">
+  <link rel="icon" href="logo/chapatupromo.png" type="image/png">
+</head>
+<body>
+
+  <header>
+    <div class="parte-arriba-encabezado">
+      <img src="logo/chapatupromo.png" alt="Logo ChapaTuPromo">
+      <div class="texto-encabezado">
+        <h1>ChapaTuPromo</h1>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu_chapatupromo.html">Ver Menu Completo</a> |
+      <a href="formulario_chapatupromo.html">Hacer Pedido</a> |
+      <a href="pedidos_chapatupromo.html">Mis Pedidos</a> |
+      <a href="login_chapatupromo.html">Ingresar</a> |
+      <a href="registrar_chapatupromo.html">Registrarme</a>
+    </nav>
+  </header>
+  <hr>
+  <section>
+    <h2>¡¡¡Ofertas Espectaculares!!! ChapaTuPromo</h2>
+    <div id="mensaje-ofertas" class="mensaje-formulario"></div>
+    <p><a href="formulario_chapatupromo.html">Ver mi pedido</a></p>
+
+    <div class="resumen-ofertas">
+      <div class="tarjeta-oferta oferta-hoy">
+        <strong id="ofertas-hoy">0</strong>
+        <span>Vencen HOY</span>
+      </div>
+      <div class="tarjeta-oferta oferta-manana">
+        <strong id="ofertas-manana">0</strong>
+        <span>Vencen MAÑANA</span>
+      </div>
+      <div class="tarjeta-oferta oferta-dos-dias">
+        <strong id="ofertas-dos-dias">0</strong>
+        <span>Vencen en 2 DIAS</span>
+      </div>
+    </div>
+
+    <div id="contenedor-ofertas">
+      <p>Cargando ofertas desde la base de datos...</p>
+    </div>
+  </section>
+  <hr>
+  <footer>
+    <p class="footer-texto-siguenos">Siguenos en nuestras redes</p>
+    <div class="iconos-redes">
+      <a href="https://instagram.com/ChapaTuPromo" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="https://facebook.com/ChapaTuPromo" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      <a href="https://tiktok.com/@ChapaTuPromo" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+    </div>
+    <p class="derechos-autor">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
+  </footer>
+  <script src="js/config.js"></script>
+  <script src="js/ofertas.js"></script>
+</body>
+</html>

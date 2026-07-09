@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChapaTuPromo | Mis Pedidos</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos_chapatupromo.css">
+  <link rel="icon" href="logo/chapatupromo.png" type="image/png">
+</head>
+<body>
+
+  <header>
+    <div class="parte-arriba-encabezado">
+      <img src="logo/chapatupromo.png" alt="Logo ChapaTuPromo">
+      <div class="texto-encabezado">
+        <h1>ChapaTuPromo</h1>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu_chapatupromo.html">Ver Menu</a> |
+      <a href="formulario_chapatupromo.html">Nuevo Pedido</a> |
+      <a href="ofertas_chapatupromo.html">Ofertas del Dia</a> |
+      <a href="login_chapatupromo.html">Ingresar</a> |
+      <a href="registrar_chapatupromo.html">Registrarme</a>
+    </nav>
+  </header>
+  <hr>
+  <section>
+    <h2>Pedidos Realizados</h2>
+    <p>Aqui puedes ver el avance de tus pedidos. El estado se actualiza automaticamente para la demostracion.</p>
+
+    <div class="mis-numeros">
+      <div class="cuadro-estadistica total-pedidos">
+        <h3 id="total-pedidos">0</h3>
+        <p>Total de pedidos</p>
+      </div>
+      <div class="cuadro-estadistica pedidos-listos">
+        <h3 id="pedidos-listos">0</h3>
+        <p>Completados</p>
+      </div>
+      <div class="cuadro-estadistica pedidos-en-camino">
+        <h3 id="pedidos-proceso">0</h3>
+        <p>En proceso</p>
+      </div>
+    </div>
+
+    <div id="mensaje-pedidos" class="mensaje-formulario"></div>
+    <div id="tabla-pedidos">
+      <p>Cargando pedidos desde la base de datos...</p>
+    </div>
+
+    <br>
+    <p><a href="formulario_chapatupromo.html">Hacer un nuevo pedido</a></p>
+  </section>
+  <hr>
+  <footer>
+    <p class="footer-texto-siguenos">Siguenos en nuestras redes</p>
+    <div class="iconos-redes">
+      <a href="https://instagram.com/ChapaTuPromo" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="https://facebook.com/ChapaTuPromo" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      <a href="https://tiktok.com/@ChapaTuPromo" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+    </div>
+    <p class="derechos-autor">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
+  </footer>
+  <script src="js/config.js"></script>
+  <script src="js/pedidos.js"></script>
+
+</body>
+</html>

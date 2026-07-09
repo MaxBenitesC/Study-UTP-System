@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChapaTuPromo | Hacer Pedido</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos_chapatupromo.css">
+  <link rel="icon" href="logo/chapatupromo.png" type="image/png">
+</head>
+<body>
+
+  <header>
+    <div class="parte-arriba-encabezado">
+      <img src="logo/chapatupromo.png" alt="Logo ChapaTuPromo">
+      <div class="texto-encabezado">
+        <h1>ChapaTuPromo</h1>
+      </div>
+    </div>
+    <nav>
+      <a href="index.html">Inicio</a> |
+      <a href="menu_chapatupromo.html">Ver Menu</a> |
+      <a href="pedidos_chapatupromo.html">Mis Pedidos</a> |
+      <a href="ofertas_chapatupromo.html">Ofertas del Dia</a> |
+      <a href="login_chapatupromo.html">Ingresar</a> |
+      <a href="registrar_chapatupromo.html">Registrarme</a>
+    </nav>
+  </header>
+  <hr>
+  <section>
+    <h2>Hacer mi Pedido</h2>
+    <div id="mensaje-pedido" class="mensaje-formulario"></div>
+    <p>Revisa tu carrito, elige la entrega y confirma el pago.</p>
+
+    <form id="formulario-pedido" class="formulario-comprar">
+
+      <div class="caja-seccion datos-personales">
+        <h3><i class="fas fa-user-circle"></i> 1. Tus datos</h3>
+        <p>
+          <label for="nombre_cliente">Nombre completo:</label><br>
+          <input type="text" id="nombre_cliente" name="nombre_cliente"
+                 placeholder="Ej: Carlos Quispe Mamani" required>
+        </p>
+        <p>
+          <label for="telefono">Celular de contacto:</label><br>
+          <input type="text" id="telefono" name="telefono"
+                 placeholder="9XXXXXXXX" required>
+        </p>
+        <p>
+          <label for="correo_cliente">Correo (te avisamos cuando este listo):</label><br>
+          <input type="email" id="correo_cliente" name="correo_cliente"
+                 placeholder="tucorreo@gmail.com" required>
+        </p>
+      </div>
+
+      <div class="caja-seccion productos-elegir">
+        <h3><i class="fas fa-shopping-basket"></i> 2. Productos de mi carrito</h3>
+        <div id="resumen-carrito-pedido">
+          <p>Cargando productos del carrito...</p>
+        </div>
+        <p class="total-formulario">
+          <strong>Subtotal de productos:</strong> S/. <span id="total-carrito-pedido">0.00</span>
+        </p>
+      </div>
+
+      <div class="caja-seccion datos-envio">
+        <h3><i class="fas fa-truck"></i> 3. Entrega y Tienda</h3>
+        <p>
+          <label for="tipo_entrega">Tipo de entrega:</label><br>
+          <select id="tipo_entrega" name="tipo_entrega">
+            <option value="">Elige una opcion</option>
+            <option value="recojo">Recojo en tienda</option>
+            <option value="delivery">Delivery a domicilio - S/. 5.00 adicionales</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="tienda">Selecciona tu tienda mas cercana:</label><br>
+          <select id="tienda" name="tienda">
+            <option value="">Elige una tienda</option>
+            <option value="surco">Surco - Av. Primavera 1180, Santiago de Surco</option>
+            <option value="san_miguel">San Miguel - Av. La Marina 2000, San Miguel</option>
+            <option value="la_molina">La Molina - Av. La Molina 1318, La Molina</option>
+            <option value="san_borja">San Borja - Av. San Luis 1921, San Borja</option>
+            <option value="chorrillos">Chorrillos - Av. Huaylas 370, Chorrillos</option>
+            <option value="independencia">Independencia - Av. Tupac Amaru 3200, Independencia</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="direccion">Direccion completa (si es Delivery):</label><br>
+          <input type="text" id="direccion" name="direccion"
+                 placeholder="Ej: Jr. Las Flores 234, Miraflores">
+        </p>
+        <p>
+          <label for="referencia">Referencia:</label><br>
+          <input type="text" id="referencia" name="referencia"
+                 placeholder="Ej: Frente al parque, puerta azul">
+        </p>
+      </div>
+
+      <div class="caja-seccion metodo-pago">
+        <h3><i class="fas fa-credit-card"></i> 4. Metodo de pago</h3>
+        <p>
+          <label for="pago">Selecciona tu metodo de pago:</label><br>
+          <select id="pago" name="pago">
+            <option value="">Elige un metodo de pago</option>
+            <option value="Yape">Yape</option>
+            <option value="Plin">Plin</option>
+            <option value="tarjeta">Tarjeta de credito o debito</option>
+          </select>
+        </p>
+      </div>
+
+      <div class="resumen-pago-lateral">
+        <h3>Total a pagar</h3>
+        <strong>S/. <span id="total-final-pedido">0.00</span></strong>
+        <button type="submit">Finalizar pedido</button>
+      </div>
+    </form>
+
+  </section>
+  <hr>
+  <footer>
+    <p class="footer-texto-siguenos">Siguenos en nuestras redes</p>
+    <div class="iconos-redes">
+      <a href="https://instagram.com/ChapaTuPromo" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="https://facebook.com/ChapaTuPromo" target="_blank"><i class="fab fa-facebook"></i> Facebook</a>
+      <a href="https://tiktok.com/@ChapaTuPromo" target="_blank"><i class="fab fa-tiktok"></i> TikTok</a>
+    </div>
+    <p class="derechos-autor">ChapaTuPromo &copy; 2026 | Todos los derechos reservados</p>
+  </footer>
+  <script src="js/config.js"></script>
+  <script src="js/formulario.js"></script>
+</body>
+</html>

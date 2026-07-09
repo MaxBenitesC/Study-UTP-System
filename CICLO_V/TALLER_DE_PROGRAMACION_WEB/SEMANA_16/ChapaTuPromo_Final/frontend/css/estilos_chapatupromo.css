@@ -1,0 +1,1447 @@
+/* 1. General*/
+/* Colores que voy a usar en toda la página */
+:root {
+  --morado-principal: #4a0e7a;
+  --morado-oscuro: #2e0854;
+  --dorado-llamativo: #ffd700;
+  --fondo-clarito: #f8f5fb;
+  --texto-negro: #333333;
+  --blanco-puro: #ffffff;
+  --verde-fresco: #27ae60;
+  --naranja-panaderia: #e67e22;
+  --azul-lacteos: #3498db;
+  --rojo-carne: #c0392b;
+  --rojo-urgente: #e74c3c;
+  --naranja-alerta: #f39c12;
+  --azul-marino: #1a2a6c;
+}
+
+/* El cuerpo de la página con su tipo de letra y fondo */
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: normal;
+  background-color: var(--fondo-clarito);
+  color: var(--texto-negro);
+  margin: 0;
+  padding: 0;
+  /* Uso grid para que el footer siempre esté abajo */
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+p {
+  line-height: 1.7;
+  text-wrap: wrap;
+}
+
+/* Una rayita para separar*/
+hr {
+  border: none;
+  border-top: 1px solid #dddddd;
+  margin: 0;
+}
+
+
+/* 2. EL ENCABEZADO (HEADER) */
+/* La parte de arriba donde está el logo y el nombre */
+header {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  padding: 20px 30px 0 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+header img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  /* El logo se mueve un poquito arriba y abajo */
+  animation: flotar 1.5s infinite alternate;
+}
+
+header h1 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--blanco-puro);
+}
+
+header p {
+  margin: 4px 0 0 0;
+  font-size: 16px;
+  font-style: italic;
+  color: #e9d4f5;
+}
+
+/* Contenedor para el logo y el texto de arriba */
+.parte-arriba-encabezado {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 15px;
+}
+
+.texto-encabezado {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* 3. MENÚ DE NAVEGACIÓN (NAV) */
+/* La barrita de links */
+nav {
+  background-color: var(--morado-oscuro);
+  padding: 12px 30px;
+  margin: 0 -30px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 15px;
+  font-size: 0; /* Oculta los separadores '|' del HTML original */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Sombra para resaltar */
+}
+
+nav a {
+  color: var(--blanco-puro);
+  text-decoration: none;
+  font-size: 17px; /* Restaura el tamaño de la letra y lo hace más grande */
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 30px; /* Botones tipo pastilla más redondos */
+  transition: all 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo sutil */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Borde sutil */
+}
+
+/* Cuando paso el mouse por los links se ponen dorados */
+nav a:hover {
+  background-color: var(--dorado-llamativo);
+  color: var(--morado-oscuro);
+  border-color: var(--dorado-llamativo);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+}
+
+.usuario-header {
+  background-color: var(--morado-oscuro);
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+  margin: 0 -30px;
+  padding: 8px 30px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.usuario-header button {
+  background-color: var(--dorado-llamativo);
+  color: var(--morado-oscuro);
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
+/* 4. SECCIONES DE LA PÁGINA */
+section {
+  max-width: 1200px;
+  min-width: 280px;
+  margin: 40px auto;
+  padding: 0 30px;
+}
+
+h2 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--morado-principal);
+  border-bottom: 3px solid var(--morado-principal);
+  padding-bottom: 10px;
+  margin-bottom: 25px;
+}
+
+h3 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  font-style: normal;
+  color: #555555;
+}
+
+
+/* 5. LAS TABLAS */
+table {
+  width: 100%;
+  /* Separate para que se vean bien las esquinas redondas */
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 20px;
+  background-color: var(--blanco-puro);
+}
+
+th {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  font-size: 14px;
+  border: none;
+}
+
+/* Clases para redondear las puntas de la tabla */
+th.celda-primera {
+  border-top-left-radius: 8px;
+}
+
+th.celda-ultima {
+  border-top-right-radius: 8px;
+}
+
+td {
+  padding: 8px 10px;
+  border: none;
+  border-bottom: 1px solid #e9d4f5;
+  font-size: 14px;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+}
+
+/* Cuando paso el mouse por la fila de la tabla */
+tr:hover td {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+}
+
+/* Si hay links en la tabla, se ponen amarillos al pasar el mouse */
+tr:hover td a {
+  color: var(--dorado-llamativo);
+}
+
+
+/* 6. FORMULARIOS */
+form {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  max-width: 600px;
+  min-width: 280px;
+}
+
+label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Estilos para las cajas de texto y selects */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 2px solid #edf2f7;
+  background-color: #f8fafc;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: Arial, Helvetica, sans-serif;
+  /* Box-sizing para que no se salga del ancho */
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+input[type="text"]:hover,
+input[type="password"]:hover,
+input[type="email"]:hover,
+select:hover {
+  border-color: #4a0e7a;
+}
+
+/* Efecto cuando escribes en la cajita */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus {
+  background-color: var(--blanco-puro);
+  border-color: var(--morado-principal);
+  box-shadow: 0 0 0 4px rgba(74, 14, 122, 0.1);
+  outline: none;
+}
+
+
+/* 7. BOTONES Y LINKS */
+button[type="submit"] {
+  background-color: #4a0e7a;
+  color: #ffffff;
+  padding: 10px 25px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: 'Poppins', Arial, sans-serif;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s, text-shadow 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #2e0854;
+  text-shadow: 1px 1px 3px #000000;
+}
+
+a {
+  color: #4a0e7a;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #2e0854;
+}
+
+
+/* 8. FOOTER */
+footer {
+  background-color: var(--morado-oscuro);
+  color: var(--blanco-puro);
+  text-align: center;
+  padding: 40px 20px 20px 20px;
+  border-top: 5px solid var(--dorado-llamativo);
+}
+
+.footer-texto-siguenos {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dorado-llamativo);
+  margin: 0 0 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.iconos-redes {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.iconos-redes a {
+  color: var(--blanco-puro);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  background-color: rgba(255,255,255,0.1);
+  padding: 10px 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.iconos-redes a:hover {
+  background-color: var(--blanco-puro);
+  color: var(--morado-principal);
+  transform: translateY(-3px);
+}
+
+.iconos-redes i {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.derechos-autor {
+  font-size: 12px;
+  color: #aaaaaa;
+  margin: 0;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+
+/* 9. SECCIÓN PRINCIPAL*/
+.seccion-principal {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  text-align: center;
+  padding: 40px;
+  max-width: 100%;
+  margin: 0;
+  border-bottom: 5px solid var(--dorado-llamativo);
+}
+
+.seccion-principal h2 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--blanco-puro);
+  border-bottom: none;
+  margin-bottom: 25px;
+}
+
+.seccion-principal p {
+  font-size: 22px;
+  color: #e9d4f5;
+  max-width: 850px;
+  margin: 0 auto 45px auto;
+  line-height: 1.6;
+}
+
+.botones-inicio {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 25px;
+}
+
+.boton-grande {
+  background-color: var(--dorado-llamativo);
+  color: var(--morado-oscuro);
+  padding: 18px 45px;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid var(--dorado-llamativo);
+  border-radius: 50px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.boton-grande:hover {
+  background-color: var(--blanco-puro);
+  color: var(--morado-principal);
+  border-color: var(--blanco-puro);
+  transform: scale(1.1) translateY(-3px);
+}
+
+.boton-transparente {
+  background-color: transparent;
+  color: var(--blanco-puro);
+  border: 2px solid var(--blanco-puro);
+}
+
+.boton-transparente:hover {
+  background-color: var(--blanco-puro);
+  color: var(--morado-principal);
+}
+
+
+/* 10. CUADRO DE INFORMACIÓN */
+.cuadro-informacion {
+  background-color: var(--blanco-puro);
+  border-left: 10px solid var(--morado-principal);
+  border-radius: 20px;
+  padding: 40px 50px;
+  max-width: 1140px;
+  margin: 60px auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.cuadro-informacion p {
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+
+/* 11. LISTA DE PASOS PARA EL USUARIO */
+.como-funciona {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 30px;
+}
+
+.lista-pasos {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 30px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.lista-pasos li {
+  background-color: var(--blanco-puro);
+  border: 1px solid #eeeeee;
+  border-top: 6px solid var(--morado-principal);
+  border-radius: 20px;
+  padding: 40px 25px;
+  font-size: 15px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.lista-pasos li:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+/* Colores bonitos para los iconos */
+.lista-pasos li:nth-child(1) i { color: var(--azul-lacteos); }
+.lista-pasos li:nth-child(2) i { color: var(--naranja-alerta); }
+.lista-pasos li:nth-child(3) i { color: var(--verde-fresco); }
+.lista-pasos li:nth-child(4) i { color: var(--morado-principal); }
+.lista-pasos li:nth-child(5) i { color: var(--rojo-carne); }
+
+.lista-pasos li i {
+  display: block;
+  font-size: 52px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+
+/* 12. TABLA DONDE SE VEN LAS TIENDAS */
+.tabla-tiendas {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 30px;
+}
+
+.tabla-tiendas table {
+  margin-top: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: none;
+}
+
+.tabla-tiendas td {
+  padding: 18px 25px;
+  font-size: 16px;
+  border-bottom: 1px solid #e9d4f5;
+  background-color: var(--blanco-puro);
+}
+
+.tabla-tiendas tr:hover td {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+}
+
+
+/* 13. MENÚ DE PRODUCTOS */
+.contenedor-menu {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 25px;
+}
+
+.tarjeta-comida {
+  background-color: var(--blanco-puro);
+  padding: 25px;
+  border: 1px solid #eeeeee;
+  border-left: 8px solid var(--morado-principal);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.tarjeta-comida:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Estilos por tipo de comida */
+.comida-dulce { border-left-color: var(--naranja-panaderia); }
+.comida-dulce h3 { color: var(--naranja-panaderia); }
+.comida-dulce th { background-color: var(--naranja-panaderia); }
+
+.comida-leche { border-left-color: var(--azul-lacteos); }
+.comida-leche h3 { color: var(--azul-lacteos); }
+.comida-leche th { background-color: var(--azul-lacteos); }
+
+.comida-carne { border-left-color: var(--rojo-carne); }
+.comida-carne h3 { color: var(--rojo-carne); }
+.comida-carne th { background-color: var(--rojo-carne); }
+
+.comida-lista { border-left-color: var(--verde-fresco); }
+.comida-lista h3 { color: var(--verde-fresco); }
+.comida-lista th { background-color: var(--verde-fresco); }
+
+.tarjeta-comida h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+/* 14. FORMULARIO PARA COMPRAR */
+form.formulario-comprar {
+  background-color: var(--blanco-puro);
+  padding: 40px;
+  border: none;
+  border-radius: 20px;
+  max-width: 1250px;
+  margin: 0 auto;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  align-items: start;
+}
+
+.caja-seccion {
+  padding: 25px;
+  margin-bottom: 0;
+  border-radius: 15px;
+  background-color: #fafafa;
+  border-left: 6px solid var(--morado-principal);
+  transition: all 0.3s ease;
+}
+
+.caja-seccion:hover {
+  transform: translateX(5px);
+  background-color: var(--blanco-puro);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Colores para las secciones del formulario */
+.datos-personales { border-left-color: var(--azul-lacteos); }
+.datos-personales h3 { color: var(--azul-lacteos); }
+
+.productos-elegir { border-left-color: var(--dorado-llamativo); }
+.productos-elegir h3 { color: #b7950b; }
+
+.datos-envio { border-left-color: var(--naranja-panaderia); }
+.datos-envio h3 { color: var(--naranja-panaderia); }
+
+.metodo-pago { border-left-color: var(--verde-fresco); }
+.metodo-pago h3 { color: var(--verde-fresco); }
+
+.datos-personales {
+  order: 2;
+  grid-column: 1;
+}
+
+.productos-elegir {
+  order: 3;
+  grid-column: 2;
+}
+
+.datos-envio {
+  order: 4;
+  grid-column: 1;
+  grid-row: 2 / 4;
+}
+
+.metodo-pago {
+  order: 5;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.resumen-pago-lateral {
+  order: 6;
+  grid-column: 2;
+  grid-row: 3;
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 12px 30px rgba(74, 14, 122, 0.25);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  align-items: center;
+  text-align: center;
+}
+
+.resumen-pago-lateral h3 {
+  color: var(--dorado-llamativo);
+  margin-top: 0;
+  margin-bottom: 0;
+  justify-content: center;
+}
+
+.resumen-pago-lateral strong {
+  display: block;
+  font-size: 44px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.resumen-pago-lateral button[type="submit"] {
+  background-color: var(--dorado-llamativo);
+  color: var(--morado-oscuro);
+  border: none;
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: none;
+  width: 100%;
+}
+
+.resumen-pago-lateral button[type="submit"]:hover {
+  background-color: var(--blanco-puro);
+  transform: none;
+}
+
+.caja-seccion h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rejilla-productos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 25px;
+  margin-bottom: 15px;
+}
+
+.rejilla-productos label {
+  font-weight: 500;
+  font-size: 13px;
+  display: block;
+  padding: 10px;
+  background-color: var(--blanco-puro);
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rejilla-productos label:hover {
+  border-color: var(--dorado-llamativo);
+  background-color: #fffdf0;
+}
+
+.rejilla-productos input[type="checkbox"] {
+  margin-right: 10px;
+  transform: scale(1.2);
+}
+
+form.formulario-comprar > button[type="submit"] {
+  background: linear-gradient(135deg, var(--morado-principal) 0%, var(--morado-oscuro) 100%);
+  width: 100%;
+  padding: 18px;
+  font-size: 20px;
+  border-radius: 50px;
+  box-shadow: 0 10px 25px rgba(74, 14, 122, 0.3);
+}
+
+form.formulario-comprar > button[type="submit"]:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(74, 14, 122, 0.4);
+}
+
+
+/* 15. PÁGINA DE MIS PEDIDOS */
+.mis-numeros {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.cuadro-estadistica {
+  background-color: var(--blanco-puro);
+  border: 1px solid #dddddd;
+  border-top: 5px solid var(--morado-principal);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.cuadro-estadistica:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.cuadro-estadistica h3 {
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--morado-principal);
+  margin: 0;
+}
+
+/* Colores para los cuadritos de números */
+.total-pedidos { border-top-color: var(--azul-lacteos); }
+.total-pedidos h3 { color: var(--azul-lacteos); }
+
+.pedidos-listos { border-top-color: var(--verde-fresco); }
+.pedidos-listos h3 { color: var(--verde-fresco); }
+
+.pedidos-en-camino { border-top-color: var(--naranja-alerta); }
+.pedidos-en-camino h3 { color: var(--naranja-alerta); }
+
+.cuadro-estadistica p {
+  font-size: 14px;
+  font-weight: 600;
+  color: #777777;
+  margin: 10px 0 0 0;
+  text-transform: uppercase;
+}
+
+.estado-pedido {
+  display: inline-block;
+  background-color: #f4ecff;
+  color: var(--morado-principal);
+  border: 1px solid #d7b8ff;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+
+/* 16. RESUMEN DE OFERTAS */
+.resumen-ofertas {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 35px;
+}
+
+.tarjeta-oferta {
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--blanco-puro);
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tarjeta-oferta strong {
+  display: block;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.tarjeta-oferta span {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.9;
+}
+
+/* Colores para las ofertas según el tiempo */
+.oferta-hoy {
+  background-color: var(--rojo-urgente);
+  animation: latido 0.8s infinite alternate;
+  box-shadow: 0 10px 25px rgba(231, 76, 60, 0.3);
+}
+
+.oferta-manana {
+  background-color: var(--naranja-alerta);
+  box-shadow: 0 10px 25px rgba(243, 156, 18, 0.3);
+}
+
+.oferta-dos-dias {
+  background-color: var(--morado-principal);
+  box-shadow: 0 10px 25px rgba(74, 14, 122, 0.3);
+}
+
+.tarjeta-oferta:hover {
+  transform: scale(1.05) translateY(-8px);
+}
+
+
+/* 17. LISTAS DE OFERTAS (TABLAS DETALLADAS) */
+.titulo-seccion-ofertas {
+  margin-top: 40px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 3px solid transparent;
+  width: fit-content;
+  padding-bottom: 5px;
+}
+
+.rojo-hoy {
+  color: var(--rojo-urgente);
+  border-bottom-color: var(--rojo-urgente);
+}
+
+.naranja-manana {
+  color: var(--naranja-alerta);
+  border-bottom-color: var(--naranja-alerta);
+}
+
+.purpura-dos-dias {
+  color: var(--morado-principal);
+  border-bottom-color: var(--morado-principal);
+}
+
+.lista-de-ofertas {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 35px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Tabla de cosas que vencen hoy */
+.tabla-vence-hoy {
+  border: 3px solid var(--rojo-urgente);
+  background-color: #fff5f5;
+  animation: brillo-urgente 2s infinite;
+}
+
+.tabla-vence-hoy th {
+  background-color: var(--rojo-urgente);
+  color: var(--blanco-puro);
+  font-size: 15px;
+  text-transform: uppercase;
+}
+
+.tabla-vence-hoy td {
+  background-color: transparent;
+  border-bottom: 1px solid #feb2b2;
+  font-weight: 600;
+}
+
+.tabla-vence-hoy tr:hover td {
+  background-color: var(--rojo-urgente);
+  color: var(--blanco-puro);
+}
+
+.etiqueta-aviso {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.etiqueta-roja { background-color: var(--rojo-urgente); color: var(--blanco-puro); }
+
+/* Tabla de cosas que vencen mañana */
+.tabla-vence-manana {
+  border: 2px solid var(--naranja-alerta);
+}
+
+.tabla-vence-manana th {
+  background-color: var(--naranja-alerta);
+}
+
+.tabla-vence-manana tr:hover td {
+  background-color: var(--naranja-alerta);
+}
+
+/* Tabla de cosas que vencen en 2 días */
+.tabla-vence-pasado {
+  border: 2px solid var(--morado-principal);
+}
+
+.tabla-vence-pasado th {
+  background-color: var(--morado-principal);
+}
+
+.tabla-vence-pasado tr:hover td {
+  background-color: var(--morado-principal);
+}
+
+
+/* 18. CAJA DE LOGIN */
+.caja-login {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  padding: 40px 20px;
+  background: radial-gradient(circle at top right, rgba(74, 14, 122, 0.05), transparent);
+}
+
+.caja-login h2 {
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 30px;
+}
+
+.caja-login form {
+  width: 100%;
+  max-width: 400px;
+  padding: 35px;
+  background-color: var(--blanco-puro);
+  border: none;
+  border-top: 8px solid var(--azul-lacteos);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.caja-login button[type="submit"] {
+  display: block;
+  width: 100%;
+  background: linear-gradient(135deg, var(--azul-lacteos) 0%, #2980b9 100%);
+  border-radius: 50px;
+  margin-top: 20px;
+  transition: all 0.3s ease;
+}
+
+.caja-login button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.4);
+}
+
+
+/* 19. CAJA DE REGISTRO */
+.caja-registro {
+  padding: 40px 20px;
+}
+
+.caja-registro h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.caja-registro form {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: var(--blanco-puro);
+  border: none;
+  border-top: 8px solid var(--verde-fresco);
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.columnas-datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 25px;
+}
+
+.caja-datos-registro {
+  padding: 25px;
+  background-color: #fcfcfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+}
+
+.caja-datos-registro:hover {
+  transform: translateY(-5px);
+  border-color: var(--verde-fresco);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.caja-datos-registro h3 {
+  margin-top: 0;
+  color: var(--verde-fresco);
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.caja-registro button[type="submit"] {
+  background: linear-gradient(135deg, var(--verde-fresco) 0%, #219150 100%);
+  padding: 15px 40px;
+  border-radius: 50px;
+  font-size: 18px;
+  margin: 0 auto;
+  display: block;
+}
+
+
+/* 20. ANIMACIONES */
+@keyframes flotar {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-6px); }
+}
+
+@keyframes latido {
+  from { transform: scale(1); }
+  to   { transform: scale(1.05); }
+}
+
+@keyframes brillo-urgente {
+  0% { box-shadow: 0 0 5px rgba(231, 76, 60, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(231, 76, 60, 0.4); }
+}
+
+
+/* 21. RESPONSIVE (PARA QUE SE VEA BIEN EN CELULAR) */
+
+/* Cuando la pantalla es como una tablet */
+@media (max-width: 900px) {
+  .lista-pasos {
+    grid-template-columns: 1fr 1fr;
+  }
+  form.formulario-comprar {
+    grid-template-columns: 1fr;
+  }
+  .datos-personales,
+  .productos-elegir,
+  .datos-envio,
+  .metodo-pago,
+  .resumen-pago-lateral {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .resumen-pago-lateral {
+    grid-template-columns: 1fr;
+  }
+  .resumen-pago-lateral strong {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.35);
+    padding-left: 0;
+    padding-top: 15px;
+    text-align: left;
+  }
+  .resumen-pago-lateral button[type="submit"] {
+    width: 100%;
+  }
+  .columnas-datos {
+    grid-template-columns: 1fr;
+  }
+  header h1 {
+    font-size: 26px;
+  }
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+}
+
+/* Cuando la pantalla es chiquita como un celular */
+@media (max-width: 600px) {
+  header {
+    padding: 15px 15px 0 15px;
+  }
+  header img {
+    width: 50px;
+    height: 50px;
+  }
+  header h1 {
+    font-size: 22px;
+  }
+  .lista-pasos {
+    grid-template-columns: 1fr;
+  }
+  .seccion-principal h2 {
+    font-size: 24px;
+  }
+  .seccion-principal p {
+    font-size: 14px;
+  }
+  .botones-inicio {
+    flex-direction: column;
+    align-items: center;
+  }
+  .rejilla-productos {
+    grid-template-columns: 1fr;
+  }
+  .mis-numeros {
+    grid-template-columns: 1fr;
+  }
+  .resumen-ofertas {
+    grid-template-columns: 1fr;
+  }
+  table {
+    font-size: 12px;
+  }
+  th, td {
+    padding: 5px;
+  }
+  .iconos-redes {
+    flex-direction: column;
+    gap: 10px;
+  }
+  section {
+    padding: 0 10px;
+  }
+}
+/*mensajes de añadir producto exito*/
+.mensaje-formulario {
+    margin: 15px 0;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: none;
+}
+.mensaje-exito {
+  display: block;
+  background-color: #e8f8ef;
+  color: #1e8449;
+  border-left: 5px solid var(--verde-fresco);
+}
+
+.mensaje-error {
+  display: block;
+  background-color: #fdecea;
+  color: #c0392b;
+  border-left: 5px solid var(--rojo-urgente);
+}
+
+.resumen-carrito-menu {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(74, 14, 122, 0.25);
+  margin: 20px 0 30px 0;
+  padding: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.icono-carrito-menu {
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background-color: var(--blanco-puro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.icono-carrito-menu img {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+}
+
+.datos-carrito-menu {
+  flex: 1;
+}
+
+.datos-carrito-menu h3 {
+  color: var(--blanco-puro);
+  font-size: 28px;
+  margin: 0 0 5px 0;
+}
+
+.datos-carrito-menu p {
+  margin: 0;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.datos-carrito-menu #cantidad-carrito {
+  font-size: 52px;
+  line-height: 1;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: 800;
+  color: var(--dorado-llamativo);
+  margin-right: 8px;
+}
+
+.acciones-carrito-menu {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.acciones-carrito-menu strong {
+  font-size: 34px;
+  font-family: 'Poppins', Arial, sans-serif;
+}
+
+.acciones-carrito-menu a {
+  background-color: var(--dorado-llamativo);
+  color: var(--morado-oscuro);
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.acciones-carrito-menu a:hover {
+  background-color: var(--blanco-puro);
+}
+
+.control-inicio {
+  max-width: 260px;
+  margin: 20px auto;
+}
+
+.resumen-inicio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  max-width: 850px;
+  margin: 25px auto;
+}
+
+.tarjeta-resumen-inicio {
+  background-color: var(--blanco-puro);
+  border-top: 5px solid var(--morado-principal);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.tarjeta-resumen-inicio strong {
+  display: block;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-size: 38px;
+  color: var(--morado-principal);
+}
+
+.tarjeta-resumen-inicio span {
+  font-weight: 700;
+  color: #333333;
+}
+
+.total-formulario {
+  font-size: 20px;
+  text-align: right;
+}
+
+button[type="button"] {
+  background-color: var(--morado-principal);
+  color: var(--blanco-puro);
+  border: none;
+  border-radius: 4px;
+  padding: 7px 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button[type="button"]:hover {
+  background-color: var(--morado-oscuro);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modo-oscuro {
+  background-color: #1f1f25;
+  color: #eeeeee;
+}
+
+.modo-oscuro section,
+.modo-oscuro .cuadro-informacion,
+.modo-oscuro .como-funciona,
+.modo-oscuro .tabla-tiendas {
+  background-color: #2b2b33;
+  color: #eeeeee;
+}
+
+.modo-oscuro h2 {
+  color: var(--dorado-llamativo);
+  border-bottom-color: var(--dorado-llamativo);
+}
+
+.modo-oscuro .purpura-dos-dias {
+  color: #c98ffc; /* Morado mas claro y brillante para el fondo oscuro */
+  border-bottom-color: #c98ffc;
+}
+
+.modo-oscuro td {
+  background-color: #33333c;
+  color: #eeeeee;
+}
+
+.modo-oscuro .lista-pasos li,
+.modo-oscuro .tarjeta-resumen-inicio {
+  background-color: #ffffff;
+  color: #333333;
+}
+
+.modo-oscuro .lista-pasos a {
+  color: var(--morado-principal);
+}
+
+.modo-oscuro .tarjeta-resumen-inicio span {
+  color: #333333;
+}
+
+/* Modificaciones para formularios (Login, Registro, Pedido) en modo oscuro */
+.modo-oscuro .caja-login,
+.modo-oscuro .caja-registro,
+.modo-oscuro .caja-seccion,
+.modo-oscuro .caja-login form,
+.modo-oscuro .caja-registro form {
+  background-color: #2b2b33;
+  color: #eeeeee;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.modo-oscuro .caja-datos-registro {
+  background-color: #1f1f25;
+  border-color: #444450;
+}
+
+.modo-oscuro form label {
+  color: #dddddd;
+}
+
+.modo-oscuro form input,
+.modo-oscuro form select {
+  background-color: #1f1f25;
+  color: #ffffff;
+  border: 1px solid #555566;
+}
+
+.modo-oscuro form input:focus,
+.modo-oscuro form select:focus {
+  background-color: #2b2b33;
+  border-color: var(--dorado-llamativo);
+  color: #ffffff;
+}
+
+.modo-oscuro form input::placeholder {
+  color: #999999;
+}
+
+.modo-oscuro .caja-login a,
+.modo-oscuro .caja-registro a,
+.modo-oscuro p a {
+  color: var(--dorado-llamativo);
+}
+
+.modo-oscuro .caja-login p,
+.modo-oscuro .caja-registro p {
+  color: #cccccc;
+}
+
+@media (max-width: 700px) {
+  .resumen-carrito-menu {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .acciones-carrito-menu {
+    width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .resumen-inicio {
+    grid-template-columns: 1fr;
+  }
+}

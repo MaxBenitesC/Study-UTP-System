@@ -1,2 +1,14 @@
 *.md
 *.MD
+.archivos_respaldo/
+.vscode/
+SEMANA_16/INFORME_PROYECTO_FINAL.html
+SEMANA_16/ProyectoFinal2026.pdf
+SEMANA_16/proyecto_final_2026_assets/
+SEMANA_16/proyecto_final_2026_layout.txt
+SEMANA_16/proyecto_final_2026_raw.txt
+SEMANA_16/capturas_proyecto_final/
+**/backend/reset_demo.sql
+**/backend/comandos_postgres.txt
+SEMANA_15/APF 3 - 2026.pdf
+SEMANA_15/APF_3_2026_page-1.png
