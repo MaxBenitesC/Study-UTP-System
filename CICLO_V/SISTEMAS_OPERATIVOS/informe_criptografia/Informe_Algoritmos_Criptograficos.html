@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Algoritmos Criptográficos en Sistemas Operativos modernos</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 20mm 18mm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      color: #171717;
+      background: #ffffff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      line-height: 1.48;
+    }
+
+    .cover {
+      height: 259mm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .cover-logo {
+      width: 67mm;
+      height: auto;
+      margin-top: 10mm;
+      margin-bottom: 24mm;
+    }
+
+    .cover-university {
+      margin: 0 0 5mm;
+      font-size: 18pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .cover-faculty {
+      max-width: 155mm;
+      margin: 0;
+      font-size: 13pt;
+      font-weight: 600;
+    }
+
+    .cover-course {
+      margin-top: 24mm;
+      font-size: 14pt;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .cover-topic {
+      max-width: 160mm;
+      margin: 9mm 0 0;
+      font-size: 22pt;
+      line-height: 1.25;
+      font-weight: 700;
+      color: #d71920;
+    }
+
+    .cover p {
+      text-align: center;
+    }
+
+    .cover-data {
+      width: 128mm;
+      margin-top: auto;
+      margin-bottom: 18mm;
+      border-collapse: collapse;
+      font-size: 11.5pt;
+      text-align: left;
+    }
+
+    .cover-data th,
+    .cover-data td {
+      padding: 2.5mm 2mm;
+      border-bottom: 0.3mm solid #b9b9b9;
+    }
+
+    .cover-data th {
+      width: 31mm;
+      font-weight: 700;
+    }
+
+    .page {
+      min-height: 259mm;
+    }
+
+    .research-page {
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .research-page h1 {
+      margin-bottom: 7mm;
+    }
+
+    .research-page h2 {
+      margin-top: 5mm;
+      margin-bottom: 2mm;
+      font-size: 12.5pt;
+    }
+
+    .research-page p {
+      margin-bottom: 2.5mm;
+      font-size: 10pt;
+      line-height: 1.4;
+    }
+
+    .research-page .key-point {
+      margin-top: 2mm;
+      padding: 2.5mm 3.5mm;
+      font-size: 9.3pt;
+      line-height: 1.35;
+    }
+
+    h1 {
+      margin: 0 0 10mm;
+      padding-bottom: 3mm;
+      border-bottom: 0.7mm solid #d71920;
+      font-size: 17pt;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 7mm 0 2.5mm;
+      font-size: 13pt;
+      line-height: 1.25;
+      color: #b5121b;
+    }
+
+    h2:first-of-type {
+      margin-top: 0;
+    }
+
+    .algorithm-type {
+      color: #4a4a4a;
+      font-weight: 400;
+    }
+
+    p {
+      margin: 0 0 3.5mm;
+      text-align: justify;
+    }
+
+    .key-point {
+      margin: 3mm 0 0;
+      padding: 3mm 4mm;
+      border-left: 1.2mm solid #d71920;
+      background: #f5f5f5;
+      font-size: 10pt;
+    }
+
+    .implementation-page h1 {
+      margin-bottom: 5mm;
+    }
+
+    .implementation-note {
+      margin-bottom: 4mm;
+      font-size: 9.5pt;
+      color: #444444;
+    }
+
+    pre {
+      margin: 0;
+      padding: 5mm;
+      border: 0.3mm solid #b8b8b8;
+      border-radius: 1.5mm;
+      background: #f7f7f7;
+      color: #111111;
+      font-family: "DejaVu Sans Mono", Consolas, monospace;
+      font-size: 6.8pt;
+      line-height: 1.34;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      tab-size: 4;
+    }
+
+    code {
+      font-family: inherit;
+    }
+
+    @media screen {
+      body {
+        background: #d8d8d8;
+      }
+
+      .cover,
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        height: auto;
+        margin: 8mm auto;
+        padding: 20mm 20mm 18mm;
+        background: #ffffff;
+        box-shadow: 0 1mm 4mm rgba(0, 0, 0, 0.18);
+      }
+
+      .cover {
+        height: 297mm;
+      }
+    }
+
+    @media print {
+      .cover,
+      .page {
+        width: auto;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <img class="cover-logo" src="assets/logo_utp.png" alt="Logo de la Universidad Tecnológica del Perú">
+    <p class="cover-university">Universidad Tecnológica del Perú</p>
+    <p class="cover-faculty">Facultad de Ingeniería de Sistemas y Electrónica</p>
+    <p class="cover-course">Sistemas Operativos</p>
+    <p class="cover-topic">Algoritmos Criptográficos en Sistemas Operativos modernos</p>
+
+    <table class="cover-data" aria-label="Datos académicos">
+      <tr>
+        <th>Estudiante</th>
+        <td>Max Anderson Benites Corazón</td>
+      </tr>
+      <tr>
+        <th>Ciclo</th>
+        <td>V Ciclo</td>
+      </tr>
+      <tr>
+        <th>Año</th>
+        <td>2026</td>
+      </tr>
+    </table>
+  </section>
+
+  <section class="page research-page">
+    <h1>2. Investigación y explicación</h1>
+
+    <h2>AES <span class="algorithm-type">— Cifrado simétrico</span></h2>
+    <p><strong>¿Qué es?</strong> AES (Advanced Encryption Standard) es un cifrador de bloques simétrico: la misma clave secreta cifra y descifra la información. Trabaja con bloques de 128 bits y admite claves de 128, 192 o 256 bits. Su operación combina varias rondas de sustitución, permutación y mezcla para transformar los datos en texto cifrado.</p>
+    <p><strong>Uso en el sistema operativo.</strong> Se emplea para proteger datos en reposo, por ejemplo en el cifrado de discos, volúmenes y archivos. BitLocker utiliza AES en modos orientados al almacenamiento, mientras que Linux puede aplicar AES mediante dm-crypt/LUKS. El sistema conserva la clave protegida y cifra o descifra sectores de forma transparente durante las operaciones de entrada/salida.</p>
+    <div class="key-point"><strong>Punto clave:</strong> AES es rápido y adecuado para grandes volúmenes de datos, pero la seguridad depende de proteger la clave y utilizar correctamente el modo de operación y los vectores de inicialización.</div>
+
+    <h2>RSA <span class="algorithm-type">— Criptografía asimétrica</span></h2>
+    <p><strong>¿Qué es?</strong> RSA utiliza un par de claves relacionadas: una pública que puede compartirse y una privada que debe permanecer secreta. Su seguridad se basa en la dificultad práctica de factorizar un número compuesto muy grande. Puede cifrar cantidades pequeñas de información y producir firmas digitales verificables con la clave pública.</p>
+    <p><strong>Uso en el sistema operativo.</strong> Los sistemas operativos pueden verificar con RSA la firma de módulos del kernel antes de cargarlos, evitando la ejecución de componentes no autorizados. En SSH, RSA se utiliza principalmente para autenticar al servidor o al usuario mediante firmas durante el handshake; el secreto de sesión normalmente se negocia con algoritmos específicos de intercambio de claves y luego se cifra con un algoritmo simétrico.</p>
+    <div class="key-point"><strong>Punto clave:</strong> RSA no se usa para cifrar archivos completos por su costo y límite de tamaño; se combina con cifrado simétrico o se usa para firmas.</div>
+
+    <h2>SHA-256 <span class="algorithm-type">— Función hash</span></h2>
+    <p><strong>¿Qué es?</strong> SHA-256 recibe datos de cualquier longitud y genera un resumen fijo de 256 bits. Es una función unidireccional: no existe una operación de descifrado. Un cambio mínimo en la entrada produce un hash muy diferente, lo que permite detectar modificaciones.</p>
+    <p><strong>Uso en el sistema operativo.</strong> Se usa para comparar la integridad de archivos, paquetes, imágenes del sistema y registros. También puede formar parte de esquemas de contraseñas con sal y múltiples rondas. No debe almacenarse una contraseña aplicando SHA-256 una sola vez; para ese fin se prefieren funciones de derivación lentas como Argon2, scrypt o PBKDF2.</p>
+    <div class="key-point"><strong>Punto clave:</strong> SHA-256 verifica integridad, pero por sí solo no demuestra quién creó los datos; para autenticidad debe combinarse con una firma digital o un HMAC.</div>
+  </section>
+
+  <section class="page implementation-page">
+    <h1>3. Implementación en Java</h1>
+    <p class="implementation-note">Clase ejecutable con AES-CBC, RSA-OAEP de 2048 bits y SHA-256. Requiere Java 8 o superior.</p>
+    <pre><code>import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.MGF1ParameterSpec;
+import java.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.OAEPParameterSpec;
+import javax.crypto.spec.PSource;
+
+public class LaboratorioCriptografia {
+    private static final String AES_TRANSFORMATION = "AES/CBC/PKCS5Padding";
+    private static final String RSA_TRANSFORMATION =
+            "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    public static String cifrarAES(String texto, SecretKey clave) throws Exception {
+        byte[] iv = new byte[16];
+        RANDOM.nextBytes(iv);
+
+        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
+        cipher.init(Cipher.ENCRYPT_MODE, clave, new IvParameterSpec(iv));
+        byte[] cifrado = cipher.doFinal(texto.getBytes(StandardCharsets.UTF_8));
+
+        ByteBuffer resultado = ByteBuffer.allocate(iv.length + cifrado.length);
+        resultado.put(iv);
+        resultado.put(cifrado);
+        return Base64.getEncoder().encodeToString(resultado.array());
+    }
+
+    public static String descifrarAES(String datosBase64, SecretKey clave)
+            throws Exception {
+        byte[] datos = Base64.getDecoder().decode(datosBase64);
+        ByteBuffer buffer = ByteBuffer.wrap(datos);
+        byte[] iv = new byte[16];
+        buffer.get(iv);
+        byte[] cifrado = new byte[buffer.remaining()];
+        buffer.get(cifrado);
+
+        Cipher cipher = Cipher.getInstance(AES_TRANSFORMATION);
+        cipher.init(Cipher.DECRYPT_MODE, clave, new IvParameterSpec(iv));
+        byte[] textoPlano = cipher.doFinal(cifrado);
+        return new String(textoPlano, StandardCharsets.UTF_8);
+    }
+
+    private static OAEPParameterSpec parametrosOAEP() {
+        return new OAEPParameterSpec(
+                "SHA-256",
+                "MGF1",
+                MGF1ParameterSpec.SHA256,
+                PSource.PSpecified.DEFAULT);
+    }
+
+    public static String cifrarRSA(String texto, PublicKey clavePublica)
+            throws Exception {
+        Cipher cipher = Cipher.getInstance(RSA_TRANSFORMATION);
+        cipher.init(Cipher.ENCRYPT_MODE, clavePublica, parametrosOAEP());
+        byte[] cifrado = cipher.doFinal(texto.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(cifrado);
+    }
+
+    public static String descifrarRSA(String datosBase64, PrivateKey clavePrivada)
+            throws Exception {
+        Cipher cipher = Cipher.getInstance(RSA_TRANSFORMATION);
+        cipher.init(Cipher.DECRYPT_MODE, clavePrivada, parametrosOAEP());
+        byte[] cifrado = Base64.getDecoder().decode(datosBase64);
+        byte[] textoPlano = cipher.doFinal(cifrado);
+        return new String(textoPlano, StandardCharsets.UTF_8);
+    }
+
+    public static String calcularSHA256(String texto) throws Exception {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(texto.getBytes(StandardCharsets.UTF_8));
+        StringBuilder hexadecimal = new StringBuilder(hash.length * 2);
+        for (byte valor : hash) {
+            hexadecimal.append(String.format("%02x", valor &amp; 0xff));
+        }
+        return hexadecimal.toString();
+    }
+
+    public static void main(String[] args) throws Exception {
+        String texto = "Sistemas Operativos UTP - 2026";
+
+        KeyGenerator generadorAES = KeyGenerator.getInstance("AES");
+        generadorAES.init(128);
+        SecretKey claveAES = generadorAES.generateKey();
+        String cifradoAES = cifrarAES(texto, claveAES);
+        String descifradoAES = descifrarAES(cifradoAES, claveAES);
+
+        KeyPairGenerator generadorRSA = KeyPairGenerator.getInstance("RSA");
+        generadorRSA.initialize(2048);
+        KeyPair parRSA = generadorRSA.generateKeyPair();
+        String cifradoRSA = cifrarRSA(texto, parRSA.getPublic());
+        String descifradoRSA = descifrarRSA(cifradoRSA, parRSA.getPrivate());
+
+        String hashSHA256 = calcularSHA256(texto);
+
+        System.out.println("=== LABORATORIO DE CRIPTOGRAFIA ===");
+        System.out.println("Texto original : " + texto);
+        System.out.println("\n[AES]");
+        System.out.println("Cifrado Base64 : " + cifradoAES);
+        System.out.println("Descifrado     : " + descifradoAES);
+        System.out.println("\n[RSA]");
+        System.out.println("Cifrado Base64 : " + cifradoRSA);
+        System.out.println("Descifrado     : " + descifradoRSA);
+        System.out.println("\n[SHA-256]");
+        System.out.println("Hash hexadecimal: " + hashSHA256);
+    }
+}</code></pre>
+  </section>
+</body>
+</html>

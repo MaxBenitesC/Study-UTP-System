@@ -1,0 +1,11 @@
+# Archivos temporales de IntelliJ
+*.iml
+.idea/
+
+# Archivos temporales del sistema
+*.tmp
+*.bak
+
+# Archivos de compilación
+*.class
+out/
