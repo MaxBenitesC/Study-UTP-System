@@ -35,3 +35,29 @@ npm-debug.log
 # AI assistant context files (local only)
 CLAUDE.md
 GEMINI.md
+
+# Documentos y ofimatica (respaldados en Google Drive via rclone)
+*.pdf
+*.docx
+*.docx#
+*.doc
+*.pptx
+*.pptx#
+*.ppt
+*.xlsx
+*.xlsx#
+*.xls
+*.~lock.*
+
+# Archivos comprimidos de entrega
+*.zip
+*.rar
+*.7z
+*.tar
+*.tar.gz
+*.gz
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
