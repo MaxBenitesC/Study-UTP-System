@@ -1,0 +1,14 @@
+{
+  "name": "semana06-nodejs-utp",
+  "version": "1.0.0",
+  "description": "Laboratorio de NodeJS Semana 06 - Módulo OS, Servidor HTTP y Servidor TCP",
+  "main": "01-modulo-os.js",
+  "scripts": {
+    "os": "node 01-modulo-os.js",
+    "http": "node 02-servidor-http.js",
+    "tcp": "node 03-servidor-tcp.js",
+    "tcp:client": "node 04-cliente-tcp.js"
+  },
+  "author": "Max Anderson Benites Corazón (Senior Technical Implementation Specialist)",
+  "license": "ISC"
+}

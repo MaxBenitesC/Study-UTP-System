@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante Sabor Peruano</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Estilos personalizados -->
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body data-bs-spy="scroll" data-bs-target="#navbarPrincipal" data-bs-offset="70">
+
+    <!-- NAVBAR (Requisito A) -->
+    <nav id="navbarPrincipal" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-warning" href="#inicio">
+                <i class="bi bi-egg-fried me-2"></i>Sabor Peruano
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuNavegacion" aria-controls="menuNavegacion" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="menuNavegacion">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#inicio">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#platos">Platos Destacados</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">Contacto</a>
+                    </li>
+                </ul>
+                <div class="ms-lg-3">
+                    <button class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalReserva">
+                        <i class="bi bi-calendar-check me-1"></i>Reservar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SECCIÓN PRINCIPAL / HERO (Requisito B) -->
+    <header id="inicio" class="hero-section text-center text-white py-5 bg-dark position-relative">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-warning text-dark mb-3 px-3 py-2 fw-bold text-uppercase">Tradición y Sabor Criollo</span>
+                    <h1 class="display-4 fw-bold mb-3">La Mejor Gastronomía Peruana</h1>
+                    <p class="lead mb-4 text-light">
+                        Disfruta de una experiencia culinaria inolvidable con auténticas recetas tradicionales preparadas con los ingredientes más frescos.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button class="btn btn-warning btn-lg fw-bold text-dark px-4" data-bs-toggle="modal" data-bs-target="#modalReserva">
+                            <i class="bi bi-bookmark-plus me-1"></i>Reservar una mesa
+                        </button>
+                        <a href="#platos" class="btn btn-outline-light btn-lg px-4">
+                            Ver nuestra carta
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SECCIÓN DE CONTENIDO / CARDS (Requisito C & D) -->
+    <main id="platos" class="py-5 bg-light">
+        <div class="container py-3">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Nuestros Platos Destacados</h2>
+                <p class="text-muted lead">Conoce nuestras especialidades recomendadas por el chef</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- CARD 1 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="https://images.unsplash.com/photo-1535399831218-d5bd36d1a6b3?w=600&auto=format&fit=crop&q=80" class="card-img-top card-img-custom" alt="Ceviche Clásico">
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title fw-bold text-primary">Ceviche Mixto Tradicional</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                Fresco pescado del día y mariscos marinados al momento con jugo de limón peruano, ají limo, cebolla morada, choclo y camote.
+                            </p>
+                            <div class="my-2">
+                                <span class="badge bg-success-subtle text-success fs-6 fw-bold">S/ 32.00</span>
+                            </div>
+                            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalCeviche">
+                                <i class="bi bi-info-circle me-1"></i>Ver información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80" class="card-img-top card-img-custom" alt="Lomo Saltado">
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title fw-bold text-primary">Costillar a la parrilla</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                Jugosa costilla a la parrilla, con tomate criollo, papas nativas, acompañados con salsa parrillera y su gaseoson.
+                            </p>
+                            <div class="my-2">
+                                <span class="badge bg-success-subtle text-success fs-6 fw-bold">S/ 36.00</span>
+                            </div>
+                            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalLomo">
+                                <i class="bi bi-info-circle me-1"></i>Ver información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&auto=format&fit=crop&q=80" class="card-img-top card-img-custom" alt="Ají de Gallina">
+                        <div class="card-body d-flex flex-column text-center">
+                            <h5 class="card-title fw-bold text-primary">Pollo Saltado</h5>
+                            <p class="card-text text-muted flex-grow-1">
+                                Pechuga de ave en trozos, servido sobre papas cocidas, tomate cocido, carne de cerdo y Wantan frito,.
+                            </p>
+                            <div class="my-2">
+                                <span class="badge bg-success-subtle text-success fs-6 fw-bold">S/ 28.00</span>
+                            </div>
+                            <button class="btn btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#modalAji">
+                                <i class="bi bi-info-circle me-1"></i>Ver información
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- SECCIÓN CONTACTO -->
+    <section id="contacto" class="py-5 bg-white">
+        <div class="container text-center">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold mb-3">Visítanos o Contáctanos</h2>
+                    <p class="text-muted lead mb-4">Estamos listos para atenderte y brindarte la mejor experiencia culinaria.</p>
+                    <div class="card bg-light border-0 p-4 mb-4 shadow-sm">
+                        <p class="mb-2"><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Dirección:</strong> Av. Arequipa 1234, Miraflores, Lima - Perú</p>
+                        <p class="mb-2"><i class="bi bi-telephone-fill text-success me-2"></i><strong>Teléfono:</strong> +51 (01) 456-7890 / 999 999 999</p>
+                        <p class="mb-0"><i class="bi bi-clock-fill text-primary me-2"></i><strong>Horario:</strong> Lunes a Domingo de 12:00 m. a 11:00 p.m.</p>
+                    </div>
+                    <button class="btn btn-primary btn-lg px-5 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalReserva">
+                        <i class="bi bi-calendar-event me-2"></i>Hacer una Reserva Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MODALES DE INFORMACIÓN DE DETALLE (Requisito D) -->
+    
+    <!-- Modal Ceviche -->
+    <div class="modal fade" id="modalCeviche" tabindex="-1" aria-labelledby="modalCevicheLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalCevicheLabel"><i class="bi bi-info-circle me-2"></i>Ceviche Mixto Tradicional</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><strong>Ingredientes:</strong> Corvina fresca, pulpo, calamar, langostinos, ají limo, limón de Chulucanas.</li>
+                        <li class="list-group-item"><strong>Tiempo de preparación:</strong> 15 a 20 minutos.</li>
+                        <li class="list-group-item"><strong>Guarnición:</strong> Camote glaseado, choclo desgranado y canchita serrana.</li>
+                        <li class="list-group-item"><strong>Nivel de picante:</strong> Medio (ajustable a gusto del cliente).</li>
+                    </ul>
+                    <div class="alert alert-info py-2 mb-0 d-flex justify-content-between align-items-center">
+                        <span><strong>Precio por porción:</strong></span>
+                        <span class="fs-5 fw-bold text-primary">S/ 32.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-warning" data-bs-target="#modalReserva" data-bs-toggle="modal">Pedir en Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lomo Saltado -->
+    <div class="modal fade" id="modalLomo" tabindex="-1" aria-labelledby="modalLomoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalLomoLabel"><i class="bi bi-info-circle me-2"></i>Lomo Saltado al Wok</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><strong>Ingredientes:</strong> Lomo fino de res en dados, cebolla morada gruesa, tomate, ají amarillo, sillao y vinagre tinto.</li>
+                        <li class="list-group-item"><strong>Tiempo de preparación:</strong> 15 minutos (flambeado al instante).</li>
+                        <li class="list-group-item"><strong>Guarnición:</strong> Papas amarillas crujientes y arroz blanco graneado.</li>
+                        <li class="list-group-item"><strong>Recomendación:</strong> Acompañar con copa de vino tinto o chicha morada de la casa.</li>
+                    </ul>
+                    <div class="alert alert-info py-2 mb-0 d-flex justify-content-between align-items-center">
+                        <span><strong>Precio por porción:</strong></span>
+                        <span class="fs-5 fw-bold text-primary">S/ 36.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-warning" data-bs-target="#modalReserva" data-bs-toggle="modal">Pedir en Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Ají de Gallina -->
+    <div class="modal fade" id="modalAji" tabindex="-1" aria-labelledby="modalAjiLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalAjiLabel"><i class="bi bi-info-circle me-2"></i>Ají de Gallina Cremoso</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item"><strong>Ingredientes:</strong> Pechuga de gallina deshilachada, pasta de ají amarillo tierno, leche evaporada, queso parmesano y pecanas.</li>
+                        <li class="list-group-item"><strong>Tiempo de preparación:</strong> 10 a 15 minutos.</li>
+                        <li class="list-group-item"><strong>Guarnición:</strong> Papas sancochadas, medio huevo cocido, aceituna de botija y arroz blanco.</li>
+                        <li class="list-group-item"><strong>Nivel de picante:</strong> Suave / Delicado.</li>
+                    </ul>
+                    <div class="alert alert-info py-2 mb-0 d-flex justify-content-between align-items-center">
+                        <span><strong>Precio por porción:</strong></span>
+                        <span class="fs-5 fw-bold text-primary">S/ 28.00</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-warning" data-bs-target="#modalReserva" data-bs-toggle="modal">Pedir en Reserva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL FORMULARIO DE RESERVA (Requisito E & F) -->
+    <div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalReservaLabel">
+                        <i class="bi bi-calendar-plus text-warning me-2"></i>Reserva tu Mesa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <!-- Alerta de éxito invisible al inicio -->
+                    <div id="alertaExito" class="alert alert-success d-none" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>¡Reserva registrada con éxito! Nos comunicaremos contigo a la brevedad.
+                    </div>
+
+                    <form id="formReserva" novalidate>
+                        <!-- Campo 1: Nombre (Input Text) -->
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label fw-bold">Nombre completo:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="nombre" placeholder="Ej. Juan Pérez" required>
+                                <div class="invalid-feedback">Por favor ingrese su nombre.</div>
+                            </div>
+                        </div>
+
+                        <!-- Campo 2: Correo (Input Email) -->
+                        <div class="mb-3">
+                            <label for="correo" class="form-label fw-bold">Correo electrónico:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="correo" placeholder="ejemplo@correo.com" required>
+                                <div class="invalid-feedback">Ingrese un correo electrónico válido.</div>
+                            </div>
+                        </div>
+
+                        <!-- Campo 3: Selección de Personas (Select) -->
+                        <div class="mb-3">
+                            <label for="personas" class="form-label fw-bold">Número de comensales:</label>
+                            <select class="form-select" id="personas" required>
+                                <option value="" selected disabled>Seleccione una opción...</option>
+                                <option value="1">1 persona (Individual)</option>
+                                <option value="2">2 personas (Pareja)</option>
+                                <option value="3-4">3 a 4 personas (Familiar)</option>
+                                <option value="5+">5 a más personas (Grupo / Evento)</option>
+                            </select>
+                            <div class="invalid-feedback">Seleccione la cantidad de personas.</div>
+                        </div>
+
+                        <!-- Campo 4: Mensaje / Peticiones Especiales (Textarea) -->
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label fw-bold">Comentarios o solicitudes especiales:</label>
+                            <textarea class="form-control" id="mensaje" rows="3" placeholder="Ej. Mesa en terraza, alergias o celebración de cumpleaños..."></textarea>
+                        </div>
+
+                        <!-- Campo 5: Términos (Checkbox) -->
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="aceptar" required>
+                            <label class="form-check-label text-muted small" for="aceptar">
+                                Acepto las políticas de reservación y tratamiento de datos.
+                            </label>
+                            <div class="invalid-feedback">Debe aceptar los términos antes de continuar.</div>
+                        </div>
+
+                        <!-- Botón de Envío -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning fw-bold text-dark py-2">
+                                <i class="bi bi-send-fill me-1"></i>Confirmar Reserva
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white text-center py-4 border-top border-secondary">
+        <div class="container">
+            <p class="mb-1 fw-bold text-warning">Restaurante Sabor Peruano &copy; 2026</p>
+            <p class="mb-0 text-muted small">Desarrollo Web con Bootstrap 5 | Ciclo VI - UTP</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS (incluye Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Script personalizado -->
+    <script src="js/script.js"></script>
+</body>
+</html>

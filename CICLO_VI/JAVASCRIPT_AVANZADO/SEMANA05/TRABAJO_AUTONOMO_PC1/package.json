@@ -1,0 +1,8 @@
+{
+  "name": "explorador-paises-pc1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

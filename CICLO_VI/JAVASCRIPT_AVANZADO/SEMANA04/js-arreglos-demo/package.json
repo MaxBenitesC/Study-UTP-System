@@ -1,0 +1,16 @@
+{
+  "name": "js-arreglos-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "densos": "node src/01-arreglos-densos.js",
+    "no-densos": "node src/02-arreglos-no-densos.js",
+    "metodos": "node src/03-shift-unshift.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

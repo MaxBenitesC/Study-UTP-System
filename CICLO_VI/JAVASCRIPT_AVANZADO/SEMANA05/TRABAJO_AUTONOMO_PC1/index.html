@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Explorador de Países</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./src/app.js"></script>
+  </head>
+  <body>
+    <header class="cabecera">
+      <div class="contenedor">
+        <h1>Explorador de Países</h1>
+        <p>Descubre y compara información de los países del mundo.</p>
+      </div>
+    </header>
+
+    <main class="contenedor">
+      <section class="panel-estado" aria-label="Estado de los datos">
+        <p id="estado-carga" role="status" aria-live="polite">Preparando la consulta de países…</p>
+        <button id="reintentar" type="button" hidden>Volver a intentar</button>
+        <p id="resumen-datos" hidden></p>
+      </section>
+
+      <div id="aplicacion" hidden>
+        <section id="controles" aria-label="Búsqueda, filtros y ordenamiento"></section>
+        <section id="estadisticas" aria-label="Estadísticas de países"></section>
+        <section id="resultados" aria-label="Resultados de países"></section>
+        <nav id="paginacion" aria-label="Páginas de resultados"></nav>
+        <section id="favoritos" aria-label="Países favoritos"></section>
+        <section id="comparador" aria-label="Comparador de países"></section>
+        <section id="clima" aria-label="Clima de países favoritos"></section>
+      </div>
+    </main>
+
+  </body>
+</html>

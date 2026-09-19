@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MiniPortal de Noticias | PC1 - JavaScript Avanzado</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Google Fonts para tipografía profesional -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- Encabezado de la Aplicación -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <span class="brand-icon">📰</span>
+        <span class="brand-name">PortalNoticias <strong>UTP</strong></span>
+        <span class="badge">PC1 - 2025</span>
+      </div>
+
+      <nav class="nav-user-area" id="navUserArea">
+        <!-- Se inyecta dinámicamente según estado de sesión -->
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- SECCIÓN 1: AUTENTICACIÓN (LOGIN / REGISTRO) -->
+    <section id="authSection" class="auth-section">
+      <div class="auth-card">
+        <!-- Pestañas de Cambio de Formulario -->
+        <div class="auth-tabs">
+          <button id="tabLogin" class="tab-btn active" type="button">Iniciar Sesión</button>
+          <button id="tabRegister" class="tab-btn" type="button">Registrarse</button>
+        </div>
+
+        <!-- Mensajes de feedback global -->
+        <div id="authAlert" class="alert hidden" role="alert"></div>
+
+        <!-- FORMULARIO: LOGIN -->
+        <form id="formLogin" class="auth-form" novalidate>
+          <h2 class="form-title">Bienvenido de nuevo</h2>
+          <p class="form-subtitle">Ingresa tus credenciales para acceder a las noticias</p>
+
+          <div class="form-group">
+            <label for="loginEmail">Correo electrónico</label>
+            <input type="email" id="loginEmail" placeholder="ejemplo@utp.edu.pe" required autocomplete="email" />
+            <span class="field-error" id="loginEmailError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Contraseña</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password" />
+            <span class="field-error" id="loginPasswordError"></span>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="btnLoginSubmit">
+            Ingresar al Portal
+          </button>
+
+          <div class="auth-footnote">
+            ¿No tienes una cuenta aún? <a href="#" id="linkToRegister">Crea una aquí</a>
+          </div>
+        </form>
+
+        <!-- FORMULARIO: REGISTRO -->
+        <form id="formRegister" class="auth-form hidden" novalidate>
+          <h2 class="form-title">Crear Cuenta</h2>
+          <p class="form-subtitle">Completa el formulario con validaciones en cliente</p>
+
+          <div class="form-group">
+            <label for="regFullName">Nombre completo <small>(mínimo 3 caracteres)</small></label>
+            <input type="text" id="regFullName" placeholder="Juan Pérez" required />
+            <span class="field-error" id="regFullNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Correo electrónico <small>(formato válido)</small></label>
+            <input type="email" id="regEmail" placeholder="usuario@dominio.com" required autocomplete="email" />
+            <span class="field-error" id="regEmailError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Contraseña <small>(mínimo 6 caracteres, alfanumérico)</small></label>
+            <input type="password" id="regPassword" placeholder="Al menos 6 letras y números" required autocomplete="new-password" />
+            <span class="field-error" id="regPasswordError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regConfirmPassword">Confirmar contraseña</label>
+            <input type="password" id="regConfirmPassword" placeholder="Repite tu contraseña" required autocomplete="new-password" />
+            <span class="field-error" id="regConfirmPasswordError"></span>
+          </div>
+
+          <button type="submit" class="btn btn-success btn-block" id="btnRegisterSubmit">
+            Registrar Usuario
+          </button>
+
+          <div class="auth-footnote">
+            ¿Ya estás registrado? <a href="#" id="linkToLogin">Inicia sesión</a>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: PORTAL DE NOTICIAS (SOLO USUARIOS AUTENTICADOS) -->
+    <section id="newsSection" class="news-section hidden">
+      <!-- Barra de Control y Configuración de API -->
+      <div class="news-toolbar">
+        <div class="news-toolbar-header">
+          <div>
+            <h1 class="page-title">Últimas Noticias Globales</h1>
+            <p class="page-subtitle" id="newsStatusText">Cargando noticias desde NewsAPI...</p>
+          </div>
+
+          <!-- Configuración de API Key para flexibilidad ante el docente -->
+          <div class="api-key-box">
+            <label for="newsApiKeyInput">NewsAPI Key (opcional):</label>
+            <div class="api-key-input-group">
+              <input type="text" id="newsApiKeyInput" placeholder="Pega tu API Key de newsapi.org" />
+              <button type="button" id="btnApplyApiKey" class="btn btn-sm btn-secondary">Guardar Key</button>
+            </div>
+            <small class="api-hint">Si no tienes Key o falla CORS en navegador, se cargará el dataset de contingencia automáticamente.</small>
+          </div>
+        </div>
+
+        <!-- Filtros y recarga -->
+        <div class="news-actions">
+          <div class="category-filters" id="categoryFilters">
+            <button class="filter-chip active" data-category="general">General</button>
+            <button class="filter-chip" data-category="technology">Tecnología</button>
+            <button class="filter-chip" data-category="business">Negocios</button>
+            <button class="filter-chip" data-category="science">Ciencia</button>
+          </div>
+
+          <button id="btnReloadNews" class="btn btn-secondary btn-sm">
+            🔄 Actualizar Noticias
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor dinámico de Noticias -->
+      <div id="newsGrid" class="news-grid">
+        <!-- Renderizado dinámico vía JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer con créditos profesionales -->
+  <footer class="footer">
+    <div class="footer-container">
+      <p>
+        <strong>JavaScript Avanzado (100000S51T) — Práctica Calificada 1</strong><br />
+        Desarrollado por: <strong>Max Anderson Benites Corazón</strong> (<em>Senior Technical Implementation Specialist</em>)
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

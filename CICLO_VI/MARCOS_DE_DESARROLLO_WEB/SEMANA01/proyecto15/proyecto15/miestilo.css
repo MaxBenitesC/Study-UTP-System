@@ -1,0 +1,95 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+h1{
+   font: bold 20px Arial, sans-serif;
+}
+h2{
+   font: bold 14px Arial, sans-serif;
+}
+header,section,footer,aside,nav,article,figure,figcaption,hgroup{
+   display: block;
+   
+}
+
+body{
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+#agrupar{
+    width: calc(100% - 30px);
+    max-width: 960px;
+    margin: 15px auto;
+    text-align: left;
+}
+
+#cabecera{
+    background-color: #FFFBB9;
+    border: 1px solid #999999;
+   padding: 20PX;
+}
+
+#menu{
+    background-color: #CCCCCC;
+    padding: 5px 15px;
+}
+
+#menu li{
+    display: inline-block;
+    list-style: none;
+    padding: 5px;
+    font: bold 14px Arial, sans-serif;
+}
+
+#seccion{
+    float: left;
+    width: 66%;
+    margin: 20px 2%;
+}
+
+#columna{
+    float: right;
+    width: 26%;
+    margin: 20px 2% 20px 0;
+    background-color: #FFFBB9;
+    border: 1px solid #999999;
+    padding: 20px;
+}
+#pie{
+    clear: both;
+    background-color: #CCCCCC;
+    text-align: center;
+    padding: 20px;
+    border-top: 2px solid #999999;
+    font: bold 12px Arial, sans-serif;
+
+}
+
+article{
+    margin-bottom: 20px;
+}
+
+figure{
+    margin: 15px 0;
+}
+
+img{
+    max-width: 100%;
+}
+
+@media (max-width: 760px){
+    #seccion,
+    #columna{
+        float: none;
+        width: 96%;
+        margin: 20px 2%;
+    }
+
+    #menu li{
+        display: block;
+    }
+}

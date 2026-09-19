@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vista previa - Matriz FODA de Alicorp S.A.A.</title>
+  <style>
+    @page { size: Letter; margin: 0; }
+
+    :root {
+      --ink: #18202a;
+      --muted: #5c6672;
+      --rule: #cbd3dc;
+      --navy: #173a59;
+      --navy-soft: #eaf1f7;
+      --green: #2f6a57;
+      --green-soft: #edf5f1;
+      --amber: #8a5b17;
+      --amber-soft: #fbf4e7;
+      --red: #8a3d3f;
+      --red-soft: #faeeee;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      background: #e8ebef;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .sheet {
+      width: 8.5in;
+      height: 11in;
+      margin: 14px auto;
+      padding: 0.66in 0.72in 0.58in;
+      background: #fff;
+      box-shadow: 0 4px 22px rgba(18, 32, 46, .14);
+      position: relative;
+      overflow: hidden;
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .sheet:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .document-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 9px;
+      border-bottom: 1.6px solid var(--navy);
+      margin-bottom: 13px;
+    }
+
+    .document-header img {
+      width: 1.45in;
+      height: auto;
+      margin-top: 1px;
+    }
+
+    .eyebrow {
+      margin: 0 0 3px;
+      color: var(--muted);
+      font-size: 8.1pt;
+      font-weight: 700;
+      letter-spacing: .55px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--navy);
+      font-size: 17pt;
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 9.2pt;
+    }
+
+    .lead {
+      margin: 0 0 10px;
+      font-size: 9.3pt;
+      line-height: 1.32;
+      text-align: left;
+    }
+
+    .table-number {
+      margin: 0 0 2px;
+      font-size: 9.3pt;
+      font-weight: 700;
+    }
+
+    .table-title {
+      margin: 0 0 7px;
+      font-size: 9.3pt;
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .factor-grid td {
+      width: 50%;
+      padding: 0;
+      vertical-align: top;
+      border: 1px solid var(--rule);
+    }
+
+    .quadrant-title {
+      margin: 0;
+      padding: 6px 8px;
+      color: #fff;
+      font-size: 9.2pt;
+      line-height: 1.15;
+    }
+
+    .strength .quadrant-title { background: var(--navy); }
+    .weakness .quadrant-title { background: var(--amber); }
+    .opportunity .quadrant-title { background: var(--green); }
+    .threat .quadrant-title { background: var(--red); }
+
+    .factor-list {
+      margin: 0;
+      padding: 7px 9px 7px 31px;
+      font-size: 8.55pt;
+      line-height: 1.24;
+    }
+
+    .factor-list li { margin: 0 0 5px; }
+    .factor-list li:last-child { margin-bottom: 0; }
+    .factor-list strong { color: var(--navy); }
+    .weakness .factor-list strong { color: var(--amber); }
+    .opportunity .factor-list strong { color: var(--green); }
+    .threat .factor-list strong { color: var(--red); }
+
+    .factor-grid tr:first-child td { height: 2.68in; }
+    .factor-grid tr:last-child td { height: 2.68in; }
+
+    .note {
+      margin: 7px 0 0;
+      color: #454f5a;
+      font-size: 7.7pt;
+      line-height: 1.23;
+      text-align: left;
+    }
+
+    .note-label { font-style: italic; }
+
+    .source-line {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid #d8dee5;
+      color: #59636e;
+      font-size: 7.2pt;
+      line-height: 1.2;
+    }
+
+    .source-line a {
+      color: #305f86;
+      text-decoration: none;
+    }
+
+    .cross-matrix th,
+    .cross-matrix td {
+      border: 1px solid var(--rule);
+      vertical-align: top;
+    }
+
+    .cross-matrix thead th {
+      padding: 6px 7px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 8.5pt;
+      text-align: center;
+    }
+
+    .cross-matrix .axis {
+      width: 0.88in;
+      padding: 7px 6px;
+      color: #fff;
+      font-size: 8.1pt;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .cross-matrix .axis-opportunity { background: var(--green); }
+    .cross-matrix .axis-threat { background: var(--red); }
+
+    .strategy-cell {
+      height: 3.18in;
+      padding: 8px 9px;
+      background: #fff;
+    }
+
+    .strategy-type {
+      margin: -8px -9px 8px;
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--rule);
+      background: #e9edf1;
+      font-size: 8.7pt;
+      font-weight: 700;
+    }
+
+    .strategy {
+      margin: 0 0 8px;
+      font-size: 8.4pt;
+      line-height: 1.24;
+    }
+
+    .strategy:last-child { margin-bottom: 0; }
+
+    .strategy strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .footer {
+      position: absolute;
+      left: 0.72in;
+      right: 0.72in;
+      bottom: 0.25in;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 5px;
+      border-top: 1px solid #d7dde3;
+      color: #6c7580;
+      font-size: 7.2pt;
+    }
+
+    @media print {
+      html, body { background: #fff; }
+      .sheet {
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="sheet">
+    <header class="document-header">
+      <div>
+        <p class="eyebrow">Avance de Proyecto Final 1</p>
+        <h1>Matriz FODA y formulación estratégica</h1>
+        <p class="subtitle">Alicorp S.A.A. · Diagnóstico actualizado 2024–2026</p>
+      </div>
+      <img src="../SEMANA03/MATERIALES/logo_utp.png" alt="Universidad Tecnológica del Perú">
+    </header>
+
+    <p class="lead">
+      La matriz integra los resultados del análisis interno y externo. Los factores se codifican para
+      demostrar el origen de cada estrategia y evitar propuestas que no guarden relación con el diagnóstico.
+    </p>
+
+    <p class="table-number">Tabla 1</p>
+    <p class="table-title">Diagnóstico FODA de Alicorp S.A.A.</p>
+
+    <table class="factor-grid" aria-label="Factores FODA de Alicorp">
+      <tbody>
+        <tr>
+          <td class="strength">
+            <h2 class="quadrant-title">Fortalezas · factores internos favorables</h2>
+            <ol class="factor-list">
+              <li><strong>F1.</strong> Portafolio superior a 150 marcas y presencia consolidada en consumo masivo.</li>
+              <li><strong>F2.</strong> Capacidad financiera y operativa: en el segundo trimestre de 2026, las ventas y el EBITDA ajustado crecieron 10,2 % y 7,5 %, respectivamente.</li>
+              <li><strong>F3.</strong> Ecosistemas digitales diferenciados: Díadía para bodegas, Insuma para clientes B2B y genIA para acuicultura.</li>
+              <li><strong>F4.</strong> Red industrial y comercial capaz de atender distintas líneas de negocio y mercados.</li>
+            </ol>
+          </td>
+          <td class="weakness">
+            <h2 class="quadrant-title">Debilidades · factores internos desfavorables</h2>
+            <ol class="factor-list">
+              <li><strong>D1.</strong> Presión sobre la rentabilidad: en 2025, el margen bruto bajó de 27,0 % a 26,4 % y el margen EBITDA ajustado pasó de 15,3 % a 15,1 %.</li>
+              <li><strong>D2.</strong> Rentabilidad reducida del negocio internacional frente a las demás unidades, particularmente por el desempeño de Bolivia.</li>
+              <li><strong>D3.</strong> Mayor complejidad operativa por la integración de Refinería del Espino y Jabonería Wilson.</li>
+              <li><strong>D4.</strong> Modelo de atención aún híbrido entre canales presenciales y digitales, lo que obliga a administrar ambos costos y procesos.</li>
+            </ol>
+          </td>
+        </tr>
+        <tr>
+          <td class="opportunity">
+            <h2 class="quadrant-title">Oportunidades · condiciones externas favorables</h2>
+            <ol class="factor-list">
+              <li><strong>O1.</strong> Crecimiento de los pagos digitales: durante 2025 aumentaron 45,8 % por adulto en el Perú.</li>
+              <li><strong>O2.</strong> Recuperación del comercio: el sector creció 3,59 % en 2025 y el comercio minorista aumentó 4,65 % en diciembre.</li>
+              <li><strong>O3.</strong> Avance de la formalización y digitalización de las MYPE, clientes relevantes para Alicorp Soluciones y el canal tradicional.</li>
+              <li><strong>O4.</strong> Demanda de productos con mejores perfiles nutricionales y envases sostenibles.</li>
+            </ol>
+          </td>
+          <td class="threat">
+            <h2 class="quadrant-title">Amenazas · condiciones externas desfavorables</h2>
+            <ol class="factor-list">
+              <li><strong>A1.</strong> Competencia intensa y presión promocional en las categorías de consumo masivo.</li>
+              <li><strong>A2.</strong> Volatilidad cambiaria y dificultades macroeconómicas en Bolivia.</li>
+              <li><strong>A3.</strong> Variabilidad de precios y disponibilidad de materias primas agrícolas.</li>
+              <li><strong>A4.</strong> Mayores exigencias nutricionales, ambientales, de ciberseguridad y protección de datos.</li>
+            </ol>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="note"><span class="note-label">Nota.</span> F = fortaleza; D = debilidad; O = oportunidad; A = amenaza. D3 y D4 son inferencias analíticas basadas en adquisiciones recientes y en el modelo híbrido de atención declarado por la empresa.</p>
+    <p class="source-line">Elaboración propia con base en Alicorp S.A.A. (2024, 2026), BCRP (2026), INEI (2026) y PRODUCE (2025).</p>
+
+    <footer class="footer">
+      <span>Administración y Organización de Empresas</span>
+      <span>1</span>
+    </footer>
+  </section>
+
+  <section class="sheet">
+    <header class="document-header">
+      <div>
+        <p class="eyebrow">Avance de Proyecto Final 1</p>
+        <h1>Matriz FODA cruzada</h1>
+        <p class="subtitle">Estrategias derivadas de factores internos y externos</p>
+      </div>
+      <img src="../SEMANA03/MATERIALES/logo_utp.png" alt="Universidad Tecnológica del Perú">
+    </header>
+
+    <p class="table-number">Tabla 2</p>
+    <p class="table-title">Matriz de formulación estratégica de Alicorp S.A.A.</p>
+
+    <table class="cross-matrix" aria-label="Matriz FODA cruzada de Alicorp">
+      <thead>
+        <tr>
+          <th class="axis">Entorno</th>
+          <th>Fortalezas</th>
+          <th>Debilidades</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th class="axis axis-opportunity">Oportunidades</th>
+          <td class="strategy-cell fo">
+            <div class="strategy-type">Estrategias FO</div>
+            <p class="strategy"><strong>FO1 (F3 + O1 + O3):</strong> Integrar pagos interoperables, promociones y programas de fidelización en Díadía e Insuma, respetando el segmento de cada plataforma, para aumentar la frecuencia de pedidos digitales.</p>
+            <p class="strategy"><strong>FO2 (F1 + F4 + O2 + O4):</strong> Utilizar el portafolio de marcas y la cobertura comercial para desarrollar productos reformulados y presentaciones adaptadas al poder adquisitivo y a las nuevas preferencias nutricionales.</p>
+          </td>
+          <td class="strategy-cell do">
+            <div class="strategy-type">Estrategias DO</div>
+            <p class="strategy"><strong>DO1 (D1 + D4 + O1 + O2):</strong> Utilizar la información de pedidos digitales para optimizar el portafolio, la planificación de la demanda y las rutas de distribución, reduciendo el costo de atención y contribuyendo a recuperar el margen.</p>
+            <p class="strategy"><strong>DO2 (D3 + O3):</strong> Integrar las operaciones recientemente adquiridas bajo procesos comerciales, logísticos y tecnológicos comunes, aprovechando el crecimiento y la formalización de las MYPE.</p>
+          </td>
+        </tr>
+        <tr>
+          <th class="axis axis-threat">Amenazas</th>
+          <td class="strategy-cell fa">
+            <div class="strategy-type">Estrategias FA</div>
+            <p class="strategy"><strong>FA1 (F1 + F2 + A1):</strong> Defender la participación de mercado mediante innovación, gestión diferenciada por categoría y promociones basadas en datos, evitando depender únicamente de descuentos generales.</p>
+            <p class="strategy"><strong>FA2 (F2 + F4 + A3):</strong> Fortalecer la diversificación de proveedores, las coberturas financieras y el abastecimiento local para reducir el impacto de la volatilidad de las materias primas.</p>
+          </td>
+          <td class="strategy-cell da">
+            <div class="strategy-type">Estrategias DA</div>
+            <p class="strategy"><strong>DA1 (D2 + A2 + A3):</strong> Revisar el portafolio internacional, aumentar el abastecimiento local y ajustar precios con mayor frecuencia en mercados afectados por inflación o volatilidad cambiaria.</p>
+            <p class="strategy"><strong>DA2 (D3 + A4):</strong> Implementar controles corporativos comunes de riesgos, ciberseguridad, cumplimiento ambiental y protección de datos en todas las unidades y empresas adquiridas.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer class="footer">
+      <span>Administración y Organización de Empresas</span>
+      <span>2</span>
+    </footer>
+  </section>
+</body>
+</html>

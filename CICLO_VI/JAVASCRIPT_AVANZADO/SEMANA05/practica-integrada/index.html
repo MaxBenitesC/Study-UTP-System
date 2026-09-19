@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluación Práctica Semana 05 - JavaScript Avanzado</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="container header-content">
+      <div class="header-titles">
+        <span class="badge">JavaScript Avanzado · Semana 05</span>
+        <h1>Primera Práctica Calificada (PC1)</h1>
+        <p class="subtitle">Solución Integrada: Arreglos, Cadenas y Expresiones Regulares</p>
+      </div>
+      <div class="header-meta">
+        <div class="specialist-card">
+          <span class="role">Especialista Responsable</span>
+          <strong>Max Anderson Benites Corazón</strong>
+          <span class="corp">Senior Technical Implementation Specialist · NCR VOYIX</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-layout">
+    <!-- SECCIÓN 1: FORMULARIO Y CAPTURA DE DATOS -->
+    <section class="card">
+      <div class="card-header">
+        <h2>1. Captura de Datos del Alumno</h2>
+        <div class="btn-group">
+          <button id="btnPrompt" class="btn btn-outline" title="Demostración con ventana prompt()">
+            ⚡ Cargar con prompt()
+          </button>
+          <button id="btnDemo" class="btn btn-secondary">
+            📋 Cargar Ejemplo
+          </button>
+        </div>
+      </div>
+
+      <form id="formAlumno" class="form-grid">
+        <div class="form-group">
+          <label for="nombres">Nombres:</label>
+          <input type="text" id="nombres" placeholder="Ej. Max Anderson" required autocomplete="off">
+          <span class="hint" id="hintNombres">Solo letras y espacios (RegEx: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="apellidos">Apellidos:</label>
+          <input type="text" id="apellidos" placeholder="Ej. Benites Corazón" required autocomplete="off">
+          <span class="hint" id="hintApellidos">Solo letras y espacios</span>
+        </div>
+
+        <div class="form-group">
+          <label for="lugarNacimiento">Lugar de Nacimiento:</label>
+          <input type="text" id="lugarNacimiento" placeholder="Ej. Chiclayo, Lambayeque" required autocomplete="off">
+          <span class="hint">Ciudad o región de procedencia</span>
+        </div>
+
+        <div class="form-group">
+          <label for="direccion">Dirección:</label>
+          <input type="text" id="direccion" placeholder="Ej. Av. José Leonardo Ortiz 250" required autocomplete="off">
+          <span class="hint">Dirección de residencia</span>
+        </div>
+
+        <div class="form-group">
+          <label for="universidad">Universidad:</label>
+          <input type="text" id="universidad" placeholder="Ej. UTP Chiclayo" value="Universidad Tecnológica del Perú" required autocomplete="off">
+          <span class="hint">Institución de educación superior</span>
+        </div>
+
+        <div class="form-group">
+          <label for="tipoSeguro">Tipo de Seguro:</label>
+          <select id="tipoSeguro" required>
+            <option value="">-- Seleccione --</option>
+            <option value="Essalud">Essalud</option>
+            <option value="EPS">EPS</option>
+          </select>
+          <span class="hint">RegEx: /^(Essalud|EPS)$/i</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            ➕ Registrar y Analizar Cadenas
+          </button>
+          <button type="reset" class="btn btn-outline" id="btnLimpiar">
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- SECCIÓN 2: DEMOSTRACIÓN DE OPERACIONES CON CADENAS -->
+    <section class="card" id="seccionCadenas">
+      <div class="card-header">
+        <h2>2. Demostración de Operaciones con Cadenas de Texto</h2>
+        <span class="badge badge-success">Slide 17 & Slide 18</span>
+      </div>
+
+      <div id="resultadoCadenas" class="empty-state">
+        Complete el formulario o pulse "Cargar Ejemplo" para visualizar el desglose técnico de operaciones de cadenas y expresiones regulares.
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: MANEJO DE ARREGLO DENSO DE REGISTROS -->
+    <section class="card">
+      <div class="card-header">
+        <h2>3. Vector de Alumnos Registrados</h2>
+        <div class="vector-status">
+          <span id="vectorLengthBadge" class="badge">Tamaño del vector: 0</span>
+          <span id="vectorTipoBadge" class="badge badge-success">Arreglo Denso: Sí</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table" id="tablaAlumnos">
+          <thead>
+            <tr>
+              <th># (Índice)</th>
+              <th>Nombres y Apellidos</th>
+              <th>Lugar Nacimiento</th>
+              <th>Dirección</th>
+              <th>Universidad</th>
+              <th>Seguro</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTabla">
+            <tr>
+              <td colspan="6" class="text-center">No hay registros almacenados en el vector todavía.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: PROBLEMA DEL SLIDE 14 (ARREGLO DENSO CON CONDICIÓN DE PARADA EN CERO) -->
+    <section class="card">
+      <div class="card-header">
+        <h2>4. Problema Slide 14: Arreglo Numérico hasta Ingreso de Cero</h2>
+        <span class="badge">Suma y Conteo de Componentes</span>
+      </div>
+      <p class="description">
+        <em>"Crear un vector vacío. Mediante una estructura repetitiva solicitar la carga de elementos por teclado hasta que se ingrese el cero. No almacenar dicho valor en el vector. Luego sumar todas las componentes del vector, mostrar dicha suma y el tamaño del vector."</em>
+      </p>
+
+      <div class="interactive-box">
+        <div class="input-inline">
+          <input type="number" id="inputNumero" placeholder="Ingrese número (0 para finalizar)">
+          <button id="btnAgregarNumero" class="btn btn-secondary">Agregar al Vector</button>
+          <button id="btnCargaPromptNumeros" class="btn btn-outline">Cargar varios vía prompt()</button>
+          <button id="btnReiniciarNumeros" class="btn btn-outline">Reiniciar</button>
+        </div>
+
+        <div id="resultadoNumeros" class="stats-panel">
+          <div class="stat-item">
+            <span class="stat-label">Vector actual:</span>
+            <code id="txtVectorNumeros">[]</code>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Cantidad de elementos (length):</span>
+            <strong id="txtCantidadNumeros">0</strong>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Suma total de componentes:</span>
+            <strong id="txtSumaNumeros" class="highlight">0</strong>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Estado de terminación:</span>
+            <span id="txtEstadoCero" class="badge">En espera de ingreso</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <p>JavaScript Avanzado (100000S51T) — Solución desarrollada para la Primera Práctica Calificada (PC1).</p>
+      <p>Créditos profesionales: <strong>Max Anderson Benites Corazón</strong> — Senior Technical Implementation Specialist.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

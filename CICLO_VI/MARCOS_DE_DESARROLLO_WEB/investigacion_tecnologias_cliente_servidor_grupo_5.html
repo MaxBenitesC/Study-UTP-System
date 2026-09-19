@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Grupo 5">
+  <title>Tecnologías del lado del cliente y del servidor</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: #111;
+      background: #eee;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+
+    main {
+      width: 210mm;
+      margin: 20px auto;
+      background: #fff;
+    }
+
+    .sheet {
+      min-height: 297mm;
+      padding: 22mm 24mm;
+      break-after: page;
+    }
+
+    .sheet:last-child { break-after: auto; }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 38mm;
+      text-align: center;
+    }
+
+    .cover img {
+      width: 100mm;
+      height: auto;
+      margin-bottom: 15mm;
+    }
+
+    .cover hr {
+      width: 145mm;
+      margin: 0 0 13mm;
+      border: 0;
+      border-top: 1.5px solid #111;
+    }
+
+    .cover h1 {
+      max-width: 155mm;
+      margin: 5mm 0 20mm;
+      font-size: 23pt;
+      line-height: 1.25;
+    }
+
+    .cover h2 {
+      margin: 0;
+      border: 0;
+      font-size: 16pt;
+      text-transform: uppercase;
+    }
+
+    .cover-data {
+      display: grid;
+      width: 155mm;
+      grid-template-columns: 40mm 1fr;
+      gap: 4mm 7mm;
+      text-align: left;
+    }
+
+    .cover-data dt {
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .cover-data dd { margin: 0; }
+    .cover-data .code { color: #555; }
+    .member + .member { margin-top: 3mm; }
+
+    .date {
+      margin-top: auto;
+      font-weight: bold;
+    }
+
+    h2 {
+      margin: 0 0 7mm;
+      padding-bottom: 2mm;
+      border-bottom: 1px solid #111;
+      font-size: 17pt;
+    }
+
+    h3 {
+      margin: 8mm 0 3mm;
+      font-size: 14pt;
+    }
+
+    h4 {
+      margin: 4mm 0 2mm;
+      font-size: 11pt;
+    }
+
+    p {
+      margin: 0 0 4mm;
+      text-align: justify;
+    }
+
+    ul {
+      margin: 2mm 0 4mm;
+      padding-left: 7mm;
+    }
+
+    li { margin-bottom: 1.5mm; }
+
+    .introduction {
+      margin-bottom: 7mm;
+    }
+
+    table {
+      width: 100%;
+      margin: 5mm 0;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+    }
+
+    th, td {
+      padding: 2.5mm;
+      border: 1px solid #555;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th { background: #eee; }
+
+    a {
+      color: #111;
+      text-decoration: none;
+      overflow-wrap: anywhere;
+    }
+
+    .references {
+      margin: 0;
+      padding: 0;
+      font-size: 9.5pt;
+      list-style: none;
+    }
+
+    .references li {
+      margin-bottom: 3.5mm;
+      padding-left: 9mm;
+      text-indent: -9mm;
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    @media print {
+      body { background: #fff; }
+      main { width: auto; margin: 0; }
+    }
+
+    @media screen and (max-width: 850px) {
+      main { width: 100%; margin: 0; }
+      .sheet { min-height: 100vh; padding: 45px 25px; }
+      .cover-data { width: 100%; grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="sheet cover">
+      <img src="logo_utp.png" alt="Universidad Tecnológica del Perú">
+      <hr>
+      <h2>Trabajo de investigación</h2>
+      <h1>Tecnologías del lado del cliente y del servidor</h1>
+
+      <dl class="cover-data">
+        <dt>Curso:</dt>
+        <dd>Marcos de Desarrollo Web</dd>
+
+        <dt>Grupo:</dt>
+        <dd>5</dd>
+
+        <dt>Integrantes:</dt>
+        <dd>
+          <div class="member">Max Anderson Benites Corazon<br><span class="code">U24217839</span></div>
+          <div class="member">Peter Mendoza Pérez<br><span class="code">U20222764</span></div>
+        </dd>
+
+        <dt>Ciclo:</dt>
+        <dd>VI</dd>
+      </dl>
+
+      <p class="date">Lima, 18 de agosto de 2026</p>
+    </section>
+
+    <section class="sheet">
+      <h2>Sass y LESS</h2>
+
+      <div class="introduction">
+        <p>
+          El lado del cliente se ejecuta en el navegador y se encarga de la interfaz y la interacción con
+          el usuario. El lado del servidor procesa solicitudes, aplica reglas del negocio y consulta bases
+          de datos (MDN Web Docs, 2025). Las tecnologías de esta investigación pertenecen principalmente
+          al lado del cliente.
+        </p>
+      </div>
+
+      <h3>1. Sass</h3>
+      <p>
+        Sass es un preprocesador de estilos que se convierte en CSS antes de llegar al navegador. Sirve
+        para organizar hojas de estilo y evitar la repetición de código, especialmente en proyectos
+        medianos o grandes (Sass, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Variables para colores, tamaños y otros valores.</li>
+        <li>Anidamiento de selectores.</li>
+        <li>Mixins, funciones y módulos reutilizables.</li>
+        <li>Utiliza las sintaxis SCSS y Sass.</li>
+      </ul>
+
+      <h3>2. LESS</h3>
+      <p>
+        LESS también es un preprocesador que amplía CSS y luego genera un archivo CSS normal. Sirve para
+        centralizar valores y reutilizar grupos de estilos. Su sintaxis es muy parecida a CSS, por lo que
+        suele ser sencilla de aprender (Less.js, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Variables identificadas con <strong>@</strong>.</li>
+        <li>Selectores anidados y mixins.</li>
+        <li>Funciones, operaciones y reglas condicionales.</li>
+        <li>Se compila a CSS compatible con el navegador.</li>
+      </ul>
+
+      <p><strong>Diferencia principal:</strong> Sass y LESS cumplen casi la misma función, pero utilizan
+        distinta sintaxis y herramientas de compilación.</p>
+    </section>
+
+    <section class="sheet">
+      <h2>jQuery y Angular</h2>
+
+      <h3>3. jQuery</h3>
+      <p>
+        jQuery es una biblioteca de JavaScript. Sirve para seleccionar y modificar elementos HTML,
+        controlar eventos, crear efectos y realizar solicitudes Ajax utilizando instrucciones breves
+        (jQuery, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Manipulación sencilla del DOM.</li>
+        <li>Manejo de eventos como clics y envío de formularios.</li>
+        <li>Efectos, animaciones y solicitudes Ajax.</li>
+        <li>Compatibilidad con sistemas web antiguos.</li>
+      </ul>
+      <p>
+        Actualmente JavaScript moderno realiza muchas de estas tareas sin jQuery. Sin embargo, la
+        biblioteca sigue presente en numerosos proyectos existentes.
+      </p>
+
+      <h3>4. Angular</h3>
+      <p>
+        Angular es un framework web mantenido por Google. Sirve para crear aplicaciones completas y
+        organizadas, principalmente aplicaciones empresariales o de una sola página. Proporciona varias
+        herramientas oficiales dentro de una misma plataforma (Angular, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Arquitectura basada en componentes.</li>
+        <li>Uso principal de TypeScript.</li>
+        <li>Inyección de dependencias.</li>
+        <li>Enrutamiento, formularios y cliente HTTP integrados.</li>
+        <li>Soporte para renderizado del lado del servidor.</li>
+      </ul>
+      <p>
+        Angular ofrece una estructura completa, aunque requiere más aprendizaje que una biblioteca
+        pequeña como jQuery.
+      </p>
+    </section>
+
+    <section class="sheet">
+      <h2>React y Vue</h2>
+
+      <h3>5. React</h3>
+      <p>
+        React es una biblioteca de JavaScript desarrollada para construir interfaces de usuario. Sirve
+        para dividir una pantalla en componentes reutilizables que se actualizan cuando cambia la
+        información de la aplicación (React, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Componentes reutilizables.</li>
+        <li>Sintaxis JSX para combinar marcado y JavaScript.</li>
+        <li>Manejo de estado mediante Hooks.</li>
+        <li>Flujo de datos principalmente unidireccional.</li>
+        <li>Amplio ecosistema de herramientas.</li>
+      </ul>
+      <p>
+        React es flexible, pero necesita herramientas adicionales para funciones como el enrutamiento de
+        una aplicación completa.
+      </p>
+
+      <h3>6. Vue</h3>
+      <p>
+        Vue es un framework progresivo de JavaScript. Sirve tanto para añadir interactividad a una página
+        existente como para construir una aplicación completa. Puede incorporarse gradualmente según las
+        necesidades del proyecto (Vue.js, s. f.).
+      </p>
+      <h4>Características</h4>
+      <ul>
+        <li>Sistema de reactividad.</li>
+        <li>Plantillas y directivas como <strong>v-if</strong> y <strong>v-for</strong>.</li>
+        <li>Componentes de archivo único con extensión <strong>.vue</strong>.</li>
+        <li>Curva de aprendizaje accesible.</li>
+        <li>Soporte para aplicaciones SPA y renderizado en servidor.</li>
+      </ul>
+      <p>
+        Vue combina una estructura clara con facilidad de adopción, por lo que resulta apropiado para
+        proyectos pequeños y medianos.
+      </p>
+    </section>
+
+    <section class="sheet">
+      <h2>Síntesis y referencias</h2>
+
+      <table>
+        <thead>
+          <tr><th>Tecnología</th><th>Tipo</th><th>Uso principal</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Sass</td><td>Preprocesador CSS</td><td>Organizar y reutilizar estilos.</td></tr>
+          <tr><td>LESS</td><td>Preprocesador CSS</td><td>Extender CSS con variables y mixins.</td></tr>
+          <tr><td>jQuery</td><td>Biblioteca JavaScript</td><td>Manipular HTML y manejar eventos.</td></tr>
+          <tr><td>Angular</td><td>Framework frontend</td><td>Crear aplicaciones completas y estructuradas.</td></tr>
+          <tr><td>React</td><td>Biblioteca de interfaz</td><td>Construir interfaces mediante componentes.</td></tr>
+          <tr><td>Vue</td><td>Framework progresivo</td><td>Crear interfaces y aplicaciones de adopción gradual.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Conclusión</h3>
+      <p>
+        Sass y LESS se utilizan para mejorar la escritura de CSS; jQuery simplifica tareas de JavaScript;
+        y Angular, React y Vue permiten construir interfaces mediante componentes. Todas son tecnologías
+        principalmente del lado del cliente. La elección depende del tamaño del proyecto, la experiencia
+        del equipo y el nivel de estructura requerido.
+      </p>
+
+      <h3>Referencias</h3>
+      <ul class="references">
+        <li>Angular. (s. f.). <em>What is Angular?</em> Recuperado el 18 de agosto de 2026, de <a href="https://angular.dev/overview">https://angular.dev/overview</a></li>
+        <li>jQuery. (s. f.). <em>jQuery</em>. OpenJS Foundation. Recuperado el 18 de agosto de 2026, de <a href="https://jquery.com/">https://jquery.com/</a></li>
+        <li>Less.js. (s. f.). <em>Features in-depth</em>. Recuperado el 18 de agosto de 2026, de <a href="https://lesscss.org/features/">https://lesscss.org/features/</a></li>
+        <li>MDN Web Docs. (2025, 24 de junio). <em>Introduction to the server side</em>. Mozilla. <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Introduction">https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Introduction</a></li>
+        <li>React. (s. f.). <em>React</em>. Meta Open Source. Recuperado el 18 de agosto de 2026, de <a href="https://react.dev/">https://react.dev/</a></li>
+        <li>Sass. (s. f.). <em>Documentation</em>. Recuperado el 18 de agosto de 2026, de <a href="https://sass-lang.com/documentation/">https://sass-lang.com/documentation/</a></li>
+        <li>Vue.js. (s. f.). <em>Introduction</em>. Recuperado el 18 de agosto de 2026, de <a href="https://vuejs.org/guide/introduction.html">https://vuejs.org/guide/introduction.html</a></li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

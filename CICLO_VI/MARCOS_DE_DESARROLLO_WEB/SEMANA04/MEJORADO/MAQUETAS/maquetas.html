@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Maquetación — Veterinaria Chumpitaz</title>
+  <style>
+    :root {
+      --green-950: #073d31;
+      --green-900: #0a4b3c;
+      --green-700: #117a61;
+      --green-500: #1eaa83;
+      --mint-100: #e9f7f2;
+      --mint-50: #f5fbf8;
+      --orange: #f59e42;
+      --ink: #18312b;
+      --muted: #677b75;
+      --line: #dce9e4;
+      --white: #ffffff;
+      --shadow: 0 18px 45px rgba(7, 61, 49, .12);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #edf3f0; color: var(--ink); font-family: Inter, "Segoe UI", Arial, sans-serif; }
+    [hidden] { display: none !important; }
+
+    .screen {
+      width: 1440px;
+      height: 900px;
+      overflow: hidden;
+      background: var(--mint-50);
+      position: relative;
+    }
+
+    .topbar { height: 30px; padding: 7px 64px; color: #d8eee7; background: #052e26; font-size: 12px; }
+    .nav { height: 78px; display: flex; align-items: center; padding: 0 64px; background: var(--white); border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.4px; font-size: 22px; color: var(--green-950); }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; background: var(--green-700); color: white; border-radius: 13px; font-size: 22px; }
+    .nav-links { display: flex; gap: 30px; margin-left: auto; align-items: center; font-size: 14px; font-weight: 600; }
+    .nav-links span.active { color: var(--green-700); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 11px; padding: 13px 22px; font-weight: 750; font-size: 14px; border: 0; }
+    .btn-primary { background: var(--green-700); color: white; box-shadow: 0 9px 24px rgba(17, 122, 97, .22); }
+    .btn-light { background: white; color: var(--green-900); border: 1px solid var(--line); }
+    .page { padding: 38px 64px; }
+    .eyebrow { margin: 0 0 8px; color: var(--green-700); text-transform: uppercase; letter-spacing: 1.7px; font-size: 12px; font-weight: 850; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { font-size: 52px; line-height: 1.06; letter-spacing: -1.8px; }
+    h2 { font-size: 31px; letter-spacing: -.7px; }
+    h3 { font-size: 17px; }
+    .muted { color: var(--muted); }
+    .footer-note { position: absolute; bottom: 14px; left: 64px; right: 64px; color: #799089; font-size: 11px; display: flex; justify-content: space-between; }
+
+    /* Inicio */
+    .hero { display: grid; grid-template-columns: 1.1fr .9fr; min-height: 410px; padding: 56px 64px 38px; background: linear-gradient(135deg, #f5fbf8 0%, #e1f3ec 100%); }
+    .hero-copy { max-width: 650px; }
+    .hero-copy p { font-size: 18px; line-height: 1.55; max-width: 585px; }
+    .hero-actions { display: flex; gap: 14px; margin-top: 28px; }
+    .hero-art { position: relative; display: grid; place-items: center; }
+    .blob { width: 460px; height: 330px; border-radius: 42% 58% 52% 48%; background: linear-gradient(145deg, #148267, #0a4b3c); transform: rotate(-4deg); box-shadow: var(--shadow); }
+    .pet-card { position: absolute; width: 330px; height: 240px; border-radius: 28px; background: rgba(255,255,255,.95); box-shadow: var(--shadow); padding: 28px; transform: rotate(3deg); }
+    .pet-card .emoji { font-size: 92px; text-align: center; }
+    .pet-card strong { display: block; color: var(--green-900); text-align: center; font-size: 20px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 26px 64px; background: white; }
+    .quick { padding: 20px; border: 1px solid var(--line); border-radius: 16px; background: white; }
+    .quick b { display: block; margin: 9px 0 5px; }
+    .icon { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; background: var(--mint-100); color: var(--green-700); font-size: 20px; }
+
+    /* Servicios */
+    .section-heading { display: flex; justify-content: space-between; align-items: end; margin-bottom: 23px; }
+    .tabs { display: flex; gap: 9px; }
+    .pill { padding: 9px 16px; border-radius: 99px; background: white; border: 1px solid var(--line); color: var(--muted); font-size: 13px; font-weight: 700; }
+    .pill.active { background: var(--green-700); color: white; border-color: var(--green-700); }
+    .card-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .service-card { overflow: hidden; border-radius: 18px; border: 1px solid var(--line); background: white; box-shadow: 0 8px 22px rgba(7,61,49,.06); }
+    .service-visual { height: 125px; display: grid; place-items: center; font-size: 60px; background: linear-gradient(140deg, #e4f6ef, #c9ebdf); }
+    .service-body { padding: 18px; }
+    .service-body p { min-height: 42px; line-height: 1.45; font-size: 13px; }
+    .price { color: var(--green-700); font-size: 17px; font-weight: 850; }
+    .product-strip { margin-top: 26px; padding: 21px 24px; display: grid; grid-template-columns: 1.25fr repeat(3, 1fr); gap: 18px; background: var(--green-950); border-radius: 20px; color: white; }
+    .product { padding: 13px; border-radius: 13px; background: rgba(255,255,255,.09); }
+    .product small { color: #b9d9cf; }
+
+    /* Citas */
+    .booking-layout { display: grid; grid-template-columns: 1.35fr .65fr; gap: 28px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 20px; padding: 26px; box-shadow: 0 10px 28px rgba(7,61,49,.07); }
+    .stepper { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+    .step { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .step-number { width: 27px; height: 27px; border-radius: 50%; display: grid; place-items: center; background: #dcebe6; }
+    .step.active { color: var(--green-700); }
+    .step.active .step-number { background: var(--green-700); color: white; }
+    .step-line { flex: 1; height: 2px; background: var(--line); }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 17px; }
+    .field label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 750; }
+    .input { height: 46px; padding: 13px; border: 1px solid #cbdcd6; border-radius: 10px; color: #3e554e; background: #fbfdfc; font-size: 13px; }
+    .slots { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .slot { padding: 9px 12px; border-radius: 9px; background: var(--mint-100); color: var(--green-900); font-size: 12px; font-weight: 750; }
+    .slot.selected { background: var(--green-700); color: white; }
+    .summary { background: var(--green-950); color: white; }
+    .summary h2 { font-size: 25px; }
+    .summary-row { display: flex; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,.13); font-size: 13px; }
+    .summary-row span { color: #bbd8cf; }
+    .summary .btn { width: 100%; margin-top: 24px; background: var(--orange); color: #3d2510; }
+    .notice { margin-top: 16px; padding: 13px; background: rgba(255,255,255,.08); border-radius: 10px; color: #d2e7e0; font-size: 11px; line-height: 1.45; }
+
+    /* Administración */
+    .admin { display: grid; grid-template-columns: 230px 1fr; height: 900px; background: #f3f7f5; }
+    .sidebar { padding: 28px 22px; background: var(--green-950); color: white; }
+    .sidebar .brand { color: white; font-size: 18px; margin-bottom: 36px; }
+    .side-item { padding: 13px 14px; margin: 5px 0; border-radius: 10px; color: #bcd7ce; font-size: 13px; }
+    .side-item.active { color: white; background: rgba(255,255,255,.12); }
+    .admin-main { padding: 30px 34px; }
+    .admin-head { display: flex; justify-content: space-between; align-items: center; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 22px 0; }
+    .metric { padding: 19px; background: white; border: 1px solid var(--line); border-radius: 15px; }
+    .metric strong { display: block; font-size: 29px; margin-top: 8px; color: var(--green-900); }
+    .table-wrap { background: white; border: 1px solid var(--line); border-radius: 17px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { text-align: left; padding: 14px 16px; background: #edf6f2; color: #577069; }
+    td { padding: 15px 16px; border-top: 1px solid #e7efec; }
+    .status { display: inline-block; padding: 6px 9px; border-radius: 99px; font-size: 10px; font-weight: 800; }
+    .confirmed { color: #0d6b50; background: #dff5ec; }
+    .pending { color: #915615; background: #fff0d7; }
+    .cancelled { color: #963637; background: #fde6e6; }
+    .admin-bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+    .chart { height: 185px; background: white; border: 1px solid var(--line); border-radius: 17px; padding: 18px; }
+    .bars { display: flex; align-items: end; gap: 14px; height: 115px; margin-top: 10px; }
+    .bar { flex: 1; background: linear-gradient(#1eaa83,#0f745b); border-radius: 7px 7px 2px 2px; }
+
+    /* Móvil */
+    .mobile-stage { height: 900px; display: grid; grid-template-columns: 1fr 510px 1fr; align-items: center; background: linear-gradient(135deg,#073d31,#0f745b); }
+    .mobile-copy { color: white; padding-left: 80px; }
+    .mobile-copy h1 { font-size: 47px; }
+    .mobile-copy p { max-width: 410px; color: #c7e2d9; font-size: 17px; line-height: 1.55; }
+    .phone { width: 410px; height: 820px; margin: auto; border: 12px solid #16211e; border-radius: 48px; overflow: hidden; background: white; box-shadow: 0 28px 80px rgba(0,0,0,.36); }
+    .phone-top { height: 28px; background: #16211e; color: white; text-align: center; font-size: 10px; padding-top: 5px; }
+    .m-nav { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
+    .m-brand { font-size: 14px; font-weight: 850; color: var(--green-900); }
+    .m-hero { padding: 26px 18px; background: var(--mint-100); }
+    .m-hero h2 { font-size: 28px; margin-bottom: 10px; }
+    .m-hero p { font-size: 13px; line-height: 1.45; }
+    .m-card { margin: 14px 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; }
+    .m-field { height: 41px; margin-top: 8px; padding: 11px; border: 1px solid #cbdcd6; border-radius: 9px; color: #60746e; font-size: 11px; }
+    .m-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .m-button { margin: 14px 16px; padding: 14px; text-align: center; border-radius: 11px; color: white; background: var(--green-700); font-weight: 800; font-size: 13px; }
+    .mobile-points { color: white; padding-right: 65px; }
+    .mobile-points div { padding: 16px; margin: 12px 0; border-radius: 13px; background: rgba(255,255,255,.10); }
+    .mobile-points strong { display: block; margin-bottom: 5px; }
+    .mobile-points span { color: #c7e2d9; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <section class="screen" data-view="inicio">
+    <div class="topbar">Atención veterinaria responsable · Lima, Perú · Datos de contacto por confirmar con la empresa</div>
+    <nav class="nav">
+      <div class="brand"><span class="brand-mark">🐾</span> Veterinaria Chumpitaz</div>
+      <div class="nav-links"><span class="active">Inicio</span><span>Servicios</span><span>Productos</span><span>Nosotros</span><span>Contacto</span><span class="btn btn-primary">Reservar cita</span></div>
+    </nav>
+    <div class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Salud y bienestar para tu mascota</p>
+        <h1>Cuidamos a quienes hacen feliz tu hogar.</h1>
+        <p class="muted">Consulta nuestros servicios veterinarios y solicita una cita en pocos pasos, desde cualquier dispositivo.</p>
+        <div class="hero-actions"><span class="btn btn-primary">Agendar una cita</span><span class="btn btn-light">Conocer servicios</span></div>
+      </div>
+      <div class="hero-art"><div class="blob"></div><div class="pet-card"><div class="emoji">🐶 🐱</div><strong>Atención cercana y profesional</strong></div></div>
+    </div>
+    <div class="quick-grid">
+      <div class="quick"><span class="icon">🩺</span><b>Consulta general</b><small class="muted">Evaluación y orientación veterinaria.</small></div>
+      <div class="quick"><span class="icon">💉</span><b>Vacunación</b><small class="muted">Programas preventivos para mascotas.</small></div>
+      <div class="quick"><span class="icon">✂</span><b>Baño y grooming</b><small class="muted">Cuidado e higiene especializada.</small></div>
+      <div class="quick"><span class="icon">📅</span><b>Reserva organizada</b><small class="muted">Selecciona servicio, fecha y horario.</small></div>
+    </div>
+    <div class="footer-note"><span>Maqueta 1 · Página de inicio</span><span>Propuesta visual — Avance 01</span></div>
+  </section>
+
+  <section class="screen" data-view="servicios" hidden>
+    <div class="topbar">Catálogo informativo · Precios y disponibilidad sujetos a confirmación</div>
+    <nav class="nav"><div class="brand"><span class="brand-mark">🐾</span> Veterinaria Chumpitaz</div><div class="nav-links"><span>Inicio</span><span class="active">Servicios</span><span>Productos</span><span>Nosotros</span><span>Contacto</span><span class="btn btn-primary">Reservar cita</span></div></nav>
+    <main class="page">
+      <div class="section-heading"><div><p class="eyebrow">Cuidado integral</p><h2>Servicios y productos</h2><p class="muted">Información clara para elegir la atención que necesita cada mascota.</p></div><div class="tabs"><span class="pill active">Servicios</span><span class="pill">Productos</span><span class="pill">Promociones</span></div></div>
+      <div class="card-grid">
+        <article class="service-card"><div class="service-visual">🩺</div><div class="service-body"><h3>Consulta general</h3><p class="muted">Evaluación clínica, orientación preventiva y seguimiento.</p><span class="price">Tarifa por confirmar</span></div></article>
+        <article class="service-card"><div class="service-visual">💉</div><div class="service-body"><h3>Vacunación</h3><p class="muted">Programación de vacunas de acuerdo con la edad y condición.</p><span class="price">Tarifa por confirmar</span></div></article>
+        <article class="service-card"><div class="service-visual">🔬</div><div class="service-body"><h3>Evaluación especializada</h3><p class="muted">Revisión y derivación según las necesidades de la mascota.</p><span class="price">Sujeto a evaluación</span></div></article>
+        <article class="service-card"><div class="service-visual">✂️</div><div class="service-body"><h3>Baño y grooming</h3><p class="muted">Higiene, corte y cuidado estético especializado.</p><span class="price">Tarifa por confirmar</span></div></article>
+      </div>
+      <div class="product-strip">
+        <div><p class="eyebrow" style="color:#f5b66e">Catálogo referencial</p><h2>Productos para su bienestar</h2><p style="color:#bed9d1">El sistema mostrará nombre, descripción, imagen, precio y disponibilidad registrada.</p></div>
+        <div class="product"><b>Alimento balanceado</b><br><small>Diferentes etapas y tamaños.</small></div>
+        <div class="product"><b>Higiene y cuidado</b><br><small>Productos seleccionados.</small></div>
+        <div class="product"><b>Accesorios</b><br><small>Opciones para paseo y descanso.</small></div>
+      </div>
+    </main>
+    <div class="footer-note"><span>Maqueta 2 · Catálogo de servicios y productos</span><span>Los datos comerciales definitivos serán proporcionados por la veterinaria</span></div>
+  </section>
+
+  <section class="screen" data-view="citas" hidden>
+    <div class="topbar">Solicitud de citas en línea · La confirmación depende de la disponibilidad registrada</div>
+    <nav class="nav"><div class="brand"><span class="brand-mark">🐾</span> Veterinaria Chumpitaz</div><div class="nav-links"><span>Inicio</span><span>Servicios</span><span class="active">Reservar cita</span><span>Contacto</span></div></nav>
+    <main class="page">
+      <p class="eyebrow">Reserva en línea</p><h2>Solicita una cita para tu mascota</h2>
+      <div class="booking-layout">
+        <div class="panel">
+          <div class="stepper"><div class="step active"><span class="step-number">1</span>Datos</div><span class="step-line"></span><div class="step active"><span class="step-number">2</span>Servicio</div><span class="step-line"></span><div class="step active"><span class="step-number">3</span>Horario</div><span class="step-line"></span><div class="step"><span class="step-number">4</span>Confirmación</div></div>
+          <div class="form-grid">
+            <div class="field"><label>Nombre del propietario</label><div class="input">María López</div></div>
+            <div class="field"><label>Teléfono de contacto</label><div class="input">999 000 000</div></div>
+            <div class="field"><label>Nombre de la mascota</label><div class="input">Luna</div></div>
+            <div class="field"><label>Especie</label><div class="input">Canino</div></div>
+            <div class="field"><label>Servicio solicitado</label><div class="input">Consulta general</div></div>
+            <div class="field"><label>Fecha seleccionada</label><div class="input">05/09/2026</div></div>
+          </div>
+          <div class="field" style="margin-top:18px"><label>Horarios disponibles</label><div class="slots"><span class="slot">09:00</span><span class="slot">10:30</span><span class="slot selected">11:30</span><span class="slot">15:00</span><span class="slot">16:30</span></div></div>
+          <div class="field" style="margin-top:18px"><label>Motivo de consulta</label><div class="input" style="height:70px">Control preventivo y consulta general.</div></div>
+        </div>
+        <aside class="panel summary"><p class="eyebrow" style="color:#f5b66e">Resumen</p><h2>Revisa tu solicitud</h2><div class="summary-row"><span>Mascota</span><b>Luna · Canino</b></div><div class="summary-row"><span>Servicio</span><b>Consulta general</b></div><div class="summary-row"><span>Fecha</span><b>05 sep. 2026</b></div><div class="summary-row"><span>Hora</span><b>11:30</b></div><div class="summary-row"><span>Estado inicial</span><b>Pendiente</b></div><div class="btn">Enviar solicitud</div><div class="notice">La reserva quedará pendiente hasta que la veterinaria confirme el horario. Los datos mostrados son referenciales para la maqueta.</div></aside>
+      </div>
+    </main>
+    <div class="footer-note"><span>Maqueta 3 · Solicitud de cita</span><span>Flujo propuesto: datos → servicio → horario → confirmación</span></div>
+  </section>
+
+  <section class="screen" data-view="admin" hidden>
+    <div class="admin">
+      <aside class="sidebar"><div class="brand"><span class="brand-mark">🐾</span> Chumpitaz</div><div class="side-item active">▣ Panel principal</div><div class="side-item">▦ Solicitudes de citas</div><div class="side-item">♟ Clientes y mascotas</div><div class="side-item">✚ Servicios</div><div class="side-item">▤ Productos</div><div class="side-item">⚙ Configuración</div><div style="position:absolute;bottom:30px;color:#9cc3b7;font-size:11px">Sesión: Administrador<br>Prototipo académico</div></aside>
+      <main class="admin-main">
+        <div class="admin-head"><div><p class="eyebrow">Panel administrativo</p><h2>Gestión de citas</h2><p class="muted">Vista propuesta para organizar las solicitudes registradas.</p></div><span class="btn btn-primary">+ Nueva cita</span></div>
+        <div class="metrics"><div class="metric"><span class="muted">Citas de hoy</span><strong>12</strong><small style="color:#117a61">3 pendientes</small></div><div class="metric"><span class="muted">Confirmadas</span><strong>8</strong><small class="muted">66,7 % del día</small></div><div class="metric"><span class="muted">Próxima atención</span><strong>10:30</strong><small class="muted">Consulta general</small></div><div class="metric"><span class="muted">Solicitudes nuevas</span><strong>5</strong><small style="color:#b76b16">Requieren revisión</small></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Hora</th><th>Propietario</th><th>Mascota</th><th>Servicio</th><th>Estado</th><th>Acción</th></tr></thead><tbody><tr><td>09:00</td><td>Ana Torres</td><td>Max · Canino</td><td>Vacunación</td><td><span class="status confirmed">Confirmada</span></td><td>Ver detalle</td></tr><tr><td>10:30</td><td>Luis Ramos</td><td>Michi · Felino</td><td>Consulta general</td><td><span class="status confirmed">Confirmada</span></td><td>Ver detalle</td></tr><tr><td>11:30</td><td>María López</td><td>Luna · Canino</td><td>Consulta general</td><td><span class="status pending">Pendiente</span></td><td>Confirmar</td></tr><tr><td>15:00</td><td>Jorge Salas</td><td>Nala · Felino</td><td>Baño y grooming</td><td><span class="status cancelled">Cancelada</span></td><td>Reprogramar</td></tr></tbody></table></div>
+        <div class="admin-bottom"><div class="chart"><b>Solicitudes por día</b><div class="bars"><span class="bar" style="height:45%"></span><span class="bar" style="height:60%"></span><span class="bar" style="height:72%"></span><span class="bar" style="height:54%"></span><span class="bar" style="height:88%"></span><span class="bar" style="height:68%"></span><span class="bar" style="height:40%"></span></div></div><div class="chart"><b>Servicios más solicitados</b><p class="muted" style="font-size:12px;margin-top:15px">Consulta general</p><div style="height:9px;background:#dbece6;border-radius:9px"><div style="width:78%;height:9px;background:#117a61;border-radius:9px"></div></div><p class="muted" style="font-size:12px;margin:14px 0 4px">Vacunación</p><div style="height:9px;background:#dbece6;border-radius:9px"><div style="width:57%;height:9px;background:#1eaa83;border-radius:9px"></div></div><p class="muted" style="font-size:12px;margin:14px 0 4px">Baño y grooming</p><div style="height:9px;background:#dbece6;border-radius:9px"><div style="width:42%;height:9px;background:#f59e42;border-radius:9px"></div></div></div></div>
+      </main>
+    </div>
+    <div class="footer-note"><span>Maqueta 4 · Panel administrativo</span><span>Datos ficticios usados únicamente para representar la interfaz</span></div>
+  </section>
+
+  <section class="screen" data-view="movil" hidden>
+    <div class="mobile-stage">
+      <div class="mobile-copy"><p class="eyebrow" style="color:#f5b66e">Diseño responsive</p><h1>La atención también debe funcionar desde el celular.</h1><p>La disposición se reorganiza para conservar legibilidad, botones táctiles y un flujo breve de reserva.</p></div>
+      <div class="phone"><div class="phone-top">9:41</div><div class="m-nav"><span class="m-brand">🐾 VETERINARIA CHUMPITAZ</span><span>☰</span></div><div class="m-hero"><p class="eyebrow">Reserva en línea</p><h2>Agenda una cita</h2><p class="muted">Completa los datos y selecciona un horario disponible.</p></div><div class="m-card"><b>Datos de la mascota</b><div class="m-field">Nombre de la mascota</div><div class="m-row"><div class="m-field">Especie</div><div class="m-field">Edad</div></div></div><div class="m-card"><b>Servicio y horario</b><div class="m-field">Seleccionar servicio</div><div class="m-row"><div class="m-field">Fecha</div><div class="m-field">Hora</div></div></div><div class="m-button">Continuar reserva</div></div>
+      <div class="mobile-points"><div><strong>Mobile first</strong><span>Componentes organizados para pantallas pequeñas.</span></div><div><strong>Accesibilidad</strong><span>Contraste, jerarquía y controles fáciles de identificar.</span></div><div><strong>Menos pasos</strong><span>El usuario completa la solicitud sin desplazamientos innecesarios.</span></div></div>
+    </div>
+  </section>
+
+  <script>
+    const vista = new URLSearchParams(location.search).get("vista") || "inicio";
+    document.querySelectorAll("[data-view]").forEach((pantalla) => {
+      pantalla.hidden = pantalla.dataset.view !== vista;
+    });
+  </script>
+</body>
+</html>
