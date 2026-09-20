@@ -6,7 +6,7 @@
 # ==============================================================================
 set -euo pipefail
 
-REMOTE_NAME="${1:-gdrive}"
+REMOTE_NAME="${1:-GoogleDrive}"
 DRIVE_FOLDER="UTP_Documentos_Backup"
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
