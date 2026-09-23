@@ -57,6 +57,16 @@ GEMINI.md
 *.tar.gz
 *.gz
 
+# Multimedia y grabaciones (respaldados en Google Drive via rclone)
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.mp3
+*.wav
+*.m4a
+
 # Python cache
 __pycache__/
 *.py[cod]

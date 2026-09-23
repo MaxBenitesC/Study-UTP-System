@@ -15,6 +15,8 @@ Este archivo funciona como memoria persistente del avance realizado en el curso.
 | 3 | Formulación de estrategias, Tarea FODA y Foro de estrategias | 100% descargados en `SEMANA03/MATERIALES` | Foro e Informe FODA preparados |
 | 4 | Modelos de negocio (CANVAS), conexión con cliente y Foro Cinepapaya | 100% descargados en `SEMANA04/MATERIALES` | Foro preparado y validado con rúbrica |
 | 5 | Contabilidad de gestión y Tarea calificada APF1 (Avance Proyecto Final 1) | 100% descargados y verificados en `SEMANA05/MATERIALES` | Informe APF1 terminado en DOCX, PDF y MD (Alicorp S.A.A.) listo para entrega |
+| 6 | Contabilidad financiera: Balance Sheet, Income Statement, Cash Flow y Caso EEFF | 100% descargados y verificados en `SEMANA06/MATERIALES` | Materiales listos y tarea (Caso Zara SAC) identificada |
+| 7 | Gestión financiera: Ratios financieros, EEFF Coca-Cola y Tarea Análisis Financiero | 100% descargados y verificados en `SEMANA07/MATERIALES` | Tarea no calificada (Análisis Financiero Coca-Cola) identificada |
 
 ## Semana 1
 
@@ -124,6 +126,52 @@ Directorio: `SEMANA05/MATERIALES`
   3. *Elaboración de conclusiones (4 pts):* 4 conclusiones estratégicas y cuantitativas alineadas al diagnóstico.
   4. *Presentación y formato APA (2 pts):* Citas, referencias y jerarquía formal.
   5. *Ortografía y redacción (2 pts):* Redacción impecable de nivel corporativo.
+
+## Semana 6
+
+### Materiales oficiales conservados
+
+Directorio: `SEMANA06/MATERIALES`
+
+- `Introduccion_a_la_contabilidad_financiera.pdf`: Infografía oficial sobre fundamentos y finalidad de la contabilidad financiera.
+- `Balance_general_ejercicio_de_aplicacion.pdf`: Ejercicio práctico de aplicación de análisis e interpretación del Balance General.
+- `Guia_video_demostrativo_balance_sheet.pdf`: Guía y transcripción completa del video explicativo sobre la estructuración del Balance Sheet.
+- `Video_demostrativo_balance_sheet.mp4`: Video explicativo descargado en calidad oficial (resolución práctica del ejercicio).
+- `Semana_06_Caso_Estado_Financiero.docx`: Documento con el enunciado del caso práctico "Importaciones Zara SAC".
+- `EEFF_Balance_Sheet_Plantilla.xlsx`: Archivo Excel con las hojas de trabajo *Solucionario* y *Formatos* para el Estado de Situación Financiera.
+- Contenidos interactivos en plataforma:
+  - *Tema 01:* Balance Sheet (Articulate Storyline).
+  - *Tema 01:* Income Statement / Estado de Resultados (Articulate Storyline).
+  - *Tema 01:* Cash Flow Statement / Estado de Flujo de Efectivo (Articulate Storyline).
+  - *Cierre de semana:* Conclusiones de la semana (actividad interactiva H5P Drag & Drop).
+
+### Tarea de la semana: Caso Estado Financiero
+
+- **Tipo:** Tarea no calificada (consolidación de aprendizaje).
+- **Consigna:** Analizar el caso de "Importaciones Zara SAC", estructurar el Balance Sheet a partir de la información contable y presentar el informe con carátula y resultados en Excel/Word.
+
+## Semana 7
+
+### Materiales oficiales conservados
+
+Directorio: `SEMANA07/MATERIALES`
+
+- `Guia_podcast_como_funcionan_las_finanzas.pdf`: Guía y transcripción del podcast introductorio sobre funcionamiento de las finanzas.
+- `Guia_video_introduccion_a_la_gestion_financiera.pdf`: Guía y transcripción completa del video explicativo "Introducción a la gestión financiera".
+- `Video_introduccion_a_la_gestion_financiera.mp4`: Video explicativo descargado en calidad oficial (43.7 MB).
+- `Semana_07_EEFF_Coca_Cola.pdf`: Estados Financieros Consolidados y Auditados de Coca-Cola FEMSA (87 páginas).
+- `Semana_07_Plantilla_Analisis_Financiero.xlsx`: Hoja de cálculo oficial para el cálculo e interpretación de ratios financieros (liquidez, solvencia y rentabilidad).
+- Contenidos interactivos en plataforma:
+  - *Tema 01:* Conceptos básicos financieros (Articulate Storyline).
+  - *Tema 01:* Principales indicadores de la gestión financiera (Articulate Storyline).
+  - *Cierre de semana:* Conclusiones de la semana (actividad interactiva H5P DragText).
+  - *Video en YouTube:* [Introducción a la gestión financiera](https://www.youtube.com/embed/I4LtLgrE_3Y).
+
+### Tarea de la semana: Análisis Financieros
+
+- **Tipo:** Tarea no calificada (consolidación de aprendizajes).
+- **Periodo:** 21 de septiembre de 2026 al 27 de septiembre de 2026.
+- **Consigna:** Realizar el análisis financiero de la empresa Coca-Cola FEMSA a partir del cálculo de los indicadores en la plantilla Excel (`Semana_07_Plantilla_Analisis_Financiero.xlsx`), interpretando los ratios e incluyendo carátula y conclusiones.
 
 ## Verificaciones realizadas en UTP+Class
 
