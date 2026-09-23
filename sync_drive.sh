@@ -45,9 +45,11 @@ rclone copy "$PROJECT_DIR" "$REMOTE_NAME:$DRIVE_FOLDER" \
     --include "*.mp3" \
     --include "*.wav" \
     --include "*.m4a" \
+    --drive-chunk-size 64M \
+    --fast-list \
+    --transfers=2 \
+    --checkers=16 \
     --progress \
-    --transfers=4 \
-    --checkers=8 \
     ${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}
 
 echo "------------------------------------------------------------------------------"
